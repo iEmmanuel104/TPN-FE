@@ -1,0 +1,38 @@
+[
+    {
+        "username": "testdev1",
+        "id": "5e1df544-d144-4658-b502-568185147a41",
+        "firstName": "johnny",
+        "lastName": "drille",
+        "displayImage": null,
+        "role": null,
+        "profile": null
+    },
+    {
+        "username": "testdev12",
+        "id": "5e1df544-d144-4658-b502-568185147a45",
+        "firstName": "johnny",
+        "lastName": "drille",
+        "displayImage": null,
+        "role": null,
+        "profile": null
+    },
+    {
+        "username": "testdev3",
+        "id": "5e1df544-d144-4658-b502-568185147a42",
+        "firstName": "johnny",
+        "lastName": "drille",
+        "displayImage": null,
+        "role": null,
+        "profile": null
+    },
+    {
+        "username": "testdev4",
+        "id": "5e1df544-d144-4658-b502-568185147a43",
+        "firstName": "johnny",
+        "lastName": "drille",
+        "displayImage": null,
+        "role": null,
+        "profile": null
+    }
+]

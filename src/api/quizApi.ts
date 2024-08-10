@@ -1,0 +1,62 @@
+// src/api/quizApi.ts
+import { apiSlice } from './api';
+import { UserCourseDto } from './courseApi';
+
+export interface IQuiz {
+    id: number;
+    courseId: string;
+    question: string;
+    options: { text: string; option: string }[];
+    answer?: string;
+}
+
+export interface IAnswer {
+    questionId: string;
+    optionId: string;
+}
+
+export interface IGradeQuizResponse {
+    userCourse: UserCourseDto; // Replace 'any' with your UserCourse interface
+    grade: number;
+    passed: boolean;
+}
+
+export const quizApiSlice = apiSlice.injectEndpoints({
+    endpoints: (builder) => ({
+        createQuiz: builder.mutation<IQuiz[], { courseId: string; questions: IQuiz[]; benchmark?: number }>({
+            query: (quizData) => ({
+                url: '/quiz',
+                method: 'POST',
+                body: quizData,
+            }),
+            invalidatesTags: ['Quiz'],
+        }),
+        updateQuiz: builder.mutation<IQuiz, { id: string; quizData: Partial<IQuiz> }>({
+            query: ({ id, quizData }) => ({
+                url: `/quiz?id=${id}`,
+                method: 'PATCH',
+                body: quizData,
+            }),
+            invalidatesTags: ['Quiz'],
+        }),
+        gradeQuiz: builder.mutation<IGradeQuizResponse, { courseId: string; answers: IAnswer[] }>({
+            query: (gradeData) => ({
+                url: '/quiz/grade',
+                method: 'POST',
+                body: gradeData,
+            }),
+            invalidatesTags: ['Quiz', 'UserCourse'],
+        }),
+        requestQuiz: builder.query<IQuiz[], string>({
+            query: (courseId) => `/quiz?courseId=${courseId}`,
+            providesTags: ['Quiz'],
+        }),
+    }),
+});
+
+export const {
+    useCreateQuizMutation,
+    useUpdateQuizMutation,
+    useGradeQuizMutation,
+    useRequestQuizQuery,
+} = quizApiSlice;
