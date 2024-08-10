@@ -11,19 +11,28 @@ const { Header, Sider, Content } = Layout;
 
 const AdminDashboard: React.FC = () => {
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Sider width={250} theme="light">
-                <Sidebar />
-            </Sider>
-            <Layout>
-                <Header style={{ background: '#fff', padding: 0 }}>
-                    <DashboardHeader />
-                </Header>
-                <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+        <Layout className="min-h-screen">
+            <Header
+                style={{
+                    background: '#fff',
+                    padding: 0,
+                    width: '100%',
+                    position: 'fixed',
+                    zIndex: 1000,
+                }}
+            >
+                <DashboardHeader />
+            </Header>
+            <Layout style={{ marginTop: '64px' }}>
+                {' '}
+                {/* This margin-top ensures the sidebar starts below the header */}
+                <Sider width={250} theme="light">
+                    <Sidebar />
+                </Sider>
+                <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
                     <div className="p-6 space-y-6">
-                        {/* Adjust the grid layout here */}
                         <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
                                 <StatsCard
                                     title="Total Students"
                                     value="3280"
@@ -37,7 +46,7 @@ const AdminDashboard: React.FC = () => {
                                     color="red"
                                 />
                                 <StatsCard
-                                    title="Total Course"
+                                    title="Total Courses"
                                     value="28"
                                     progress={76}
                                     color="red"
@@ -49,7 +58,9 @@ const AdminDashboard: React.FC = () => {
                                     color="green"
                                 />
                             </div>
-                            <IncomeExpenseReport />
+                            <div>
+                                <IncomeExpenseReport />
+                            </div>
                         </div>
                         <div className="grid grid-cols-2 gap-6">
                             <ProfessorsList />
