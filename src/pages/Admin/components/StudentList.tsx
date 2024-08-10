@@ -1,5 +1,3 @@
-// src/pages/Admin/components/StudentList.tsx
-
 import React from 'react';
 import { Table } from 'antd';
 
@@ -27,7 +25,7 @@ const columns = [
     {
         title: 'Actions',
         key: 'actions',
-        render: () => <a>Details</a>,
+        render: () => <a>...</a>,
     },
 ];
 
@@ -44,9 +42,9 @@ const data = [
 
 const StudentList: React.FC = () => {
     return (
-        <div>
-            <h2 className="text-2xl font-bold mb-6">Student List</h2>
-            <Table columns={columns} dataSource={data} />
+        <div className="bg-white p-4 shadow rounded">
+            <h2 className="font-bold text-xl mb-4">Student List</h2>
+            <Table columns={columns} dataSource={data} pagination={false} />
         </div>
     );
 };

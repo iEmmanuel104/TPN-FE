@@ -1,50 +1,46 @@
-// src/pages/Admin/components/ProfessorList.tsx
-
 import React from 'react';
-import { List, Avatar } from 'antd';
+import { Avatar } from 'antd';
 
-const data = [
-    {
-        title: 'Theodore Handle',
-        description: 'B.Com',
-        avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
-        status: 'Available',
-    },
-    {
-        title: 'Bess Willis',
-        description: 'M.Com',
-        avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
-        status: 'Not Available',
-    },
-    // Add more professor data here
+const professors = [
+    { name: 'Theodore Handle', degree: 'B.Com', available: true },
+    { name: 'Bess Willis', degree: 'M.Com', available: false },
+    { name: 'James Jones', degree: 'M.Tech', available: true },
+    { name: 'Smith Watson', degree: 'B.Tech', available: false },
 ];
 
-const ProfessorList: React.FC = () => {
+const ProfessorsList: React.FC = () => {
     return (
-        <div>
-            <h2 className="text-2xl font-bold mb-6">Professors List</h2>
-            <List
-                itemLayout="horizontal"
-                dataSource={data}
-                renderItem={(item) => (
-                    <List.Item>
-                        <List.Item.Meta
-                            avatar={<Avatar src={item.avatar} />}
-                            title={
-                                <a href="https://ant.design">{item.title}</a>
-                            }
-                            description={item.description}
+        <div className="bg-white p-4 shadow rounded">
+            <h2 className="font-bold text-xl mb-4">Professors List</h2>
+            <div>
+                {professors.map((professor, index) => (
+                    <div
+                        key={index}
+                        className="flex items-center space-x-3 mb-3"
+                    >
+                        <Avatar
+                            src={`https://randomuser.me/api/portraits/thumb/men/${index}.jpg`}
                         />
-                        <div
-                            className={`${item.status === 'Available' ? 'text-green-500' : 'text-red-500'}`}
-                        >
-                            {item.status}
+                        <div className="flex-grow">
+                            <div className="font-semibold">
+                                {professor.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                                {professor.degree}
+                            </div>
                         </div>
-                    </List.Item>
-                )}
-            />
+                        <div
+                            className={`text-sm ${professor.available ? 'text-green-500' : 'text-red-500'}`}
+                        >
+                            {professor.available
+                                ? 'Available'
+                                : 'Not Available'}
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
 
-export default ProfessorList;
+export default ProfessorsList;

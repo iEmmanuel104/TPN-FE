@@ -21,7 +21,7 @@ import { ToastContainer } from 'react-toastify';
 // import { Users } from './pages/users';
 // import { VerifyAccount } from './pages/verify_account';
 import { WelcomeBack } from './pages/welcomeBack';
-import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminDashboard from './pages/Admin/pages/AdminDashboard';
 import ScrollToTop from './ScrollToTop';
 
 function App() {
