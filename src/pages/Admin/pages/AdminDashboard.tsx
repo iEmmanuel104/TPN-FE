@@ -5,7 +5,7 @@ import DashboardHeader from '../components/DashboardHeader';
 import StatsCard from '../components/StatsCard';
 import IncomeExpenseReport from '../components/IncomeExpenseReport';
 import InstructorsList from '../components/InstructorList';
-import StudentList from '../components/StudentList';
+import TopCoursesList from '../components/TopCoursesList';
 
 const { Header, Sider, Content } = Layout;
 
@@ -60,7 +60,7 @@ const AdminDashboard: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-6">
                             <InstructorsList />
-                            <StudentList />
+                            <TopCoursesList />
                         </div>
                     </div>
                 </Content>
