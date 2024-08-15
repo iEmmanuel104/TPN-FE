@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Menu, Layout } from 'antd';
+import React from 'react';
+import { Menu } from 'antd';
 import {
     DashboardOutlined,
     UserOutlined,
@@ -7,50 +7,37 @@ import {
     FileTextOutlined,
 } from '@ant-design/icons';
 
-const { Sider } = Layout;
+interface SidebarProps {
+    mobile?: boolean;
+}
 
-const Sidebar: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false);
-
-    const onCollapse = (collapsed: boolean) => {
-        setCollapsed(collapsed);
-    };
-
+const Sidebar: React.FC<SidebarProps> = ({ mobile = false }) => {
     return (
-        <Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={onCollapse}
-            width={250}
-            collapsedWidth={80}
-            breakpoint="lg"
-            style={{ zIndex: 1000 }}
+        <Menu
+            defaultSelectedKeys={['1']}
+            mode={mobile ? 'inline' : 'vertical'}
+            theme="light"
+            className={mobile ? 'px-2 py-4' : ''}
         >
-            <Menu defaultSelectedKeys={['1']} mode="inline" theme="light">
-                <Menu.Item key="1" icon={<DashboardOutlined />}>
-                    {!collapsed && 'Dashboard'}
-                </Menu.Item>
-                <Menu.SubMenu
-                    key="sub1"
-                    icon={<UserOutlined />}
-                    title={!collapsed && 'Instructors'}
-                >
-                    <Menu.Item key="2">Professor 1</Menu.Item>
-                    <Menu.Item key="3">Professor 2</Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu
-                    key="sub2"
-                    icon={<BookOutlined />}
-                    title={!collapsed && 'Courses'}
-                >
-                    <Menu.Item key="4">Course 1</Menu.Item>
-                    <Menu.Item key="5">Course 2</Menu.Item>
-                </Menu.SubMenu>
-                <Menu.Item key="6" icon={<FileTextOutlined />}>
-                    {!collapsed && 'Students'}
-                </Menu.Item>
-            </Menu>
-        </Sider>
+            <Menu.Item key="1" icon={<DashboardOutlined />}>
+                Dashboard
+            </Menu.Item>
+            <Menu.SubMenu
+                key="sub1"
+                icon={<UserOutlined />}
+                title="Instructors"
+            >
+                <Menu.Item key="2">Professor 1</Menu.Item>
+                <Menu.Item key="3">Professor 2</Menu.Item>
+            </Menu.SubMenu>
+            <Menu.SubMenu key="sub2" icon={<BookOutlined />} title="Courses">
+                <Menu.Item key="4">Course 1</Menu.Item>
+                <Menu.Item key="5">Course 2</Menu.Item>
+            </Menu.SubMenu>
+            <Menu.Item key="6" icon={<FileTextOutlined />}>
+                Students
+            </Menu.Item>
+        </Menu>
     );
 };
 

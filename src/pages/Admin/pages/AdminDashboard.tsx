@@ -28,13 +28,15 @@ const AdminDashboard: React.FC = () => {
                     zIndex: 1000,
                 }}
             >
-                <Button
-                    type="text"
-                    icon={<MenuOutlined />}
-                    onClick={toggleMobileDrawer}
-                    className="ml-4 lg:hidden"
-                />
-                <DashboardHeader />
+                <div className="flex items-center h-full">
+                    <Button
+                        type="text"
+                        icon={<MenuOutlined />}
+                        onClick={toggleMobileDrawer}
+                        className="ml-4 lg:hidden"
+                    />
+                    <DashboardHeader />
+                </div>
             </Header>
             <Layout style={{ marginTop: '64px' }}>
                 {/* Desktop Sidebar */}
@@ -47,11 +49,11 @@ const AdminDashboard: React.FC = () => {
                     placement="left"
                     closable={false}
                     onClose={toggleMobileDrawer}
-                    visible={mobileDrawerVisible}
+                    open={mobileDrawerVisible}
                     className="lg:hidden"
                     bodyStyle={{ padding: 0 }}
                 >
-                    <Sidebar />
+                    <Sidebar mobile={true} />
                 </Drawer>
 
                 <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
