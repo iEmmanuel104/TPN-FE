@@ -8,8 +8,8 @@ import {
 
 const DashboardHeader: React.FC = () => {
     return (
-        <header className="flex justify-between items-center bg-white px-4 py-2">
-            <div className="flex items-center space-x-2 bg-[#6366F1] px-4 py-2 ">
+        <header className="flex justify-between items-center bg-white px-4 py-2 w-full">
+            <div className="flex items-center space-x-2 bg-[#6366F1] px-4 py-2">
                 <img
                     src="https://res.cloudinary.com/drc6omjqc/image/upload/v1721073067/chain_breaker_lmjc02.webp"
                     alt="EDUMIN"
@@ -17,7 +17,7 @@ const DashboardHeader: React.FC = () => {
                 />
                 <span className="text-white font-bold text-xl">EDUMIN</span>
             </div>
-            <div className="relative flex-grow max-w-xl mx-4">
+            <div className="relative flex-grow max-w-xl mx-4 hidden md:block">
                 <Input
                     prefix={<SearchOutlined className="text-gray-400" />}
                     placeholder="Search"
