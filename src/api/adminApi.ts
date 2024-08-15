@@ -43,6 +43,7 @@ interface InstructorStatsResponse {
     topInstructors: {
         id: string;
         name: string;
+        instructorImage: string;
         courseCount: string;
         averageRating: number;
     }[];
@@ -53,6 +54,9 @@ interface TopCoursesResponse {
     title: string;
     enrollments: number;
     rating: number;
+    instructorName: string;
+    previewImage: string;
+    instructorId: string;
 }
 
 interface RevenueStatsResponse {
