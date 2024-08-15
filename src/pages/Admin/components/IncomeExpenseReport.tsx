@@ -135,7 +135,7 @@ const IncomeExpenseReport: React.FC = () => {
     };
 
     return (
-        <Card className="w-full shadow-md">
+        <Card className="w-full shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">
                     Revenue Report
@@ -152,7 +152,7 @@ const IncomeExpenseReport: React.FC = () => {
             </div>
             <div
                 ref={chartRef}
-                style={{ height: chartWidth < 400 ? '300px' : '400px' }}
+                className={`w-full ${chartWidth < 400 ? 'h-[300px]' : 'h-[400px]'}`}
             >
                 <Bar data={data} options={options} />
             </div>

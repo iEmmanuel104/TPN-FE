@@ -1,7 +1,21 @@
 import React from 'react';
-import { Table, Avatar, Spin } from 'antd';
+import { Table, Avatar, Spin, Tag } from 'antd';
 import { useGetTopCoursesQuery } from '../../../api/adminApi';
 import { StarFilled } from '@ant-design/icons';
+
+enum CourseLevel {
+    Beginner = 'Beginner',
+    Intermediate = 'Intermediate',
+    Advanced = 'Advanced',
+    AllLevels = 'AllLevels',
+}
+
+const levelColors = {
+    [CourseLevel.Beginner]: 'green',
+    [CourseLevel.Intermediate]: 'blue',
+    [CourseLevel.Advanced]: 'red',
+    [CourseLevel.AllLevels]: 'purple',
+};
 
 const TopCoursesList: React.FC = () => {
     const {
@@ -45,6 +59,22 @@ const TopCoursesList: React.FC = () => {
             ),
         },
         {
+            title: 'Level',
+            dataIndex: 'level',
+            key: 'level',
+            render: (level: CourseLevel) => (
+                <Tag color={levelColors[level]}>{level}</Tag>
+            ),
+        },
+        {
+            title: 'Price',
+            dataIndex: 'price',
+            key: 'price',
+            render: (price: number) => (
+                <span className="font-semibold">${price.toFixed(2)}</span>
+            ),
+        },
+        {
             title: 'Enrollments',
             dataIndex: 'enrollments',
             key: 'enrollments',
@@ -69,30 +99,30 @@ const TopCoursesList: React.FC = () => {
 
     if (isLoading) {
         return (
-            <Spin
-                size="large"
-                className="flex justify-center items-center h-64"
-            />
+            <div className="flex justify-center items-center h-64">
+                <Spin size="large" />
+            </div>
         );
     }
-    if (error) return <div>Error loading top courses</div>;
+    if (error)
+        return <div className="text-red-500">Error loading top courses</div>;
 
     const topCourses = topCoursesData?.data || [];
 
     return (
-        <div className="bg-white p-6 shadow rounded-lg">
+        <div className="bg-white p-4 md:p-6 shadow rounded-lg">
             <h2 className="font-bold text-xl mb-4">Top Courses</h2>
-            <Table
-                columns={columns}
-                dataSource={topCourses.map((course) => ({
-                    ...course,
-                    instructorImage: '', // Add the instructorImage property here
-                    ...course,
-                    key: course.id,
-                }))}
-                pagination={false}
-                className="border border-gray-200 rounded-lg"
-            />
+            <div className="overflow-x-auto">
+                <Table
+                    columns={columns}
+                    dataSource={topCourses.map((course) => ({
+                        ...course,
+                        key: course.id,
+                    }))}
+                    pagination={false}
+                    className="min-w-full"
+                />
+            </div>
         </div>
     );
 };

@@ -55,6 +55,9 @@ interface TopCoursesResponse {
     enrollments: number;
     rating: number;
     instructorName: string;
+    instructorImage: string;
+    level: string;
+    price: number;
     previewImage: string;
     instructorId: string;
 }
