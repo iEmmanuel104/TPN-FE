@@ -26,6 +26,7 @@ const AdminDashboard: React.FC = () => {
                     width: '100%',
                     position: 'fixed',
                     zIndex: 1000,
+                    height: '64px', // Explicitly set header height
                 }}
             >
                 <div className="flex items-center h-full">
@@ -38,9 +39,14 @@ const AdminDashboard: React.FC = () => {
                     <DashboardHeader />
                 </div>
             </Header>
-            <Layout style={{ marginTop: '64px' }}>
+            <Layout>
                 {/* Desktop Sidebar */}
-                <Sider width={250} theme="light" className="hidden lg:block">
+                <Sider
+                    width={250}
+                    theme="light"
+                    className="hidden lg:block"
+                    style={{ marginTop: '64px' }}
+                >
                     <Sidebar />
                 </Sider>
 
@@ -56,8 +62,14 @@ const AdminDashboard: React.FC = () => {
                     <Sidebar mobile={true} />
                 </Drawer>
 
-                <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
-                    <div className="p-6 space-y-6">
+                <Content
+                    style={{
+                        marginTop: '64px',
+                        padding: '24px',
+                        minHeight: 'calc(100vh - 64px)',
+                    }}
+                >
+                    <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <StatsCard

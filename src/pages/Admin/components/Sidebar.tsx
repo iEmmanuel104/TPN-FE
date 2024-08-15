@@ -17,7 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobile = false }) => {
             defaultSelectedKeys={['1']}
             mode={mobile ? 'inline' : 'vertical'}
             theme="light"
-            className={mobile ? 'px-2 py-4' : ''}
+            className={`h-full ${mobile ? 'px-2 py-4' : ''}`}
         >
             <Menu.Item key="1" icon={<DashboardOutlined />}>
                 Dashboard

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -25,12 +25,29 @@ const { Option } = Select;
 
 const IncomeExpenseReport: React.FC = () => {
     const [timeFrame, setTimeFrame] = useState<string>('month');
+    const [chartWidth, setChartWidth] = useState<number>(0);
+    const chartRef = useRef<HTMLDivElement>(null);
 
     const {
         data: revenueStatsData,
         isLoading,
         error,
     } = useGetRevenueStatsQuery({ timeFrame });
+
+    useEffect(() => {
+        const updateChartWidth = () => {
+            if (chartRef.current) {
+                setChartWidth(chartRef.current.offsetWidth);
+            }
+        };
+
+        updateChartWidth();
+        window.addEventListener('resize', updateChartWidth);
+
+        return () => {
+            window.removeEventListener('resize', updateChartWidth);
+        };
+    }, []);
 
     if (isLoading) {
         return (
@@ -70,13 +87,23 @@ const IncomeExpenseReport: React.FC = () => {
 
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top' as const,
+                labels: {
+                    boxWidth: 10,
+                    font: {
+                        size: chartWidth < 400 ? 10 : 12,
+                    },
+                },
             },
             title: {
                 display: true,
                 text: 'Revenue and Enrollments Report',
+                font: {
+                    size: chartWidth < 400 ? 14 : 16,
+                },
             },
         },
         scales: {
@@ -84,8 +111,20 @@ const IncomeExpenseReport: React.FC = () => {
                 beginAtZero: true,
                 max: maxDataValue,
                 ticks: {
-                    maxTicksLimit: 8,
-                    stepSize: Math.ceil(maxDataValue / 8),
+                    maxTicksLimit: chartWidth < 400 ? 5 : 8,
+                    stepSize: Math.ceil(
+                        maxDataValue / (chartWidth < 400 ? 5 : 8),
+                    ),
+                    font: {
+                        size: chartWidth < 400 ? 10 : 12,
+                    },
+                },
+            },
+            x: {
+                ticks: {
+                    font: {
+                        size: chartWidth < 400 ? 10 : 12,
+                    },
                 },
             },
         },
@@ -97,8 +136,8 @@ const IncomeExpenseReport: React.FC = () => {
 
     return (
         <Card className="w-full shadow-md">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">
                     Revenue Report
                 </h2>
                 <Select
@@ -111,9 +150,14 @@ const IncomeExpenseReport: React.FC = () => {
                     <Option value="day">Daily</Option>
                 </Select>
             </div>
-            <Bar data={data} options={options} />
+            <div
+                ref={chartRef}
+                style={{ height: chartWidth < 400 ? '300px' : '400px' }}
+            >
+                <Bar data={data} options={options} />
+            </div>
             <div className="mt-4 text-right">
-                <p className="text-lg font-semibold">
+                <p className="text-base sm:text-lg font-semibold">
                     Total Revenue:{' '}
                     {revenueStats?.totalRevenue.toLocaleString('en-US', {
                         style: 'currency',
