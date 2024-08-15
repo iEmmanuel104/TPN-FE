@@ -62,35 +62,34 @@ const IncomeExpenseReport: React.FC = () => {
         ],
     };
 
-const maxDataValue = Math.max(
-    ...(revenueStats?.stats.map((stat) =>
-        Math.max(stat.revenue, stat.enrollments),
-    ) || [0]),
-);
+    const maxDataValue = Math.max(
+        ...(revenueStats?.stats.map((stat) =>
+            Math.max(stat.revenue, stat.enrollments),
+        ) || [0]),
+    );
 
-const options = {
-    responsive: true,
-    plugins: {
-        legend: {
-            position: 'top' as const,
-        },
-        title: {
-            display: true,
-            text: 'Revenue and Enrollments Report',
-        },
-    },
-    scales: {
-        y: {
-            beginAtZero: true,
-            max: maxDataValue,
-            ticks: {
-                maxTicksLimit: 8,
-                stepSize: Math.ceil(maxDataValue / 8),
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top' as const,
+            },
+            title: {
+                display: true,
+                text: 'Revenue and Enrollments Report',
             },
         },
-    },
-};
-
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: maxDataValue,
+                ticks: {
+                    maxTicksLimit: 8,
+                    stepSize: Math.ceil(maxDataValue / 8),
+                },
+            },
+        },
+    };
 
     const handleTimeFrameChange = (value: string) => {
         setTimeFrame(value);
