@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Avatar } from 'antd';
+import { Table, Avatar, Spin } from 'antd';
 import { useGetTopCoursesQuery } from '../../../api/adminApi';
 import { StarFilled } from '@ant-design/icons';
 
@@ -67,7 +67,14 @@ const TopCoursesList: React.FC = () => {
         },
     ];
 
-    if (isLoading) return <div>Loading top courses...</div>;
+    if (isLoading) {
+        return (
+            <Spin
+                size="large"
+                className="flex justify-center items-center h-64"
+            />
+        );
+    }
     if (error) return <div>Error loading top courses</div>;
 
     const topCourses = topCoursesData?.data || [];

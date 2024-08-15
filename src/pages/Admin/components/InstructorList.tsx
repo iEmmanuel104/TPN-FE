@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar } from 'antd';
+import { Avatar, Spin } from 'antd';
 import { useGetInstructorStatsQuery } from '../../../api/adminApi';
 
 const InstructorsList: React.FC = () => {
@@ -9,7 +9,14 @@ const InstructorsList: React.FC = () => {
         error,
     } = useGetInstructorStatsQuery();
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading) {
+        return (
+            <Spin
+                size="large"
+                className="flex justify-center items-center h-64"
+            />
+        );
+    }
     if (error) return <div>Error loading instructor</div>;
 
     const topInstructors = instructorStats?.data?.topInstructors || [];
@@ -45,9 +52,11 @@ const InstructorsList: React.FC = () => {
                     </div>
                 ))}
             </div>
-            <button className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-md text-sm font-medium">
-                View All
-            </button>
+            <div className="flex justify-center mt-6">
+                <button className="bg-indigo-600 text-white py-2 px-4 rounded-md text-sm font-medium">
+                    View All
+                </button>
+            </div>
         </div>
     );
 };
