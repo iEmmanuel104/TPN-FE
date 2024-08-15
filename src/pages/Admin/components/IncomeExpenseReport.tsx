@@ -99,7 +99,7 @@ const IncomeExpenseReport: React.FC = () => {
         <Card className="w-full shadow-md">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">
-                    Revenue/Enrollment Report
+                    Revenue Report
                 </h2>
                 <Select
                     defaultValue="month"
