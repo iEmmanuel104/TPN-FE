@@ -6,7 +6,7 @@ import {
     FetchBaseQueryError,
     FetchArgs,
 } from '@reduxjs/toolkit/query/react';
-import { ADMIN_SERVER_URL } from '../constants';
+import { SERVER_URL } from '../constants';
 
 export interface ApiResponse<T> {
     status: string;
@@ -18,7 +18,7 @@ export interface ApiResponse<T> {
 const baseQuery: BaseQueryFn< string | FetchArgs, unknown, FetchBaseQueryError
     > = async (args, api, extraOptions) => {
         const result = await fetchBaseQuery({
-            baseUrl: ADMIN_SERVER_URL,
+            baseUrl: SERVER_URL,
             ...api,
         })(args, api, extraOptions);
 

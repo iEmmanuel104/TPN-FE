@@ -9,6 +9,7 @@ import { userSlice } from './slices/userSlice';
 import { certificateSlice } from './slices/certificateSlice';
 import { quizSlice } from './slices/quizSlice';
 import { reviewSlice } from './slices/reviewSlice';
+import { adminSlice } from './slices/adminSlice';
 
 import type { AuthState } from './slices/authSlice';
 import type { CourseState } from './slices/courseSlice';
@@ -18,6 +19,7 @@ import type { UserState } from './slices/userSlice';
 import type { CertificateState } from './slices/certificateSlice';
 import type { QuizState } from './slices/quizSlice';
 import type { ReviewState } from './slices/reviewSlice';
+import type { AdminState } from './slices/adminSlice';
 
 
 export interface RootState {
@@ -29,6 +31,7 @@ export interface RootState {
     certificate: CertificateState;
     quiz: QuizState;
     review: ReviewState;
+    admin: AdminState;
     [apiSlice.reducerPath]: ReturnType<typeof apiSlice.reducer>;
 }
 
@@ -43,6 +46,7 @@ export const store = configureStore({
         certificate: certificateSlice.reducer,
         quiz: quizSlice.reducer,
         review: reviewSlice.reducer,
+        admin: adminSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(apiSlice.middleware),

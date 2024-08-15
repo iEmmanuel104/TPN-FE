@@ -1,41 +1,41 @@
 import React from 'react';
 import { Avatar } from 'antd';
-
-const Instructors = [
-    { name: 'Theodore Handle', degree: 'B.Com', available: true },
-    { name: 'Bess Willis', degree: 'M.Com', available: false },
-    { name: 'James Jones', degree: 'M.Tach', available: true },
-    { name: 'Smith Watson', degree: 'B.Tach', available: false },
-];
+import { useGetInstructorStatsQuery } from '../../../api/adminApi';
 
 const InstructorsList: React.FC = () => {
+    const {
+        data: instructorStats,
+        isLoading,
+        error,
+    } = useGetInstructorStatsQuery();
+
+    if (isLoading) return <div>Loading...</div>;
+    if (error) return <div>Error loading instructor stats</div>;
+
+    const topInstructors = instructorStats?.data?.topInstructors || [];
+
     return (
         <div className="bg-white p-6 shadow rounded-lg">
-            <h2 className="font-bold text-xl mb-4">Instructors List</h2>
+            <h2 className="font-bold text-xl mb-4">Top Instructors</h2>
             <div className="space-y-4">
-                {Instructors.slice(0, 4).map((Instructor, index) => (
-                    <div key={index} className="flex items-center space-x-3">
+                {topInstructors.slice(0, 4).map((instructor, index) => (
+                    <div
+                        key={instructor.id}
+                        className="flex items-center space-x-3"
+                    >
                         <Avatar
                             size={48}
                             src={`https://randomuser.me/api/portraits/thumb/men/${index + 1}.jpg`}
                         />
                         <div>
                             <div className="font-semibold">
-                                {Instructor.name}{' '}
+                                {instructor.name}{' '}
                                 <span className="text-sm font-normal text-gray-500">
-                                    ({Instructor.degree})
+                                    (Courses: {instructor.courseCount})
                                 </span>
                             </div>
-                            <div
-                                className={`text-sm ${
-                                    Instructor.available
-                                        ? 'text-blue-500'
-                                        : 'text-red-500'
-                                }`}
-                            >
-                                {Instructor.available
-                                    ? 'Available'
-                                    : 'Not Available'}
+                            <div className="text-sm text-yellow-500">
+                                Rating: {instructor.averageRating.toFixed(1)}
                             </div>
                         </div>
                     </div>

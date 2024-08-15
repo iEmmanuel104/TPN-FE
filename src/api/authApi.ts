@@ -1,8 +1,7 @@
 // src/api/authApi.ts
-import { ADMIN_AUTH_SERVER_URL } from '../constants';
 import { apiSlice } from './api';
 
-const AUTH_URL = ADMIN_AUTH_SERVER_URL + '/auth';
+const URL_PREFIX = '/auth';
 
 export interface UserInfoFromApi {
     id: string;
@@ -96,7 +95,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         signup: builder.mutation<SignupResponse, SignupParams>({
             query: (credentials) => ({
-                url: AUTH_URL + '/signup',
+                url: URL_PREFIX + '/signup',
                 method: 'POST',
                 body: credentials,
             }),
@@ -104,14 +103,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }),
         getLoggedUser: builder.query<GetLoggedUserResponse, void>({
             query: () => ({
-                url: AUTH_URL + '/loggeduser',
+                url: URL_PREFIX + '/loggeduser',
                 method: 'GET',
             }),
             providesTags: ['User'],
         }),
         login: builder.mutation<LoginResponse, LoginParams>({
             query: (credentials) => ({
-                url: AUTH_URL + '/login',
+                url: URL_PREFIX + '/login',
                 method: 'POST',
                 body: credentials,
             }),
@@ -119,28 +118,28 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }),
         logout: builder.mutation<LogoutResponse, void>({
             query: () => ({
-                url: AUTH_URL + '/logout',
+                url: URL_PREFIX + '/logout',
                 method: 'GET',
             }),
             invalidatesTags: ['User'],
         }),
         verifyEmail: builder.mutation<VerifyEmailResponse, { email: string; otpCode: string }>({
             query: ({ email, otpCode }) => ({
-                url: AUTH_URL + '/verifyemail',
+                url: URL_PREFIX + '/verifyemail',
                 method: 'POST',
                 body: { email, otpCode },
             }),
         }),
         resendVerificationEmail: builder.mutation<ForgotPasswordResponse, { email: string }>({
             query: ({ email }) => ({
-                url: AUTH_URL + `/resendverifyemail`,
+                url: URL_PREFIX + `/resendverifyemail`,
                 method: 'GET',
                 params: { email },
             }),
         }),
         forgotPassword: builder.mutation<ForgotPasswordResponse, { email: string }>({
             query: ({ email }) => ({
-                url: AUTH_URL + '/forgotpassword',
+                url: URL_PREFIX + '/forgotpassword',
                 method: 'POST',
                 body: {
                     email,
@@ -150,14 +149,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
         }),
         resetPassword: builder.mutation<ResetPasswordResponse, { resetToken: string; email: string; newPassword: string }>({
             query: ({ resetToken, email, newPassword }) => ({
-                url: AUTH_URL + '/resetpassword',
+                url: URL_PREFIX + '/resetpassword',
                 method: 'POST',
                 body: { resetToken, email, newPassword },
             }),
         }),
         changePassword: builder.mutation<ResetPasswordResponse, { oldPassword: string; newPassword: string }>({
             query: ({ oldPassword, newPassword }) => ({
-                url: AUTH_URL + '/changepassword',
+                url: URL_PREFIX + '/changepassword',
                 method: 'POST',
                 body: { oldPassword, newPassword },
             }),
