@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import DashboardHeader from '../components/DashboardHeader';
 import StatsCard from '../components/StatsCard';
 import IncomeExpenseReport from '../components/IncomeExpenseReport';
-import ProfessorsList from '../components/ProfessorList';
+import InstructorsList from '../components/InstructorList';
 import StudentList from '../components/StudentList';
 
 const { Header, Sider, Content } = Layout;
@@ -24,15 +24,13 @@ const AdminDashboard: React.FC = () => {
                 <DashboardHeader />
             </Header>
             <Layout style={{ marginTop: '64px' }}>
-                {' '}
-                {/* This margin-top ensures the sidebar starts below the header */}
                 <Sider width={250} theme="light">
                     <Sidebar />
                 </Sider>
                 <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
                     <div className="p-6 space-y-6">
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-3 gap-6">
+                            <div className="col-span-2 grid grid-cols-2 gap-6">
                                 <StatsCard
                                     title="Total Students"
                                     value="3280"
@@ -58,12 +56,10 @@ const AdminDashboard: React.FC = () => {
                                     color="green"
                                 />
                             </div>
-                            <div>
-                                <IncomeExpenseReport />
-                            </div>
+                            <IncomeExpenseReport />
                         </div>
                         <div className="grid grid-cols-2 gap-6">
-                            <ProfessorsList />
+                            <InstructorsList />
                             <StudentList />
                         </div>
                     </div>
