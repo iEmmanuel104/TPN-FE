@@ -29,8 +29,8 @@ const AdminDashboard: React.FC = () => {
                 </Sider>
                 <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
                     <div className="p-6 space-y-6">
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <StatsCard
                                     title="Total Students"
                                     value="3280"
@@ -58,11 +58,11 @@ const AdminDashboard: React.FC = () => {
                             </div>
                             <IncomeExpenseReport />
                         </div>
-                        <div className="grid grid-cols-3 gap-6">
-                            <div className="col-span-1">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="md:col-span-1">
                                 <InstructorsList />
                             </div>
-                            <div className="col-span-2">
+                            <div className="md:col-span-2">
                                 <TopCoursesList />
                             </div>
                         </div>
