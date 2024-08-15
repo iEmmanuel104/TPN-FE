@@ -10,7 +10,7 @@ const InstructorsList: React.FC = () => {
     } = useGetInstructorStatsQuery();
 
     if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error loading instructor stats</div>;
+    if (error) return <div>Error loading instructor</div>;
 
     const topInstructors = instructorStats?.data?.topInstructors || [];
 
@@ -18,14 +18,17 @@ const InstructorsList: React.FC = () => {
         <div className="bg-white p-6 shadow rounded-lg">
             <h2 className="font-bold text-xl mb-4">Top Instructors</h2>
             <div className="space-y-4">
-                {topInstructors.slice(0, 4).map((instructor, index) => (
+                {topInstructors.map((instructor) => (
                     <div
                         key={instructor.id}
                         className="flex items-center space-x-3"
                     >
                         <Avatar
                             size={48}
-                            src={`https://randomuser.me/api/portraits/thumb/men/${index + 1}.jpg`}
+                            src={
+                                instructor.instructorImage ||
+                                'https://randomuser.me/api/portraits/thumb/men/1.jpg'
+                            }
                         />
                         <div>
                             <div className="font-semibold">
@@ -35,7 +38,8 @@ const InstructorsList: React.FC = () => {
                                 </span>
                             </div>
                             <div className="text-sm text-yellow-500">
-                                Rating: {instructor.averageRating.toFixed(1)}
+                                Rating:{' '}
+                                {instructor.averageRating?.toFixed(1) || 'N/A'}
                             </div>
                         </div>
                     </div>
