@@ -20,8 +20,13 @@ const AdminDashboard: React.FC = () => {
     return (
         <Layout className="min-h-screen">
             <Header
-                className="bg-white p-0 w-full fixed z-10 flex items-center"
-                style={{ height: 'auto' }}
+                style={{
+                    background: '#fff',
+                    padding: 0,
+                    width: '100%',
+                    position: 'fixed',
+                    zIndex: 1000,
+                }}
             >
                 <Button
                     type="text"
@@ -49,41 +54,43 @@ const AdminDashboard: React.FC = () => {
                     <Sidebar />
                 </Drawer>
 
-                <Content className="m-4 lg:m-6 overflow-auto">
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <StatsCard
-                                title="Total Students"
-                                value="3280"
-                                progress={80}
-                                color="blue"
-                            />
-                            <StatsCard
-                                title="New Students"
-                                value="245"
-                                progress={50}
-                                color="red"
-                            />
-                            <StatsCard
-                                title="Total Courses"
-                                value="28"
-                                progress={76}
-                                color="red"
-                            />
-                            <StatsCard
-                                title="Fees Collection"
-                                value="25160$"
-                                progress={30}
-                                color="green"
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Content style={{ margin: '24px 16px', overflow: 'initial' }}>
+                    <div className="p-6 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <StatsCard
+                                    title="Total Students"
+                                    value="3280"
+                                    progress={80}
+                                    color="blue"
+                                />
+                                <StatsCard
+                                    title="New Students"
+                                    value="245"
+                                    progress={50}
+                                    color="red"
+                                />
+                                <StatsCard
+                                    title="Total Courses"
+                                    value="28"
+                                    progress={76}
+                                    color="red"
+                                />
+                                <StatsCard
+                                    title="Fees Collection"
+                                    value="25160$"
+                                    progress={30}
+                                    color="green"
+                                />
+                            </div>
                             <IncomeExpenseReport />
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="md:col-span-1">
                                 <InstructorsList />
-                                <div className="md:col-span-2 lg:col-span-1">
-                                    <TopCoursesList />
-                                </div>
+                            </div>
+                            <div className="md:col-span-2">
+                                <TopCoursesList />
                             </div>
                         </div>
                     </div>
