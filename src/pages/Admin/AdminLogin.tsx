@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import {
+    useLoginAdminMutation,
+    useVerifyAdminLoginMutation,
+} from '../../api/adminApi';
+import { useDispatch } from 'react-redux';
+import { setAdminCredentials } from '../../state/slices/adminSlice';
 
 interface LoginValues {
     email: string;
@@ -10,38 +17,40 @@ interface LoginValues {
 const AdminLogin: React.FC = () => {
     const [form] = Form.useForm<LoginValues>();
     const [showCodeInput, setShowCodeInput] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const [loginAdmin, { isLoading: isLoginLoading }] = useLoginAdminMutation();
+    const [verifyAdminLogin, { isLoading: isVerifyLoading }] =  useVerifyAdminLoginMutation();
 
     const onFinish = async (values: LoginValues) => {
-        setLoading(true);
         try {
             if (!showCodeInput) {
                 // Send email for OTP
-                await sendEmailForOTP(values.email);
+                await loginAdmin({ email: values.email }).unwrap();
                 setShowCodeInput(true);
                 message.success('Verification code sent to your email');
             } else if (values.otpCode) {
                 // Verify OTP
-                await verifyOTP(values.email, values.otpCode);
-                message.success('Login successful');
-                // Redirect to dashboard or set auth state
+                const response = await verifyAdminLogin({
+                    email: values.email,
+                    otpCode: values.otpCode,
+                }).unwrap();
+                if (response.data && response.data.adminToken) {
+                    dispatch(
+                        setAdminCredentials({
+                            adminToken: response.data.adminToken,
+                        }),
+                    );
+                    message.success('Login successful');
+                    navigate('/iadmin/dashboard'); // Adjust this route as needed
+                } else {
+                    throw new Error('No admin token received');
+                }
             }
         } catch (error) {
             message.error((error as Error).message || 'An error occurred');
-        } finally {
-            setLoading(false);
         }
-    };
-
-    // Replace these with your actual API calls
-    const sendEmailForOTP = async (email: string): Promise<void> => {
-        // Implement your API call here
-        console.log('Sending OTP to:', email);
-    };
-
-    const verifyOTP = async (email: string, otpCode: string): Promise<void> => {
-        // Implement your API call here
-        console.log('Verifying OTP:', email, otpCode);
     };
 
     return (
@@ -121,7 +130,7 @@ const AdminLogin: React.FC = () => {
                                 htmlType="submit"
                                 className="w-full bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white"
                                 size="large"
-                                loading={loading}
+                                loading={isLoginLoading || isVerifyLoading}
                             >
                                 {showCodeInput
                                     ? 'Verify & Login'
