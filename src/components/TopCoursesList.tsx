@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Avatar, Spin, Tag } from 'antd';
-import { useGetTopCoursesQuery } from '../../../api/adminApi';
+import { useGetTopCoursesQuery } from '../api/adminApi';
 import { StarFilled } from '@ant-design/icons';
 
 enum CourseLevel {

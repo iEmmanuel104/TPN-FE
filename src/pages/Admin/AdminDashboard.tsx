@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Layout, Drawer, Button } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
-import Sidebar from '../components/Sidebar';
-import DashboardHeader from '../components/DashboardHeader';
-import StatsCard from '../components/StatsCard';
-import IncomeExpenseReport from '../components/IncomeExpenseReport';
-import InstructorsList from '../components/InstructorList';
-import TopCoursesList from '../components/TopCoursesList';
+import Sidebar from '../../components/Sidebar';
+import DashboardHeader from '../../components/DashboardHeader';
+import StatsCard from '../../components/StatsCard';
+import IncomeExpenseReport from '../../components/IncomeExpenseReport';
+import InstructorsList from '../../components/InstructorList';
+import TopCoursesList from '../../components/TopCoursesList';
 
 const { Header, Sider, Content } = Layout;
 

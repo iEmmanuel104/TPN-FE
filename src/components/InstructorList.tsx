@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, Spin } from 'antd';
-import { useGetInstructorStatsQuery } from '../../../api/adminApi';
+import { useGetInstructorStatsQuery } from '../api/adminApi';
 
 const InstructorsList: React.FC = () => {
     const {
