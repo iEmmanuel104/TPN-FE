@@ -48,6 +48,9 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
 
     // For successful responses, you might want to show a success message
     const successData = result.data as ApiResponse<unknown>;
+    console.log({
+        APISUCCESS: successData,
+    });
     // if (successData.message) {
     //     message.success(successData.message);
     // }

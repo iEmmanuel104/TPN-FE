@@ -20,6 +20,7 @@ interface ApiResponse<T> {
 // Specific response interfaces
 interface AdminTokenResponse {
     adminToken: string;
+    admin: Omit<Admin, 'id'>;
 }
 
 interface UserStatsResponse {

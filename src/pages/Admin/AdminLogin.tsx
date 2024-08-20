@@ -40,6 +40,7 @@ const AdminLogin: React.FC = () => {
                     dispatch(
                         setAdminCredentials({
                             adminToken: response.data.adminToken,
+                            admin: response.data.admin,
                         }),
                     );
                     message.success('Login successful');
