@@ -43,6 +43,14 @@ interface LoginResponse {
     };
 }
 
+interface RefreshTokenResponse {
+    status: string;
+    message: string;
+    data: {
+        accessToken: string;
+    };
+}
+
 interface LogoutResponse {
     status: string;
     message: string;
@@ -115,6 +123,12 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 body: credentials,
             }),
             invalidatesTags: ['User'],
+        }),
+        refreshToken: builder.query<RefreshTokenResponse, void>({
+            query: () => ({
+                url: '/authtoken',
+                method: 'GET',
+            }),
         }),
         logout: builder.mutation<LogoutResponse, void>({
             query: () => ({
