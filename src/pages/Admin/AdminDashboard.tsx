@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Drawer, Button } from 'antd';
+import { Layout, Drawer, Button, Spin } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import Sidebar from '../../components/Sidebar';
 import DashboardHeader from '../../components/DashboardHeader';
@@ -7,15 +7,27 @@ import StatsCard from '../../components/StatsCard';
 import IncomeExpenseReport from '../../components/IncomeExpenseReport';
 import InstructorsList from '../../components/InstructorList';
 import TopCoursesList from '../../components/TopCoursesList';
+import {
+    useGetUserStatsQuery,
+} from '../../api/adminApi';
 
 const { Header, Sider, Content } = Layout;
 
 const AdminDashboard: React.FC = () => {
     const [mobileDrawerVisible, setMobileDrawerVisible] = useState(false);
 
+      const { data: userStats, isLoading: userStatsLoading } =
+          useGetUserStatsQuery();
+
+
+
     const toggleMobileDrawer = () => {
         setMobileDrawerVisible(!mobileDrawerVisible);
     };
+
+    if (userStatsLoading ) {
+        return <Spin size="large" />;
+    }
 
     return (
         <Layout className="min-h-screen">
@@ -71,30 +83,67 @@ const AdminDashboard: React.FC = () => {
                 >
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <StatsCard
-                                    title="Total Students"
-                                    value="3280"
-                                    progress={80}
+                                    title="User Statistics"
+                                    stats={[
+                                        {
+                                            label: 'Total/Enrolled Users',
+                                            value: `${userStats?.data.totalUsers ?? 0} (${userStats?.data.enrolledUsers ?? 0})`,
+                                        },
+                                        {
+                                            label: 'New Users This Month',
+                                            value: userStats?.data.newUsersThisMonth ?? 0,
+                                        },
+                                    ]}
+                                    progress={userStats?.data.userIncrease ?? 0}
                                     color="blue"
                                 />
                                 <StatsCard
-                                    title="New Students"
-                                    value="245"
-                                    progress={50}
-                                    color="red"
-                                />
-                                <StatsCard
-                                    title="Total Courses"
-                                    value="28"
-                                    progress={76}
-                                    color="red"
-                                />
-                                <StatsCard
-                                    title="Fees Collection"
-                                    value="25160$"
-                                    progress={30}
+                                    title="Course Statistics"
+                                    stats={[
+                                        {
+                                            label: 'Total Courses',
+                                            value: userStats?.data.totalCourses ?? 0,
+                                        },
+                                        {
+                                            label: 'New Courses This Month',
+                                            value: userStats?.data.newCoursesThisMonth ?? 0,
+                                        },
+                                    ]}
+                                    progress={
+                                        userStats?.data.courseIncrease ?? 0
+                                    }
                                     color="green"
+                                />
+                                <StatsCard
+                                    title="Revenue Statistics"
+                                    stats={[
+                                        {
+                                            label: 'Total Revenue',
+                                            value: `$${userStats?.data.totalRevenue?.toFixed(2) ?? '0'}`,
+                                        },
+                                        {
+                                            label: 'Revenue This Month',
+                                            value: `$${userStats?.data.revenueThisMonth?.toFixed(2) ?? '0'}`,
+                                        },
+                                    ]}
+                                    progress={
+                                        userStats?.data.revenueIncrease ?? 0
+                                    }
+                                    color="yellow"
+                                />
+                                <StatsCard
+                                    title="Users by Status"
+                                    stats={
+                                        userStats?.data.usersByStatus.map(
+                                            (status) => ({
+                                                label: status.status,
+                                                value: status.count,
+                                            }),
+                                        ) ?? []
+                                    }
+                                    color="red"
                                 />
                             </div>
                             <IncomeExpenseReport />

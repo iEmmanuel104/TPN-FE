@@ -7,7 +7,7 @@ import {
     useVerifyAdminLoginMutation,
 } from '../../api/adminApi';
 import { useDispatch } from 'react-redux';
-import { setAdminCredentials } from '../../state/slices/adminSlice';
+import { setAdminCredentials } from '../../state/slices/authSlice';
 
 interface LoginValues {
     email: string;

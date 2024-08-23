@@ -26,6 +26,14 @@ interface AdminTokenResponse {
 interface UserStatsResponse {
     totalUsers: number;
     enrolledUsers: number;
+    newUsersThisMonth: number,
+    totalCourses: number,
+    newCoursesThisMonth: number,
+    totalRevenue: number,
+    revenueThisMonth: number,
+    userIncrease: number,
+    revenueIncrease: number,
+    courseIncrease: number,
     usersByStatus: { status: string; count: string }[];
 }
 

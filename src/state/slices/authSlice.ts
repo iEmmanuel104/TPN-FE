@@ -28,6 +28,7 @@ export const authSlice = createSlice({
     initialState,
     reducers: {
         setUserCredentials: (state, action: PayloadAction<{ user: UserInfoFromApi; accessToken: string; refreshToken: string }>) => {
+            console.log('setting user crdentiuals')
             const { user, accessToken, refreshToken } = action.payload;
             state.user = user;
             state.admin = null;
@@ -43,6 +44,7 @@ export const authSlice = createSlice({
             localStorage.removeItem("adminToken");
         },
         setAdminCredentials: (state, action: PayloadAction<{ admin: Omit<Admin, 'id'>; adminToken: string }>) => {
+            console.log('setting Admin Credentials');
             const { admin, adminToken } = action.payload;
             state.admin = admin;
             state.user = null;
