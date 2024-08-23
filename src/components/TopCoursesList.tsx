@@ -45,8 +45,8 @@ const TopCoursesList: React.FC = () => {
                         shape="square"
                     />
                     <div>
-                        <div className="font-semibold">{text}</div>
-                        <div className="flex items-center text-sm text-gray-500">
+                        <div className="font-semibold text-sm">{text}</div>
+                        <div className="flex items-center text-xs text-gray-500">
                             <Avatar
                                 src={record.instructorImage}
                                 size={20}
@@ -71,7 +71,9 @@ const TopCoursesList: React.FC = () => {
             dataIndex: 'price',
             key: 'price',
             render: (price: number) => (
-                <span className="font-semibold">${price.toFixed(2)}</span>
+                <span className="font-semibold text-sm">
+                    ${price.toFixed(2)}
+                </span>
             ),
         },
         {
@@ -79,7 +81,7 @@ const TopCoursesList: React.FC = () => {
             dataIndex: 'enrollments',
             key: 'enrollments',
             render: (enrollments: number) => (
-                <span className="font-semibold">
+                <span className="font-semibold text-sm">
                     {enrollments.toLocaleString()}
                 </span>
             ),
@@ -89,7 +91,7 @@ const TopCoursesList: React.FC = () => {
             dataIndex: 'rating',
             key: 'rating',
             render: (rating: number) => (
-                <div className="flex items-center">
+                <div className="flex items-center text-sm">
                     <StarFilled className="text-yellow-400 mr-1" />
                     <span>{rating.toFixed(1)}</span>
                 </div>
@@ -120,7 +122,7 @@ const TopCoursesList: React.FC = () => {
                         key: course.id,
                     }))}
                     pagination={false}
-                    className="min-w-full"
+                    className="min-w-full text-sm"
                 />
             </div>
         </div>

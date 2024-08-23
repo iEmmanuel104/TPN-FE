@@ -1,4 +1,3 @@
-// components/DashboardLayout.tsx
 import React, { useState } from 'react';
 import { Layout, Drawer, Button } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
@@ -45,7 +44,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     width={250}
                     theme="light"
                     className="hidden lg:block"
-                    style={{ marginTop: '64px' }}
+                    style={{
+                        marginTop: '64px',
+                        position: 'fixed',
+                        height: '100vh',
+                    }}
                 >
                     <Sidebar />
                 </Sider>
@@ -64,6 +67,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <Content
                     style={{
                         marginTop: '64px',
+                        marginLeft: '250px',
                         padding: '24px',
                         minHeight: 'calc(100vh - 64px)',
                     }}

@@ -38,13 +38,13 @@ const InstructorsList: React.FC = () => {
                             }
                         />
                         <div>
-                            <div className="font-semibold">
+                            <div className="font-semibold text-sm">
                                 {instructor.name}{' '}
                                 <span className="text-sm font-normal text-gray-500">
                                     (Courses: {instructor.courseCount})
                                 </span>
                             </div>
-                            <div className="text-sm text-yellow-500">
+                            <div className="text-xs text-yellow-500">
                                 Rating:{' '}
                                 {instructor.averageRating?.toFixed(1) || 'N/A'}
                             </div>
@@ -53,7 +53,7 @@ const InstructorsList: React.FC = () => {
                 ))}
             </div>
             <div className="flex justify-center mt-6">
-                <button className="bg-indigo-600 text-white py-2 px-4 rounded-md text-sm font-medium">
+                <button className="bg-indigo-600 text-white py-2 px-4 rounded-md text-xs font-medium">
                     View All
                 </button>
             </div>
