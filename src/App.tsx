@@ -8,6 +8,10 @@ import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import NotFound from './components/NotFound';
 import ScrollToTop from './ScrollToTop';
+import CourseList from './pages/Admin/course/CourseList';
+import AddCourse from './pages/Admin/course/AddCourse';
+import EditCourse from './pages/Admin/course/EditCourse';
+import CourseView from './pages/Admin/course/CourseView';
 
 function App() {
     return (
@@ -19,10 +23,17 @@ function App() {
                     <Route path="/login" element={<AdminLogin />} />
                     <Route path="/" element={<AdminLogin />} />
                     <Route path="/iadmin">
-                        <Route index element={<AdminLogin />} />
+                        <Route index element={<AdminDashboard />} />
                         <Route path="dashboard" element={<AdminDashboard />} />
+                        <Route path="courses">
+                            <Route index element={<CourseList />} />
+                            <Route path="add" element={<AddCourse />} />
+                            <Route path=":id">
+                                <Route index element={<CourseView />} />
+                                <Route path="edit" element={<EditCourse />} />
+                            </Route>
+                        </Route>
                         {/* <Route path="users" element={<AdminUsers />} /> */}
-                        {/* <Route path="courses" element={<AdminCourses />} /> */}
                     </Route>
                     <Route path="*" element={<NotFound />} />
                 </Routes>

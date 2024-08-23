@@ -21,6 +21,7 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
 
             if (isAdminLoggedIn && adminToken) {
                 headers.set('Authorization', `Bearer ${adminToken}`);
+                headers.set('X-iAdmin-Access', 'true');
             } else if (accessToken) {
                 headers.set('Authorization', `Bearer ${accessToken}`);
             }

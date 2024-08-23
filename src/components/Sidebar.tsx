@@ -1,3 +1,4 @@
+// components/Sidebar.tsx
 import React from 'react';
 import { Menu } from 'antd';
 import {
@@ -6,6 +7,7 @@ import {
     BookOutlined,
     FileTextOutlined,
 } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 interface SidebarProps {
     mobile?: boolean;
@@ -20,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobile = false }) => {
             className={`h-full ${mobile ? 'px-2 py-4' : ''}`}
         >
             <Menu.Item key="1" icon={<DashboardOutlined />}>
-                Dashboard
+                <Link to="/dashboard">Dashboard</Link>
             </Menu.Item>
             <Menu.SubMenu
                 key="sub1"
@@ -31,8 +33,12 @@ const Sidebar: React.FC<SidebarProps> = ({ mobile = false }) => {
                 <Menu.Item key="3">Professor 2</Menu.Item>
             </Menu.SubMenu>
             <Menu.SubMenu key="sub2" icon={<BookOutlined />} title="Courses">
-                <Menu.Item key="4">Course 1</Menu.Item>
-                <Menu.Item key="5">Course 2</Menu.Item>
+                <Menu.Item key="4">
+                    <Link to="/courses">All Courses</Link>
+                </Menu.Item>
+                <Menu.Item key="5">
+                    <Link to="/courses/add">Add Course</Link>
+                </Menu.Item>
             </Menu.SubMenu>
             <Menu.Item key="6" icon={<FileTextOutlined />}>
                 Students

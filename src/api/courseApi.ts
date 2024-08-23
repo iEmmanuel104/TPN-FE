@@ -76,16 +76,16 @@ export const courseApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Course'],
         }),
-        getAllCourses: builder.query<ApiResponse<CourseDto[]>, { level?: CourseLevel }>({
+        getAllCourses: builder.query<ApiResponse<{ courses: CourseDto[]}>, { level?: CourseLevel }>({
             query: ({ level }) => ({
                 url: level ? `/course/?level=${level}` : '/course/',
                 method: 'GET',
             }),
             providesTags: ['Course'],
         }),
-        getCourseInfo: builder.query<ApiResponse<CourseDto>, { id: string }>({
+        getSingleCourseInfo: builder.query<ApiResponse<CourseDto>, { id: string }>({
             query: ({ id }) => ({
-                url: `/course/?id=${id}`,
+                url: `/course/info?id=${id}`,
                 method: 'GET',
             }),
             providesTags: ['Course'],
@@ -142,7 +142,7 @@ export const courseApiSlice = apiSlice.injectEndpoints({
 export const {
     useAddCourseMutation,
     useGetAllCoursesQuery,
-    useGetCourseInfoQuery,
+    useGetSingleCourseInfoQuery,
     useUpdateCourseMutation,
     useDeleteCourseMutation,
     useEnrollForCourseMutation,
