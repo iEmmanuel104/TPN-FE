@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // src/components/VideoPlayer.tsx
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
@@ -10,6 +11,11 @@ import {
     BackwardOutlined,
     SettingOutlined,
     CloseOutlined,
+    BulbOutlined,
+    BulbFilled,
+    AppstoreOutlined,
+    FullscreenOutlined,
+    FullscreenExitOutlined,
 } from '@ant-design/icons';
 import { List, Switch, Select, Slider } from 'antd';
 import { formatTime } from '../utils/formatTime';
@@ -32,14 +38,16 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         const [isPlaying, setIsPlaying] = useState(false);
         const [currentTime, setCurrentTime] = useState(0);
         const [isMuted, setIsMuted] = useState(false);
-        // const [showControls, setShowControls] = useState(false);
         const [isUserActive, setIsUserActive] = useState(false);
         const [showSettings, setShowSettings] = useState(false);
         const [playbackSpeed, setPlaybackSpeed] = useState(1);
         const [showFrames, setShowFrames] = useState(false);
+        const [isLightOn, setIsLightOn] = useState(true);
         const playerRef = useRef<ReactPlayer>(null);
         const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
         const [hasBeenCounted, setHasBeenCounted] = useState(false);
+        const [isFullscreen, setIsFullscreen] = useState(false);
+        const containerRef = useRef<HTMLDivElement>(null);
 
         const handlePlayPause = () => {
             setIsPlaying(!isPlaying);
@@ -81,13 +89,11 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
 
         const handleUserActivity = () => {
             setIsUserActive(true);
-            // setShowControls(true);
             if (controlsTimeoutRef.current) {
                 clearTimeout(controlsTimeoutRef.current);
             }
             controlsTimeoutRef.current = setTimeout(() => {
                 setIsUserActive(false);
-                // setShowControls(false);
             }, 3000);
         };
 
@@ -100,6 +106,34 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         const toggleFrames = () => {
             setShowFrames(!showFrames);
         };
+
+        const toggleLight = () => {
+            setIsLightOn(!isLightOn);
+        };
+
+         const toggleFullscreen = () => {
+             if (!document.fullscreenElement) {
+                 containerRef.current?.requestFullscreen();
+                 setIsFullscreen(true);
+             } else {
+                 document.exitFullscreen();
+                 setIsFullscreen(false);
+             }
+         };
+
+         useEffect(() => {
+             const handleKeyDown = (e: KeyboardEvent) => {
+                 if (e.key === 'Escape' && isFullscreen) {
+                     document.exitFullscreen();
+                     setIsFullscreen(false);
+                 }
+             };
+
+             document.addEventListener('keydown', handleKeyDown);
+             return () => {
+                 document.removeEventListener('keydown', handleKeyDown);
+             };
+         }, [isFullscreen]);
 
         useEffect(() => {
             const intervalId = setInterval(() => {
@@ -151,13 +185,28 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
 
         return (
             <div
-                className={`relative aspect-video h-full w-full overflow-hidden rounded-lg bg-black ${className}`}
-                ref={ref}
+                className={`relative aspect-video h-full w-full overflow-hidden rounded-lg ${
+                    isLightOn ? 'bg-black' : 'bg-gray-900'
+                } ${className}`}
+                ref={(node) => {
+                    if (typeof ref === 'function') {
+                        ref(node);
+                    } else if (ref) {
+                        (
+                            ref as React.MutableRefObject<HTMLDivElement | null>
+                        ).current = node;
+                    }
+                    {/* @ts-expect-error */}
+                    containerRef.current = node;
+                }}
                 onMouseMove={handleUserActivity}
                 onTouchStart={handleUserActivity}
                 onTouchMove={handleUserActivity}
                 onScroll={handleUserActivity}
             >
+                {!isLightOn && (
+                    <div className="absolute inset-0 bg-black bg-opacity-70 z-10"></div>
+                )}
                 <ReactPlayer
                     url={
                         url ||
@@ -228,7 +277,7 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
 
                 {/* Bottom Controls */}
                 <motion.div
-                    className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 p-2 text-white sm:p-3 md:p-4"
+                    className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 p-2 text-white sm:p-3 md:p-4 z-20"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: isUserActive ? 1 : 0 }}
                     transition={{ duration: 0.3 }}
@@ -247,19 +296,41 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
                         tipFormatter={null}
                     />
                     <div className="mt-1 flex items-center justify-between sm:mt-2">
-                        <SoundOutlined
-                            className={`text-lg cursor-pointer sm:text-xl md:text-2xl ${
-                                isMuted ? 'text-gray-400' : 'text-white'
-                            }`}
-                            onClick={handleMute}
-                        />
                         <div className="flex items-center">
-                            <button
-                                className="mr-2 text-xs sm:text-sm"
+                            <SoundOutlined
+                                className={`text-lg cursor-pointer sm:text-xl md:text-2xl mr-2 ${
+                                    isMuted ? 'text-gray-400' : 'text-white'
+                                }`}
+                                onClick={handleMute}
+                            />
+                            {isLightOn ? (
+                                <BulbFilled
+                                    className="text-lg cursor-pointer sm:text-xl md:text-2xl text-yellow-400 mr-2"
+                                    onClick={toggleLight}
+                                />
+                            ) : (
+                                <BulbOutlined
+                                    className="text-lg cursor-pointer sm:text-xl md:text-2xl text-white mr-2"
+                                    onClick={toggleLight}
+                                />
+                            )}
+                        </div>
+                        <div className="flex items-center">
+                            <AppstoreOutlined
+                                className="text-lg cursor-pointer sm:text-xl md:text-2xl text-white mr-2"
                                 onClick={toggleFrames}
-                            >
-                                {showFrames ? 'Hide Frames' : 'Show Frames'}
-                            </button>
+                            />
+                            {isFullscreen ? (
+                                <FullscreenExitOutlined
+                                    className="text-lg cursor-pointer sm:text-xl md:text-2xl text-white mr-2"
+                                    onClick={toggleFullscreen}
+                                />
+                            ) : (
+                                <FullscreenOutlined
+                                    className="text-lg cursor-pointer sm:text-xl md:text-2xl text-white mr-2"
+                                    onClick={toggleFullscreen}
+                                />
+                            )}
                             <div className="relative">
                                 <SettingOutlined
                                     className="text-lg cursor-pointer sm:text-xl md:text-2xl"

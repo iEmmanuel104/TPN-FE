@@ -11,12 +11,15 @@ import {
     List,
     Typography,
     Collapse,
+    Avatar,
 } from 'antd';
+import { TwitterOutlined, LinkedinOutlined } from '@ant-design/icons';
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useGetSingleCourseInfoQuery } from '../../../api/courseApi';
 import VideoPlayer from '../../../components/VideoPlayer';
+import { formatVideoLength } from '../../../utils/formatVideoLength';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
 const CourseView: React.FC = () => {
@@ -126,7 +129,7 @@ const CourseView: React.FC = () => {
                     <Collapse accordion>
                         {course.modules.map((module, index) => (
                             <Panel
-                                header={`${index + 1}. ${module.title}`}
+                                header={`${index + 1}. ${module.title} - ${formatVideoLength(module.videoInfo?.length || 0)}`}
                                 key={module.id}
                             >
                                 <Text>{module.description}</Text>
@@ -139,6 +142,61 @@ const CourseView: React.FC = () => {
                             </Panel>
                         ))}
                     </Collapse>
+                </div>
+                <Divider />
+                <div>
+                    <Title level={3}>Instructor</Title>
+                    <Card className="mt-4">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start">
+                            <div className="mb-4 sm:mb-0 sm:mr-4 w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36">
+                                <Avatar
+                                    className="w-full h-full"
+                                    src={
+                                        course.instructor.info.profilePictureUrl
+                                    }
+                                    alt={course.instructor.name}
+                                />
+                            </div>
+                            <div className="ml-4 flex-grow">
+                                <Title level={4}>
+                                    {course.instructor.name}
+                                </Title>
+                                <Paragraph className="text-gray-500">
+                                    {course.instructor.email}
+                                </Paragraph>
+                                <Paragraph>{course.instructor.bio}</Paragraph>
+                                {course.instructor.socials && (
+                                    <div className="mt-2">
+                                        {course.instructor.socials.x && (
+                                            <a
+                                                href={
+                                                    course.instructor.socials.x
+                                                }
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mr-4 text-blue-500 hover:text-blue-700"
+                                            >
+                                                <TwitterOutlined /> Twitter
+                                            </a>
+                                        )}
+                                        {course.instructor.socials.linkedin && (
+                                            <a
+                                                href={
+                                                    course.instructor.socials
+                                                        .linkedin
+                                                }
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-500 hover:text-blue-700"
+                                            >
+                                                <LinkedinOutlined /> LinkedIn
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </Card>
                 </div>
                 <Divider />
                 <div>

@@ -1,5 +1,8 @@
 // src/api/courseApi.ts
 import { ApiResponse, apiSlice } from './api';
+import { InstructorDto } from './instructorApi';
+import { ModuleDto } from './moduleApi';
+import { IReview } from './reviewApi';
 
 export enum CourseStatus {
     New = 'New',
@@ -43,24 +46,14 @@ export interface CourseDto {
         hasAssessment?: boolean;
     };
     instructorId: string;
+    instructor: InstructorDto;
     requirements: string[];
     certificateId?: string;
     customStyles?: Record<string, string>;
     createdAt: string;
     updatedAt: string;
-    modules: {
-        id: string;
-        title: string;
-        description: string;
-        episodeNumber: number;
-        frames: { title: string; timestamp: number }[];
-        url: string;
-    }[];
-    reviews: {
-        id: string;
-        comment: string;
-        rating: number;
-    }[];
+    modules: ModuleDto[];
+    reviews: IReview[];
     stats: {
         overallRating: number;
         numberOfPaidStudents: number;
