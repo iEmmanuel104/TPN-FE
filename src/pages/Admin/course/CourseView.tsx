@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Card, Button, Tag, Descriptions, Divider } from 'antd';
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useGetSingleCourseInfoQuery } from '../../../api/courseApi';
@@ -79,9 +79,11 @@ const CourseView: React.FC = () => {
                 </div>
                 <Divider />
                 <div className="flex justify-end">
-                    <Button type="primary" className="mr-2">
-                        Edit Course
-                    </Button>
+                    <Link to={`/iadmin/courses/${id}/edit`}>
+                        <Button type="primary" className="mr-2">
+                            Edit Course
+                        </Button>
+                    </Link>
                     <Button>Delete Course</Button>
                 </div>
             </Card>
