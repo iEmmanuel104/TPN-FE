@@ -33,7 +33,6 @@ const EditCourse: React.FC = () => {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">Edit Course</h1>
                 <p className="text-gray-500">
-                    <Link to="/iadmin">Admin</Link> {' > '}
                     <Link to="/iadmin/courses">Courses</Link> {' > '}
                     <Link to={`/iadmin/courses/${id}`}>
                         {courseData?.data?.title || 'Course'}

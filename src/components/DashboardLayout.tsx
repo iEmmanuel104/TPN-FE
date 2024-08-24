@@ -19,16 +19,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     return (
         <Layout className="min-h-screen">
-            <Header
-                style={{
-                    background: '#fff',
-                    padding: 0,
-                    width: '100%',
-                    position: 'fixed',
-                    zIndex: 1000,
-                    height: '64px',
-                }}
-            >
+            <Header className="bg-white p-0 w-full fixed z-50 h-16">
                 <div className="flex items-center h-full">
                     <Button
                         type="text"
@@ -43,12 +34,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <Sider
                     width={250}
                     theme="light"
-                    className="hidden lg:block"
-                    style={{
-                        marginTop: '64px',
-                        position: 'fixed',
-                        height: '100vh',
-                    }}
+                    className="hidden lg:block fixed h-screen"
+                    style={{ marginTop: '64px' }}
                 >
                     <Sidebar />
                 </Sider>
@@ -64,14 +51,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     <Sidebar mobile={true} />
                 </Drawer>
 
-                <Content
-                    style={{
-                        marginTop: '64px',
-                        marginLeft: '250px',
-                        padding: '24px',
-                        minHeight: 'calc(100vh - 64px)',
-                    }}
-                >
+                <Content className="mt-16  p-6 min-h-[calc(100vh-64px)]">
                     {children}
                 </Content>
             </Layout>

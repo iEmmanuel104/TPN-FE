@@ -23,7 +23,6 @@ const AddCourse: React.FC = () => {
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">Add New Course</h1>
                 <p className="text-gray-500">
-                    <Link to="/iadmin">Admin</Link> {' > '}
                     <Link to="/iadmin/courses">Courses</Link> {' > '}
                     Add Course
                 </p>{' '}

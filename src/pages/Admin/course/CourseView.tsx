@@ -19,7 +19,14 @@ const CourseView: React.FC = () => {
         <DashboardLayout>
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">{course.title}</h1>
-                <p className="text-gray-500">Courses {'>'} Course Details</p>
+                <p className="text-gray-500">
+                    <Link to="/iadmin/courses">Courses</Link> {' > '}
+                    <Link to={`/iadmin/courses/${id}`}>
+                        {courseData?.data?.title || 'Course'}
+                    </Link>
+                    {' > '}
+                    Details
+                </p>{' '}
             </div>
             <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

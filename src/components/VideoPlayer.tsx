@@ -20,18 +20,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [isPlaying, setIsPlaying] = useState(false);
     const playerRef = useRef<ReactPlayer>(null);
 
-    console.log(url);
-
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
     };
 
     return (
-        <div className={`relative ${className}`}>
+        <div className={`relative w-full h-full ${className}`}>
             <ReactPlayer
                 url={url}
                 width="100%"
-                height="auto"
+                height="100%"
                 playing={isPlaying}
                 ref={playerRef}
                 onProgress={(progress) => {
