@@ -46,6 +46,27 @@ export interface CourseDto {
     requirements: string[];
     certificateId?: string;
     customStyles?: Record<string, string>;
+    createdAt: string;
+    updatedAt: string;
+    modules: {
+        id: string;
+        title: string;
+        description: string;
+        episodeNumber: number;
+        frames: { title: string; timestamp: number }[];
+        url: string;
+    }[];
+    reviews: {
+        id: string;
+        comment: string;
+        rating: number;
+    }[];
+    stats: {
+        overallRating: number;
+        numberOfPaidStudents: number;
+        ratingCount: number;
+        numberOfModules: number;
+    };
 }
 
 export interface UserCourseDto {

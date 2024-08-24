@@ -1,52 +1,323 @@
 // src/components/VideoPlayer.tsx
-import React, { useState, useRef } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
-import { Button } from 'antd';
-import { PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    PlayCircleOutlined,
+    PauseCircleOutlined,
+    SoundOutlined,
+    ForwardOutlined,
+    BackwardOutlined,
+    SettingOutlined,
+    CloseOutlined,
+} from '@ant-design/icons';
+import { List, Switch, Select, Slider } from 'antd';
+import { formatTime } from '../utils/formatTime';
+
+interface Frame {
+    title: string;
+    timestamp: number;
+}
 
 interface VideoPlayerProps {
-    url: string;
+    url?: string;
     className?: string;
     videoId: string;
+    frames?: Frame[];
     onVideoWatched?: (videoId: string) => void;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({
-    url,
-    className = '',
-    videoId,
-    onVideoWatched,
-}) => {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const playerRef = useRef<ReactPlayer>(null);
+const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
+    ({ url, className = '', videoId, frames, onVideoWatched }, ref) => {
+        const [isPlaying, setIsPlaying] = useState(false);
+        const [currentTime, setCurrentTime] = useState(0);
+        const [isMuted, setIsMuted] = useState(false);
+        // const [showControls, setShowControls] = useState(false);
+        const [isUserActive, setIsUserActive] = useState(false);
+        const [showSettings, setShowSettings] = useState(false);
+        const [playbackSpeed, setPlaybackSpeed] = useState(1);
+        const [showFrames, setShowFrames] = useState(false);
+        const playerRef = useRef<ReactPlayer>(null);
+        const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+        const [hasBeenCounted, setHasBeenCounted] = useState(false);
 
-    const handlePlayPause = () => {
-        setIsPlaying(!isPlaying);
-    };
-
-    return (
-        <div className={`relative w-full h-full ${className}`}>
-            <ReactPlayer
-                url={url}
-                width="100%"
-                height="100%"
-                playing={isPlaying}
-                ref={playerRef}
-                onProgress={(progress) => {
-                    if (progress.playedSeconds > 30 && onVideoWatched) {
-                        onVideoWatched(videoId);
-                    }
-                }}
-            />
-            <Button
-                icon={
-                    isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />
+        const handlePlayPause = () => {
+            setIsPlaying(!isPlaying);
+            if (!isPlaying) {
+                if (playerRef.current?.getDuration() === currentTime) {
+                    setCurrentTime(0);
                 }
-                onClick={handlePlayPause}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-            />
-        </div>
-    );
-};
+                playerRef.current!.seekTo(currentTime);
+            }
+        };
 
+        const handleSeekChange = (value: number) => {
+            setCurrentTime(value);
+            playerRef.current!.seekTo(value);
+        };
+
+        const handleRewind = () => {
+            const newTime = Math.max(currentTime - 15, 0);
+            setCurrentTime(newTime);
+            playerRef.current!.seekTo(newTime);
+        };
+
+        const handleForward = () => {
+            const newTime = Math.min(
+                currentTime + 15,
+                playerRef.current!.getDuration(),
+            );
+            setCurrentTime(newTime);
+            playerRef.current!.seekTo(newTime);
+        };
+
+        const handleMute = () => {
+            setIsMuted((prev) => !prev);
+        };
+
+        const toggleSettings = () => {
+            setShowSettings(!showSettings);
+        };
+
+        const handleUserActivity = () => {
+            setIsUserActive(true);
+            // setShowControls(true);
+            if (controlsTimeoutRef.current) {
+                clearTimeout(controlsTimeoutRef.current);
+            }
+            controlsTimeoutRef.current = setTimeout(() => {
+                setIsUserActive(false);
+                // setShowControls(false);
+            }, 3000);
+        };
+
+        const handleFrameClick = (timestamp: number) => {
+            setCurrentTime(timestamp);
+            playerRef.current!.seekTo(timestamp);
+            setIsPlaying(true);
+        };
+
+        const toggleFrames = () => {
+            setShowFrames(!showFrames);
+        };
+
+        useEffect(() => {
+            const intervalId = setInterval(() => {
+                if (isPlaying) {
+                    setCurrentTime(playerRef.current!.getCurrentTime());
+                }
+            }, 100);
+
+            return () => {
+                clearInterval(intervalId);
+                if (controlsTimeoutRef.current) {
+                    clearTimeout(controlsTimeoutRef.current);
+                }
+            };
+        }, [isPlaying]);
+
+        const SettingsMenu = () => {
+            return (
+                <motion.div
+                    className="absolute bottom-full right-0 mb-2 rounded-lg bg-black bg-opacity-75 p-4 text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                >
+                    <div className="mb-2">
+                        <Switch
+                            checked={isMuted}
+                            onChange={handleMute}
+                            checkedChildren="Unmute"
+                            unCheckedChildren="Mute"
+                        />
+                    </div>
+                    <div>
+                        <span className="mr-2">Speed:</span>
+                        <Select
+                            value={playbackSpeed}
+                            onChange={(value) => setPlaybackSpeed(value)}
+                            style={{ width: 80 }}
+                        >
+                            <Select.Option value={0.5}>0.5x</Select.Option>
+                            <Select.Option value={1}>1x</Select.Option>
+                            <Select.Option value={1.5}>1.5x</Select.Option>
+                            <Select.Option value={2}>2x</Select.Option>
+                        </Select>
+                    </div>
+                </motion.div>
+            );
+        };
+
+        return (
+            <div
+                className={`relative aspect-video h-full w-full overflow-hidden rounded-lg bg-black ${className}`}
+                ref={ref}
+                onMouseMove={handleUserActivity}
+                onTouchStart={handleUserActivity}
+                onTouchMove={handleUserActivity}
+                onScroll={handleUserActivity}
+            >
+                <ReactPlayer
+                    url={
+                        url ||
+                        'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4'
+                    }
+                    className="aspect-video"
+                    width="100%"
+                    height="100%"
+                    playing={isPlaying}
+                    playbackRate={playbackSpeed}
+                    muted={isMuted}
+                    ref={playerRef}
+                    config={{
+                        file: {
+                            attributes: {
+                                controlsList: 'nodownload',
+                            },
+                        },
+                    }}
+                    onProgress={(progress) => {
+                        const currentTime =
+                            progress.played * playerRef.current!.getDuration();
+                        setCurrentTime(currentTime);
+
+                        const significantDuration = Math.min(
+                            30,
+                            playerRef.current!.getDuration() * 0.3,
+                        );
+                        if (
+                            currentTime >= significantDuration &&
+                            !hasBeenCounted
+                        ) {
+                            setHasBeenCounted(true);
+                            onVideoWatched && onVideoWatched(videoId);
+                        }
+                    }}
+                />
+
+                {/* Center Controls */}
+                <motion.div
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isUserActive ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+                        <BackwardOutlined
+                            className="text-2xl text-white cursor-pointer sm:text-3xl md:text-4xl lg:text-5xl"
+                            onClick={handleRewind}
+                        />
+                        {isPlaying ? (
+                            <PauseCircleOutlined
+                                className="text-3xl text-white cursor-pointer sm:text-4xl md:text-5xl lg:text-6xl"
+                                onClick={handlePlayPause}
+                            />
+                        ) : (
+                            <PlayCircleOutlined
+                                className="text-3xl text-white cursor-pointer sm:text-4xl md:text-5xl lg:text-6xl"
+                                onClick={handlePlayPause}
+                            />
+                        )}
+                        <ForwardOutlined
+                            className="text-2xl text-white cursor-pointer sm:text-3xl md:text-4xl lg:text-5xl"
+                            onClick={handleForward}
+                        />
+                    </div>
+                </motion.div>
+
+                {/* Bottom Controls */}
+                <motion.div
+                    className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 p-2 text-white sm:p-3 md:p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isUserActive ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <div className="mb-1 flex justify-between text-xs sm:mb-2 sm:text-sm">
+                        <span>{formatTime(currentTime)}</span>
+                        <span>
+                            {formatTime(playerRef.current?.getDuration() || 0)}
+                        </span>
+                    </div>
+                    <Slider
+                        min={0}
+                        max={playerRef.current?.getDuration() || 0}
+                        value={currentTime}
+                        onChange={handleSeekChange}
+                        tipFormatter={null}
+                    />
+                    <div className="mt-1 flex items-center justify-between sm:mt-2">
+                        <SoundOutlined
+                            className={`text-lg cursor-pointer sm:text-xl md:text-2xl ${
+                                isMuted ? 'text-gray-400' : 'text-white'
+                            }`}
+                            onClick={handleMute}
+                        />
+                        <div className="flex items-center">
+                            <button
+                                className="mr-2 text-xs sm:text-sm"
+                                onClick={toggleFrames}
+                            >
+                                {showFrames ? 'Hide Frames' : 'Show Frames'}
+                            </button>
+                            <div className="relative">
+                                <SettingOutlined
+                                    className="text-lg cursor-pointer sm:text-xl md:text-2xl"
+                                    onClick={toggleSettings}
+                                />
+                                <AnimatePresence>
+                                    {showSettings && <SettingsMenu />}
+                                </AnimatePresence>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Frames List */}
+                <AnimatePresence>
+                    {showFrames && frames && (
+                        <motion.div
+                            className="absolute right-0 top-0 h-full w-1/4 bg-black bg-opacity-90 p-4 overflow-y-auto"
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                        >
+                            <div className="flex justify-between items-center mb-2">
+                                <div className="text-white font-semibold text-sm">
+                                    Video Frames
+                                </div>
+                                <CloseOutlined
+                                    className="text-white cursor-pointer"
+                                    onClick={toggleFrames}
+                                />
+                            </div>
+                            <List
+                                size="small"
+                                dataSource={frames}
+                                renderItem={(frame) => (
+                                    <List.Item
+                                        onClick={() =>
+                                            handleFrameClick(frame.timestamp)
+                                        }
+                                        className="cursor-pointer text-white hover:bg-gray-800 transition-colors duration-200"
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className="font-medium text-xs text-white">
+                                                {frame.title} -{' '}
+                                                {formatTime(frame.timestamp)}
+                                            </span>
+                                        </div>
+                                    </List.Item>
+                                )}
+                                className="bg-transparent"
+                            />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        );
+    },
+);
+
+VideoPlayer.displayName = 'VideoPlayer';
 export default VideoPlayer;

@@ -1,12 +1,31 @@
+// src/pages/Admin/course/CourseView.tsx
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Card, Button, Tag, Descriptions, Divider } from 'antd';
+import {
+    Card,
+    Button,
+    Tag,
+    Descriptions,
+    Divider,
+    Rate,
+    List,
+    Typography,
+    Collapse,
+} from 'antd';
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useGetSingleCourseInfoQuery } from '../../../api/courseApi';
+import VideoPlayer from '../../../components/VideoPlayer';
+
+const { Title, Text } = Typography;
+const { Panel } = Collapse;
 
 const CourseView: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { data: courseData, isLoading, error } = useGetSingleCourseInfoQuery({ id: id as string ?? '' });
+    const {
+        data: courseData,
+        isLoading,
+        error,
+    } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
 
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error loading course</div>;
@@ -21,21 +40,27 @@ const CourseView: React.FC = () => {
                 <h1 className="text-2xl font-bold">{course.title}</h1>
                 <p className="text-gray-500">
                     <Link to="/iadmin/courses">Courses</Link> {' > '}
-                    <Link to={`/iadmin/courses/${id}`}>
-                        {courseData?.data?.title || 'Course'}
-                    </Link>
+                    <Link to={`/iadmin/courses/${id}`}>{course.title}</Link>
                     {' > '}
                     Details
-                </p>{' '}
+                </p>
             </div>
             <Card>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <img
-                            src={course.media.videoThumbnail}
-                            alt={course.title}
-                            className="w-full h-64 object-cover rounded-lg"
-                        />
+                        {course.media.previewVideo ? (
+                            <VideoPlayer
+                                url={course.media.previewVideo}
+                                videoId={course.id}
+                                className="w-full h-64 rounded-lg"
+                            />
+                        ) : (
+                            <img
+                                src={course.media.videoThumbnail}
+                                alt={course.title}
+                                className="w-full h-64 object-cover rounded-lg"
+                            />
+                        )}
                     </div>
                     <div>
                         <Descriptions
@@ -53,11 +78,22 @@ const CourseView: React.FC = () => {
                             <Descriptions.Item label="Status">
                                 {course.status}
                             </Descriptions.Item>
+                            <Descriptions.Item label="Rating">
+                                <Rate
+                                    disabled
+                                    defaultValue={course.stats.overallRating}
+                                />{' '}
+                                ({course.stats.ratingCount} reviews)
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Students">
+                                {course.stats.numberOfPaidStudents}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Modules">
+                                {course.stats.numberOfModules}
+                            </Descriptions.Item>
                         </Descriptions>
                         <div className="mt-4">
-                            <h3 className="text-lg font-semibold mb-2">
-                                Categories:
-                            </h3>
+                            <Title level={4}>Categories:</Title>
                             {course.category.map((cat, index) => (
                                 <Tag
                                     key={index}
@@ -72,17 +108,57 @@ const CourseView: React.FC = () => {
                 </div>
                 <Divider />
                 <div>
-                    <h2 className="text-xl font-semibold mb-2">Description</h2>
-                    <p>{course.description}</p>
+                    <Title level={3}>Description</Title>
+                    <Text>{course.description}</Text>
                 </div>
                 <Divider />
                 <div>
-                    <h2 className="text-xl font-semibold mb-2">Requirements</h2>
+                    <Title level={3}>Requirements</Title>
                     <ul className="list-disc list-inside">
                         {course.requirements.map((req, index) => (
                             <li key={index}>{req}</li>
                         ))}
                     </ul>
+                </div>
+                <Divider />
+                <div>
+                    <Title level={3}>Modules</Title>
+                    <Collapse accordion>
+                        {course.modules.map((module, index) => (
+                            <Panel
+                                header={`${index + 1}. ${module.title}`}
+                                key={module.id}
+                            >
+                                <Text>{module.description}</Text>
+                                <VideoPlayer
+                                    url={module.url}
+                                    videoId={module.id}
+                                    frames={module.frames}
+                                    className="mt-4"
+                                />
+                            </Panel>
+                        ))}
+                    </Collapse>
+                </div>
+                <Divider />
+                <div>
+                    <Title level={3}>Reviews</Title>
+                    <List
+                        dataSource={course.reviews}
+                        renderItem={(review) => (
+                            <List.Item>
+                                <List.Item.Meta
+                                    title={
+                                        <Rate
+                                            disabled
+                                            defaultValue={review.rating}
+                                        />
+                                    }
+                                    description={review.comment}
+                                />
+                            </List.Item>
+                        )}
+                    />
                 </div>
                 <Divider />
                 <div className="flex justify-end">
@@ -91,7 +167,7 @@ const CourseView: React.FC = () => {
                             Edit Course
                         </Button>
                     </Link>
-                    <Button>Delete Course</Button>
+                    <Button danger>Delete Course</Button>
                 </div>
             </Card>
         </DashboardLayout>
