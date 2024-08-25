@@ -15,7 +15,7 @@ const DashboardHeader: React.FC = () => {
                     alt="EDUMIN"
                     className="w-8 h-8"
                 />
-                <span className="text-white font-bold text-xl">EDUMIN</span>
+                <span className="text-white font-bold text-sm">Texas Private Network</span>
             </div>
             <div className="relative flex-grow max-w-xl mx-4 hidden md:block">
                 <Input

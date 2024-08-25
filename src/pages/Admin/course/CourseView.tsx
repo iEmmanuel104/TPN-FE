@@ -127,7 +127,7 @@ const CourseView: React.FC = () => {
                                 ))}
                             </Descriptions.Item>
                             <Descriptions.Item label="Assessment">
-                                {course.assessment.hasAssessment
+                                {course.assessment?.hasAssessment && course.assessment.benchmark
                                     ? `Yes (Benchmark: ${course?.assessment?.benchmark ? course.assessment.benchmark * 100 : 0}%)`
                                     : 'No'}
                             </Descriptions.Item>

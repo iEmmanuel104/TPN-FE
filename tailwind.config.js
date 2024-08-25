@@ -8,9 +8,15 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: '#EB1D25',
+                primary: '#EB1D25', 
+                fontSize: {
+                    'xxs': '0.625rem', // 10px
+                },
             },
         },
     },
-    plugins: [require('flowbite/plugin')],
+    plugins: [
+        require('flowbite/plugin'),
+        require('@tailwindcss/line-clamp'),
+    ],
 };
