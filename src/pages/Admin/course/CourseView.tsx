@@ -12,8 +12,18 @@ import {
     Typography,
     Collapse,
     Avatar,
+    Row,
+    Col,
+    Progress,
 } from 'antd';
-import { TwitterOutlined, LinkedinOutlined } from '@ant-design/icons';
+import {
+    TwitterOutlined,
+    LinkedinOutlined,
+    UserOutlined,
+    BookOutlined,
+    FileTextOutlined,
+    PlayCircleOutlined,
+} from '@ant-design/icons';
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useGetSingleCourseInfoQuery } from '../../../api/courseApi';
 import VideoPlayer from '../../../components/VideoPlayer';
@@ -37,43 +47,67 @@ const CourseView: React.FC = () => {
 
     if (!course) return <div>Course not found</div>;
 
+    const totalDuration = course.modules.reduce(
+        (acc, module) => acc + (module.videoInfo?.length || 0),
+        0,
+    );
+
     return (
         <DashboardLayout>
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">{course.title}</h1>
-                <p className="text-gray-500">
+            <div className="mb-4">
+                <h1 className="text-xl font-bold">{course.title}</h1>
+                <p className="text-xs text-gray-500">
                     <Link to="/iadmin/courses">Courses</Link> {' > '}
                     <Link to={`/iadmin/courses/${id}`}>{course.title}</Link>
-                    {' > '}
-                    Details
+                    {' > '} Details
                 </p>
             </div>
             <Card>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
+                <Row gutter={16}>
+                    <Col span={16}>
                         {course.media.previewVideo ? (
                             <VideoPlayer
                                 url={course.media.previewVideo}
                                 videoId={course.id}
-                                className="w-full h-64 rounded-lg"
+                                className="w-full h-full rounded-lg"
                             />
                         ) : (
                             <img
                                 src={course.media.videoThumbnail}
                                 alt={course.title}
-                                className="w-full h-64 object-cover rounded-lg"
+                                className="w-full h-80 object-cover rounded-lg"
                             />
                         )}
-                    </div>
-                    <div>
-                        <Descriptions
-                            title="Course Information"
-                            layout="vertical"
-                            bordered
-                        >
+                    </Col>
+                    <Col span={8}>
+                        <Descriptions size="small" column={1} bordered>
                             <Descriptions.Item label="Price">
-                                {course.currency.symbol}
-                                {course.price}
+                                <Text strong>
+                                    {course.currency.symbol}
+                                    {course.price}
+                                </Text>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Students">
+                                <Text>
+                                    <UserOutlined />{' '}
+                                    {course.stats.numberOfPaidStudents}
+                                </Text>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Modules">
+                                <Text>
+                                    <BookOutlined />{' '}
+                                    {course.stats.numberOfModules}
+                                </Text>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Rating">
+                                <Rate
+                                    disabled
+                                    defaultValue={course.stats.overallRating}
+                                    style={{ fontSize: '12px' }}
+                                />
+                                <Text className="ml-2 text-xs">
+                                    ({course.stats.ratingCount} reviews)
+                                </Text>
                             </Descriptions.Item>
                             <Descriptions.Item label="Level">
                                 {course.level}
@@ -81,151 +115,232 @@ const CourseView: React.FC = () => {
                             <Descriptions.Item label="Status">
                                 {course.status}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Rating">
-                                <Rate
-                                    disabled
-                                    defaultValue={course.stats.overallRating}
-                                />{' '}
-                                ({course.stats.ratingCount} reviews)
+                            <Descriptions.Item label="Categories">
+                                {course.category.map((cat, index) => (
+                                    <Tag
+                                        key={index}
+                                        color="blue"
+                                        className="mr-1 mb-1 text-xs"
+                                    >
+                                        {cat}
+                                    </Tag>
+                                ))}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Students">
-                                {course.stats.numberOfPaidStudents}
+                            <Descriptions.Item label="Assessment">
+                                {course.assessment.hasAssessment
+                                    ? `Yes (Benchmark: ${course?.assessment?.benchmark ? course.assessment.benchmark * 100 : 0}%)`
+                                    : 'No'}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Modules">
-                                {course.stats.numberOfModules}
+                            <Descriptions.Item label="Certificate">
+                                Available
                             </Descriptions.Item>
                         </Descriptions>
-                        <div className="mt-4">
-                            <Title level={4}>Categories:</Title>
-                            {course.category.map((cat, index) => (
-                                <Tag
-                                    key={index}
-                                    color="blue"
-                                    className="mr-1 mb-1"
-                                >
-                                    {cat}
-                                </Tag>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                    </Col>
+                </Row>
                 <Divider />
-                <div>
-                    <Title level={3}>Description</Title>
-                    <Text>{course.description}</Text>
-                </div>
-                <Divider />
-                <div>
-                    <Title level={3}>Requirements</Title>
-                    <ul className="list-disc list-inside">
-                        {course.requirements.map((req, index) => (
-                            <li key={index}>{req}</li>
-                        ))}
-                    </ul>
-                </div>
-                <Divider />
-                <div>
-                    <Title level={3}>Modules</Title>
-                    <Collapse accordion>
-                        {course.modules.map((module, index) => (
-                            <Panel
-                                header={`${index + 1}. ${module.title} - ${formatVideoLength(module.videoInfo?.length || 0)}`}
-                                key={module.id}
-                            >
-                                <Text>{module.description}</Text>
-                                <VideoPlayer
-                                    url={module.url}
-                                    videoId={module.id}
-                                    frames={module.frames}
-                                    className="mt-4"
-                                />
-                            </Panel>
-                        ))}
-                    </Collapse>
-                </div>
-                <Divider />
-                <div>
-                    <Title level={3}>Instructor</Title>
-                    <Card className="mt-4">
-                        <div className="flex flex-col sm:flex-row items-center sm:items-start">
-                            <div className="mb-4 sm:mb-0 sm:mr-4 w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36">
+                <Row gutter={16}>
+                    <Col span={16}>
+                        <Card title="Description" size="small">
+                            <Paragraph className="text-sm">
+                                {course.description}
+                            </Paragraph>
+                        </Card>
+                        <Card
+                            title="Requirements"
+                            size="small"
+                            className="mt-4"
+                        >
+                            <ul className="list-disc list-inside text-sm">
+                                {course.requirements.map((req, index) => (
+                                    <li key={index}>{req}</li>
+                                ))}
+                            </ul>
+                        </Card>
+                    </Col>
+                    <Col span={8}>
+                        <Card title="Instructor" size="small">
+                            <div className="flex items-center">
                                 <Avatar
-                                    className="w-full h-full"
+                                    size={48}
                                     src={
                                         course.instructor.info.profilePictureUrl
                                     }
                                     alt={course.instructor.name}
                                 />
+                                <div className="ml-4">
+                                    <Text strong className="text-sm">
+                                        {course.instructor.name}
+                                    </Text>
+                                    <br />
+                                    <Text className="text-xs text-gray-500">
+                                        {course.instructor.email}
+                                    </Text>
+                                </div>
                             </div>
-                            <div className="ml-4 flex-grow">
-                                <Title level={4}>
-                                    {course.instructor.name}
-                                </Title>
-                                <Paragraph className="text-gray-500">
-                                    {course.instructor.email}
-                                </Paragraph>
-                                <Paragraph>{course.instructor.bio}</Paragraph>
-                                {course.instructor.socials && (
-                                    <div className="mt-2">
-                                        {course.instructor.socials.x && (
-                                            <a
-                                                href={
-                                                    course.instructor.socials.x
-                                                }
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="mr-4 text-blue-500 hover:text-blue-700"
-                                            >
-                                                <TwitterOutlined /> Twitter
-                                            </a>
-                                        )}
-                                        {course.instructor.socials.linkedin && (
-                                            <a
-                                                href={
-                                                    course.instructor.socials
-                                                        .linkedin
-                                                }
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-500 hover:text-blue-700"
-                                            >
-                                                <LinkedinOutlined /> LinkedIn
-                                            </a>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </Card>
-                </div>
+                            <Paragraph className="text-xs mt-2">
+                                {course.instructor.bio}
+                            </Paragraph>
+                            {course.instructor.socials && (
+                                <div className="mt-2">
+                                    {course.instructor.socials.x && (
+                                        <Button
+                                            icon={<TwitterOutlined />}
+                                            href={course.instructor.socials.x}
+                                            target="_blank"
+                                            size="small"
+                                            className="mr-2"
+                                        >
+                                            Twitter
+                                        </Button>
+                                    )}
+                                    {course.instructor.socials.linkedin && (
+                                        <Button
+                                            icon={<LinkedinOutlined />}
+                                            href={
+                                                course.instructor.socials
+                                                    .linkedin
+                                            }
+                                            target="_blank"
+                                            size="small"
+                                        >
+                                            LinkedIn
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </Card>
+                    </Col>
+                </Row>
                 <Divider />
-                <div>
-                    <Title level={3}>Reviews</Title>
-                    <List
-                        dataSource={course.reviews}
-                        renderItem={(review) => (
-                            <List.Item>
-                                <List.Item.Meta
-                                    title={
-                                        <Rate
-                                            disabled
-                                            defaultValue={review.rating}
+                <Title level={5}>Course Content</Title>
+                <Row gutter={16}>
+                    <Col span={16}>
+                        <Card>
+                            <Collapse accordion className="mb-4">
+                                {course.modules.map((module) => (
+                                    <Panel
+                                        header={
+                                            <div className="flex justify-between items-center">
+                                                <Text
+                                                    strong
+                                                >{`Module ${module.episodeNumber}: ${module.title}`}</Text>
+                                                <Text className="text-gray-500">
+                                                    {formatVideoLength(
+                                                        module.videoInfo
+                                                            ?.length || 0,
+                                                    )}
+                                                </Text>
+                                            </div>
+                                        }
+                                        key={module.id}
+                                    >
+                                        <Paragraph className="text-sm mb-2">
+                                            {module.description}
+                                        </Paragraph>
+                                        <VideoPlayer
+                                            url={module.url}
+                                            videoId={module.id}
+                                            frames={module.frames}
+                                            className="mb-4"
                                         />
-                                    }
-                                    description={review.comment}
-                                />
-                            </List.Item>
-                        )}
-                    />
-                </div>
+                                        <List
+                                            size="small"
+                                            dataSource={[
+                                                {
+                                                    icon: (
+                                                        <PlayCircleOutlined />
+                                                    ),
+                                                    text: 'Video Lecture',
+                                                    duration: formatVideoLength(
+                                                        module.videoInfo
+                                                            ?.length || 0,
+                                                    ),
+                                                },
+                                                {
+                                                    icon: <FileTextOutlined />,
+                                                    text: 'Reading Material',
+                                                    duration: '10 mins',
+                                                },
+                                            ]}
+                                            renderItem={(item) => (
+                                                <List.Item>
+                                                    <List.Item.Meta
+                                                        avatar={item.icon}
+                                                        title={item.text}
+                                                        description={
+                                                            item.duration
+                                                        }
+                                                    />
+                                                </List.Item>
+                                            )}
+                                        />
+                                    </Panel>
+                                ))}
+                            </Collapse>
+                        </Card>
+                    </Col>
+                    <Col span={8}>
+                        <Card>
+                            <Title level={5}>Course Overview</Title>
+                            <Progress percent={30} status="active" />
+                            <Text className="block mt-1 text-xs">
+                                {course.modules.length} modules •{' '}
+                                {formatVideoLength(totalDuration)}
+                            </Text>
+                            <Divider />
+                            <Title level={5}>Learning Outcomes</Title>
+                            <ul className="list-disc list-inside">
+                                {course.learningOutcome.map(
+                                    (outcome, index) => (
+                                        <li key={index} className="text-xs mb-1">
+                                            {outcome}
+                                        </li>
+                                    ),
+                                )}
+                            </ul>
+                        </Card>
+                    </Col>
+                </Row>
+                <Title level={5}>Student Reviews</Title>
+                <List
+                    size="small"
+                    itemLayout="horizontal"
+                    dataSource={course.reviews}
+                    renderItem={(review) => (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={
+                                    <Avatar
+                                        icon={<UserOutlined />}
+                                        size="small"
+                                    />
+                                }
+                                title={
+                                    <Rate
+                                        disabled
+                                        defaultValue={review.rating}
+                                        style={{ fontSize: '12px' }}
+                                    />
+                                }
+                                description={
+                                    <Text className="text-xs">
+                                        {review.comment}
+                                    </Text>
+                                }
+                            />
+                        </List.Item>
+                    )}
+                />
                 <Divider />
                 <div className="flex justify-end">
                     <Link to={`/iadmin/courses/${id}/edit`}>
-                        <Button type="primary" className="mr-2">
+                        <Button type="primary" size="small" className="mr-2">
                             Edit Course
                         </Button>
                     </Link>
-                    <Button danger>Delete Course</Button>
+                    <Button danger size="small">
+                        Delete Course
+                    </Button>
                 </div>
             </Card>
         </DashboardLayout>

@@ -48,6 +48,7 @@ export interface CourseDto {
     instructorId: string;
     instructor: InstructorDto;
     requirements: string[];
+    learningOutcome: string[];
     certificateId?: string;
     customStyles?: Record<string, string>;
     createdAt: string;
