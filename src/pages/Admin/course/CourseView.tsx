@@ -20,7 +20,7 @@ import {
     TwitterOutlined,
     LinkedinOutlined,
     UserOutlined,
-    BookOutlined,
+    ReadOutlined,
     FileTextOutlined,
     PlayCircleOutlined,
 } from '@ant-design/icons';
@@ -95,7 +95,7 @@ const CourseView: React.FC = () => {
                             </Descriptions.Item>
                             <Descriptions.Item label="Modules">
                                 <Text>
-                                    <BookOutlined />{' '}
+                                    <ReadOutlined />{' '}
                                     {course.stats.numberOfModules}
                                 </Text>
                             </Descriptions.Item>

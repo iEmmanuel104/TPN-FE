@@ -3,6 +3,7 @@ import { Card, Rate, Tag, Typography, Badge } from 'antd';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useGetAllCoursesQuery } from '../../../api/courseApi';
+import { UserOutlined, ReadOutlined } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
 
@@ -23,7 +24,7 @@ const levelColors = {
 const statusColors = {
     Published: 'green',
     New: 'orange',
-    Uploaded: 'red',
+    Uploaded: 'blue',
 };
 
 const CourseList: React.FC = () => {
@@ -62,9 +63,12 @@ const CourseList: React.FC = () => {
                 <Text className="text-gray-500 mb-4 block text-xs">
                     Courses {'>'} All Courses
                 </Text>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
                     {courses.map((course) => (
-                        <Link to={`/iadmin/courses/${course.id}`} key={course.id}>
+                        <Link
+                            to={`/iadmin/courses/${course.id}`}
+                            key={course.id}
+                        >
                             <Badge.Ribbon
                                 text={course.status}
                                 color={getStatusColor(course.status)}
@@ -79,7 +83,7 @@ const CourseList: React.FC = () => {
                                                 src={
                                                     course.media.videoThumbnail
                                                 }
-                                                className="h-32 w-full object-cover"
+                                                className="h-40 w-full object-cover"
                                             />
                                         </div>
                                     }
@@ -99,31 +103,37 @@ const CourseList: React.FC = () => {
                                         >
                                             {course.title}
                                         </Title>
-                                        <Text className="text-gray-500 text-xxs mb-1 h-8 overflow-hidden">
+                                        <Text className="text-gray-500 text-xs mb-2 h-8 overflow-hidden">
                                             {truncateDescription(
                                                 course.description,
                                                 60,
                                             )}
                                         </Text>
-                                        <div className="flex items-center mb-1">
+                                        <div className="flex items-center mb-2">
                                             <Rate
                                                 disabled
                                                 defaultValue={
                                                     course.stats.overallRating
                                                 }
-                                                className="text-xxs mr-1"
+                                                className="text-xs mr-1"
                                             />
-                                            <Text className="text-xxs text-gray-500">
+                                            <Text className="text-xs text-gray-500">
                                                 ({course.stats.ratingCount})
                                             </Text>
                                         </div>
-                                        <Text className="text-xxs text-gray-500 mb-1">
-                                            {course.stats.numberOfPaidStudents}{' '}
-                                            students
-                                        </Text>
+                                        <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
+                                            <span>
+                                                <UserOutlined className="mr-1" />
+                                                { course.stats.numberOfPaidStudents } students
+                                            </span>
+                                            <span>
+                                                <ReadOutlined className="mr-1" />
+                                                {course.stats.numberOfModules} modules
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="mt-auto">
-                                        <div className="flex justify-between items-center mb-1">
+                                        <div className="flex justify-between items-center mb-2">
                                             <Text className="font-bold text-xs">
                                                 {course.currency.symbol}
                                                 {course.price}
@@ -132,7 +142,7 @@ const CourseList: React.FC = () => {
                                                 color={getLevelColor(
                                                     course.level,
                                                 )}
-                                                className="text-xxs px-1 py-0"
+                                                className="text-xs px-1 py-0"
                                             >
                                                 {course.level}
                                             </Tag>
@@ -143,7 +153,7 @@ const CourseList: React.FC = () => {
                                                 .map((cat, index) => (
                                                     <Tag
                                                         key={index}
-                                                        className="text-xxs px-1 py-0"
+                                                        className="text-xs px-1 py-0"
                                                     >
                                                         {cat}
                                                     </Tag>
