@@ -1,16 +1,18 @@
 // src/components/CourseForm.tsx
+
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, InputNumber, Upload } from 'antd';
+import { Form, Input, Button, Select, InputNumber, Switch } from 'antd';
 import { UploadOutlined, EditOutlined } from '@ant-design/icons';
-import { CourseDto, CourseLevel } from '../api/courseApi';
+import { CourseDto, CourseLevel, CourseStatus } from '../api/courseApi';
 import VideoPlayer from './VideoPlayer';
 import categories from '../constants/categories.json';
+import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 interface CourseFormProps {
-    onFinish: (values: Partial<CourseDto>) => void;
+    onFinish: (values: Partial<CourseDto>) => Promise<void>;
     initialValues?: Partial<CourseDto>;
     submitButtonText: string;
 }
@@ -24,62 +26,90 @@ const currencies = [
 
 const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submitButtonText }) => {
     const [form] = Form.useForm<Partial<CourseDto>>();
-    const [hoverThumbnail, setHoverThumbnail] = useState(false);
-    const [hoverVideo, setHoverVideo] = useState(false);
     const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
+    const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+    const { openWidget: openThumbnailWidget } = useCloudinaryWidget({
+        onSuccess: (url) => {
+            setThumbnailUrl(url);
+            form.setFieldsValue({ media: { ...form.getFieldValue('media'), videoThumbnail: url } });
+        },
+    });
+
+    const { openWidget: openVideoWidget } = useCloudinaryWidget({
+        onSuccess: (url) => {
+            setVideoUrl(url);
+            form.setFieldsValue({ media: { ...form.getFieldValue('media'), previewVideo: url } });
+        },
+    });
 
     useEffect(() => {
         if (initialValues) {
             form.setFieldsValue(initialValues);
-            const initialCurrency =
-                currencies.find(
-                    (c) => c.code === initialValues.currency?.code,
-                ) || currencies[0];
+            const initialCurrency = currencies.find((c) => c.code === initialValues.currency?.code) || currencies[0];
             setSelectedCurrency(initialCurrency);
+            setThumbnailUrl(initialValues.media?.videoThumbnail || null);
+            setVideoUrl(initialValues.media?.previewVideo || null);
         }
     }, [initialValues, form]);
 
-     const handleCurrencyChange = (value: string) => {
-         const newCurrency =
-             currencies.find((c) => c.code === value) || currencies[0];
-         setSelectedCurrency(newCurrency);
-         form.setFieldsValue({
-             currency: { code: newCurrency.code, symbol: newCurrency.symbol },
-         });
-     };
+    const handleCurrencyChange = (value: string) => {
+        const newCurrency = currencies.find((c) => c.code === value) || currencies[0];
+        setSelectedCurrency(newCurrency);
+        form.setFieldsValue({
+            currency: { code: newCurrency.code, symbol: newCurrency.symbol },
+        });
+    };
 
+    const handleFinish = (values: Partial<CourseDto>) => {
+        onFinish(values);
+    };
+    
     return (
-        <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            initialValues={initialValues}
-            className="bg-white rounded-lg p-4"
-        >
+        <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues} className="bg-white rounded-lg p-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">
-                            Basic Information
-                        </h3>
+                        <h3 className="text-lg font-semibold mb-2">Basic Information</h3>
                         <Form.Item
                             name="title"
                             label="Course Title"
-                            rules={[{ required: true }]}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input the course title',
+                                },
+                            ]}
                         >
                             <Input />
                         </Form.Item>
                         <Form.Item
                             name="description"
                             label="Description"
-                            rules={[{ required: true }]}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input the course description',
+                                },
+                            ]}
                         >
                             <TextArea rows={4} />
                         </Form.Item>
                         <Form.Item
                             name="category"
                             label="Categories"
-                            rules={[{ required: true }]}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please select at least one category',
+                                },
+                                {
+                                    type: 'array',
+                                    max: 5,
+                                    message: 'You can select up to 5 categories',
+                                },
+                            ]}
                         >
                             <Select mode="tags" placeholder="Select categories">
                                 {categories.map((category) => (
@@ -89,16 +119,28 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                 ))}
                             </Select>
                         </Form.Item>
+                        <Form.Item name="status" label="Course Status" rules={[{ required: true }]}>
+                            <Select>
+                                {Object.values(CourseStatus).map((status) => (
+                                    <Option key={status} value={status}>
+                                        {status}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">
-                            Course Details
-                        </h3>
+                        <h3 className="text-lg font-semibold mb-2">Course Details</h3>
                         <div className="grid grid-cols-2 gap-4">
                             <Form.Item
                                 name="level"
                                 label="Course Level"
-                                rules={[{ required: true }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please select the course level',
+                                    },
+                                ]}
                             >
                                 <Select>
                                     {Object.values(CourseLevel).map((level) => (
@@ -111,22 +153,20 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                             <Form.Item
                                 name="price"
                                 label="Price"
-                                rules={[{ required: true }]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input the course price',
+                                    },
+                                ]}
                             >
                                 <InputNumber
                                     min={0}
                                     className="w-full"
                                     addonBefore={
-                                        <Select
-                                            value={selectedCurrency.code}
-                                            onChange={handleCurrencyChange}
-                                            style={{ width: 90 }}
-                                        >
+                                        <Select value={selectedCurrency.code} onChange={handleCurrencyChange} style={{ width: 90 }}>
                                             {currencies.map((c) => (
-                                                <Option
-                                                    key={c.code}
-                                                    value={c.code}
-                                                >
+                                                <Option key={c.code} value={c.code}>
                                                     {c.code} ({c.symbol})
                                                 </Option>
                                             ))}
@@ -145,109 +185,133 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                 </div>
                 <div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">
-                            Requirements
-                        </h3>
+                        <h3 className="text-lg font-semibold mb-2">Requirements and Learning Outcomes</h3>
                         <Form.Item
                             name="requirements"
                             label="Course Requirements"
+                            rules={[
+                                {
+                                    type: 'array',
+                                    max: 5,
+                                    message: 'You can add up to 5 requirements',
+                                },
+                            ]}
                         >
-                            <Select
-                                mode="tags"
-                                placeholder="Add requirements"
-                            />
+                            <Select mode="tags" placeholder="Add requirements" />
+                        </Form.Item>
+                        <Form.Item
+                            name="learningOutcome"
+                            label="Learning Outcomes"
+                            rules={[
+                                {
+                                    type: 'array',
+                                    max: 5,
+                                    message: 'You can add up to 5 learning outcomes',
+                                },
+                            ]}
+                        >
+                            <Select mode="tags" placeholder="Add learning outcomes" />
                         </Form.Item>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">Media</h3>
+                        <h3 className="text-lg font-semibold mb-2">Assessment</h3>
                         <div className="grid grid-cols-2 gap-4">
+                            <Form.Item name={['assessment', 'hasAssessment']} label="Has Assessment" valuePropName="checked">
+                                <Switch />
+                            </Form.Item>
                             <Form.Item
-                                name={['media', 'videoThumbnail']}
-                                label="Thumbnail"
+                                name={['assessment', 'benchmark']}
+                                label="Benchmark Score"
+                                rules={[
+                                    {
+                                        type: 'number',
+                                        min: 0.6,
+                                        max: 1,
+                                        message: 'Benchmark must be between 60% and 100%',
+                                    },
+                                ]}
                             >
-                                <div
-                                    className="media-container h-48 w-full relative border border-dashed border-gray-300 rounded-md overflow-hidden"
-                                    onMouseEnter={() => setHoverThumbnail(true)}
-                                    onMouseLeave={() =>
-                                        setHoverThumbnail(false)
+                                <Form.Item
+                                    noStyle
+                                    shouldUpdate={(prevValues, currentValues) =>
+                                        prevValues.assessment?.hasAssessment !== currentValues.assessment?.hasAssessment
                                     }
                                 >
-                                    {initialValues?.media?.videoThumbnail ? (
-                                        <>
-                                            <img
-                                                src={
-                                                    initialValues.media
-                                                        .videoThumbnail
-                                                }
-                                                alt="Course Thumbnail"
-                                                className="w-full h-full object-cover"
+                                    {({ getFieldValue }) => {
+                                        const hasAssessment = getFieldValue(['assessment', 'hasAssessment']);
+                                        return (
+                                            <InputNumber
+                                                step={1}
+                                                disabled={!hasAssessment}
+                                                formatter={(value) => {
+                                                    return value ? `${value}%` : '';
+                                                }}
+                                                parser={(value) => {
+                                                    const parsedValue = value ? parseInt(value.replace('%', ''), 10) : 60;
+                                                    return isNaN(parsedValue) ? 60 : Math.max(60, Math.min(100, parsedValue));
+                                                }}
+                                                onChange={(value) => {
+                                                    if (value !== null) {
+                                                        const unitValue = typeof value === 'number' ? value / 100 : 0;
+                                                        form.setFieldsValue({
+                                                            assessment: {
+                                                                ...form.getFieldValue('assessment'),
+                                                                benchmark: unitValue,
+                                                            },
+                                                        });
+                                                    }
+                                                }}
+                                                className="w-full"
                                             />
-                                            {hoverThumbnail && (
-                                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                    <Upload>
-                                                        <Button
-                                                            icon={
-                                                                <EditOutlined />
-                                                            }
-                                                        >
-                                                            Edit Thumbnail
-                                                        </Button>
-                                                    </Upload>
-                                                </div>
-                                            )}
+                                        );
+                                    }}
+                                </Form.Item>
+                            </Form.Item>
+                        </div>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                        <h3 className="text-lg font-semibold mb-2">Media</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Form.Item name={['media', 'videoThumbnail']} label="Thumbnail">
+                                <div className="media-container h-48 w-full relative border border-dashed border-gray-300 rounded-md overflow-hidden">
+                                    {thumbnailUrl ? (
+                                        <>
+                                            <img src={thumbnailUrl} alt="Course Thumbnail" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                <Button icon={<EditOutlined />} onClick={openThumbnailWidget}>
+                                                    Edit Thumbnail
+                                                </Button>
+                                            </div>
                                         </>
                                     ) : (
-                                        <Upload>
-                                            <div className="flex flex-col items-center justify-center h-full">
+                                        <div className="w-full h-full flex items-center justify-center" onClick={openThumbnailWidget}>
+                                            <div className="text-center">
                                                 <UploadOutlined className="text-2xl mb-2" />
-                                                <span>Upload Thumbnail</span>
+                                                <p>Upload Thumbnail</p>
                                             </div>
-                                        </Upload>
+                                        </div>
                                     )}
                                 </div>
                             </Form.Item>
-                            <Form.Item
-                                name={['media', 'previewVideo']}
-                                label="Preview Video"
-                            >
-                                <div
-                                    className="media-container h-48 w-full relative border border-dashed border-gray-300 rounded-md overflow-hidden"
-                                    onMouseEnter={() => setHoverVideo(true)}
-                                    onMouseLeave={() => setHoverVideo(false)}
-                                >
-                                    {initialValues?.media?.previewVideo ? (
+                            <Form.Item name={['media', 'previewVideo']} label="Preview Video">
+                                <div className="media-container h-48 w-full relative border border-dashed border-gray-300 rounded-md overflow-hidden">
+                                    {videoUrl ? (
                                         <>
-                                            <VideoPlayer
-                                                url={
-                                                    initialValues.media
-                                                        .previewVideo
-                                                }
-                                                videoId={initialValues.id || ''}
-                                                className="w-full h-full"
-                                            />
-                                            {hoverVideo && (
-                                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                    <Upload>
-                                                        <Button
-                                                            icon={
-                                                                <EditOutlined />
-                                                            }
-                                                        >
-                                                            Edit Video
-                                                        </Button>
-                                                    </Upload>
-                                                </div>
-                                            )}
+                                            <VideoPlayer url={videoUrl} videoId={initialValues?.id || ''} className="w-full h-full" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                <Button icon={<EditOutlined />} onClick={openVideoWidget}>
+                                                    Edit Video
+                                                </Button>
+                                            </div>
                                         </>
                                     ) : (
-                                        <Upload>
-                                            <div className="flex flex-col items-center justify-center h-full">
+                                        <div className="w-full h-full flex items-center justify-center" onClick={openVideoWidget}>
+                                            <div className="text-center">
                                                 <UploadOutlined className="text-2xl mb-2" />
-                                                <span>
-                                                    Upload Preview Video
-                                                </span>
+                                                <p>Upload Preview Video</p>
                                             </div>
-                                        </Upload>
+                                        </div>
                                     )}
                                 </div>
                             </Form.Item>
