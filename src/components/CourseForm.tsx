@@ -1,7 +1,7 @@
 // src/components/CourseForm.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, InputNumber, Switch } from 'antd';
+import { Form, Input, Button, Select, InputNumber, Switch, Spin } from 'antd';
 import { UploadOutlined, EditOutlined } from '@ant-design/icons';
 import { CourseDto, CourseLevel, CourseStatus } from '../api/courseApi';
 import VideoPlayer from './VideoPlayer';
@@ -29,11 +29,17 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
     const [selectedCurrency, setSelectedCurrency] = useState(currencies[0]);
     const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [isThumbnailLoading, setIsThumbnailLoading] = useState(false);
+    const [isVideoLoading, setIsVideoLoading] = useState(false);
 
     const { openWidget: openThumbnailWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
             setThumbnailUrl(url);
             form.setFieldsValue({ media: { ...form.getFieldValue('media'), videoThumbnail: url } });
+            setIsThumbnailLoading(false);
+        },
+        onClose: () => {
+            setIsThumbnailLoading(false);
         },
     });
 
@@ -41,6 +47,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
         onSuccess: (url) => {
             setVideoUrl(url);
             form.setFieldsValue({ media: { ...form.getFieldValue('media'), previewVideo: url } });
+            setIsVideoLoading(false);
+        },
+        onClose: () => {
+            setIsVideoLoading(false);
         },
     });
 
@@ -65,7 +75,17 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
     const handleFinish = (values: Partial<CourseDto>) => {
         onFinish(values);
     };
-    
+
+    const handleOpenThumbnailWidget = () => {
+        setIsThumbnailLoading(true);
+        openThumbnailWidget();
+    };
+
+    const handleOpenVideoWidget = () => {
+        setIsVideoLoading(true);
+        openVideoWidget();
+    };
+
     return (
         <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={initialValues} className="bg-white rounded-lg p-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -277,18 +297,33 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                 <div className="media-container h-48 w-full relative border border-dashed border-gray-300 rounded-md overflow-hidden">
                                     {thumbnailUrl ? (
                                         <>
-                                            <img src={thumbnailUrl} alt="Course Thumbnail" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                <Button icon={<EditOutlined />} onClick={openThumbnailWidget}>
-                                                    Edit Thumbnail
+                                            <div className="w-full h-full relative">
+                                                <img
+                                                    src={thumbnailUrl}
+                                                    alt="Course Thumbnail"
+                                                    className="absolute inset-0 w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                                <Button icon={<EditOutlined />} onClick={handleOpenThumbnailWidget} loading={isThumbnailLoading}>
+                                                    {isThumbnailLoading ? 'Loading...' : 'Edit Thumbnail'}
                                                 </Button>
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center" onClick={openThumbnailWidget}>
+                                        <div
+                                            className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors duration-300"
+                                            onClick={handleOpenThumbnailWidget}
+                                        >
                                             <div className="text-center">
-                                                <UploadOutlined className="text-2xl mb-2" />
-                                                <p>Upload Thumbnail</p>
+                                                {isThumbnailLoading ? (
+                                                    <Spin />
+                                                ) : (
+                                                    <>
+                                                        <UploadOutlined className="text-2xl mb-2" />
+                                                        <p>Upload Thumbnail</p>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     )}
@@ -298,18 +333,32 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                 <div className="media-container h-48 w-full relative border border-dashed border-gray-300 rounded-md overflow-hidden">
                                     {videoUrl ? (
                                         <>
-                                            <VideoPlayer url={videoUrl} videoId={initialValues?.id || ''} className="w-full h-full" />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                <Button icon={<EditOutlined />} onClick={openVideoWidget}>
-                                                    Edit Video
+                                            <VideoPlayer url={videoUrl} videoId={initialValues?.id || ''} className="w-full h-full object-cover" />
+                                            <div className="absolute top-2 right-2 z-10 ">
+                                                <Button
+                                                    icon={<EditOutlined />}
+                                                    onClick={handleOpenVideoWidget}
+                                                    loading={isVideoLoading}
+                                                    className="bg-black bg-opacity-50 text-white border-none hover:bg-black hover:bg-opacity-75"
+                                                >
+                                                    {isVideoLoading ? 'Loading...' : 'Edit Video'}
                                                 </Button>
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center" onClick={openVideoWidget}>
+                                        <div
+                                            className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors duration-300"
+                                            onClick={handleOpenVideoWidget}
+                                        >
                                             <div className="text-center">
-                                                <UploadOutlined className="text-2xl mb-2" />
-                                                <p>Upload Preview Video</p>
+                                                {isVideoLoading ? (
+                                                    <Spin />
+                                                ) : (
+                                                    <>
+                                                        <UploadOutlined className="text-2xl mb-2" />
+                                                        <p>Upload Preview Video</p>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     )}
