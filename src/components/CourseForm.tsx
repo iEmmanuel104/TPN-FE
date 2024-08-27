@@ -37,7 +37,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
 
     const { data: instructorsData, isLoading: isInstructorsLoading } = useGetAllInstructorsQuery();
 
-
     const { openWidget: openThumbnailWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
             setThumbnailUrl(url);
@@ -104,76 +103,73 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                 <div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                         <h3 className="text-lg font-semibold mb-2">Basic Information</h3>
-                        <Form.Item
-                            name="title"
-                            label="Course Title"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input the course title',
-                                },
-                            ]}
-                        >
+                        <Form.Item name="title" label="Course Title" rules={[{ required: true, message: 'Please input the course title' }]}>
                             <Input />
                         </Form.Item>
                         <Form.Item
                             name="description"
                             label="Description"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input the course description',
-                                },
-                            ]}
+                            rules={[{ required: true, message: 'Please input the course description' }]}
                         >
                             <TextArea rows={4} />
                         </Form.Item>
-                        <Form.Item
-                            name="category"
-                            label="Categories"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Please select at least one category',
-                                },
-                                {
-                                    type: 'array',
-                                    max: 5,
-                                    message: 'You can select up to 5 categories',
-                                },
-                            ]}
-                        >
-                            <Select mode="tags" placeholder="Select categories">
-                                {categories.map((category) => (
-                                    <Option key={category} value={category}>
-                                        {category}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                        <Form.Item name="status" label="Course Status" rules={[{ required: true }]}>
-                            <Select>
-                                {Object.values(CourseStatus).map((status) => (
-                                    <Option key={status} value={status}>
-                                        {status}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
+                        <div className="grid grid-cols-3 gap-4">
+                            <Form.Item
+                                name="category"
+                                label="Categories"
+                                className="col-span-2"
+                                rules={[
+                                    { required: true, message: 'Please select at least one category' },
+                                    { type: 'array', max: 5, message: 'You can select up to 5 categories' },
+                                ]}
+                            >
+                                <Select mode="tags" placeholder="Select categories">
+                                    {categories.map((category) => (
+                                        <Option key={category} value={category}>
+                                            {category}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name="status" label="Course Status" rules={[{ required: true }]}>
+                                <Select>
+                                    {Object.values(CourseStatus).map((status) => (
+                                        <Option key={status} value={status}>
+                                            {status}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                            <h3 className="text-lg font-semibold mb-2">Instructor Information</h3>
+                            <Form.Item name="instructorId" label="Instructor" rules={[{ required: true, message: 'Please select an instructor' }]}>
+                                <Select onChange={handleInstructorChange} loading={isInstructorsLoading}>
+                                    {instructorsData?.data?.map((instructor) => (
+                                        <Option key={instructor.id} value={instructor.id}>
+                                            {instructor.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+
+                            {selectedInstructor && (
+                                <div className="mt-4 flex items-center space-x-4">
+                                    <Avatar size={64} src={selectedInstructor.info?.profilePictureUrl} icon={<UserOutlined />} />
+                                    <div>
+                                        <p className="font-semibold">{selectedInstructor.name}</p>
+                                        <p>{selectedInstructor.email}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
+                </div>
+                <div>
                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                         <h3 className="text-lg font-semibold mb-2">Course Details</h3>
                         <div className="grid grid-cols-2 gap-4">
-                            <Form.Item
-                                name="level"
-                                label="Course Level"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please select the course level',
-                                    },
-                                ]}
-                            >
+                            <Form.Item name="level" label="Course Level" rules={[{ required: true, message: 'Please select the course level' }]}>
                                 <Select>
                                     {Object.values(CourseLevel).map((level) => (
                                         <Option key={level} value={level}>
@@ -182,16 +178,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                     ))}
                                 </Select>
                             </Form.Item>
-                            <Form.Item
-                                name="price"
-                                label="Price"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Please input the course price',
-                                    },
-                                ]}
-                            >
+                            <Form.Item name="price" label="Price" rules={[{ required: true, message: 'Please input the course price' }]}>
                                 <InputNumber
                                     min={0}
                                     className="w-full"
@@ -213,47 +200,19 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                         <Form.Item name={['currency', 'symbol']} hidden>
                             <Input />
                         </Form.Item>
-                    </div>
-                </div>
-                <div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">Requirements and Learning Outcomes</h3>
-                        <Form.Item
-                            name="requirements"
-                            label="Course Requirements"
-                            rules={[
-                                {
-                                    type: 'array',
-                                    max: 5,
-                                    message: 'You can add up to 5 requirements',
-                                },
-                            ]}
-                        >
-                            <Select mode="tags" placeholder="Add requirements" />
-                        </Form.Item>
-                        <Form.Item
-                            name="learningOutcome"
-                            label="Learning Outcomes"
-                            rules={[
-                                {
-                                    type: 'array',
-                                    max: 5,
-                                    message: 'You can add up to 5 learning outcomes',
-                                },
-                            ]}
-                        >
-                            <Select mode="tags" placeholder="Add learning outcomes" />
-                        </Form.Item>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">Assessment</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Form.Item name={['assessment', 'hasAssessment']} label="Has Assessment" valuePropName="checked">
-                                <Switch />
+
+                        <div className="grid grid-cols-3 gap-4 mt-4">
+                            <Form.Item
+                                name="requirements"
+                                label="Course Requirements"
+                                className="col-span-2"
+                                rules={[{ type: 'array', max: 5, message: 'You can add up to 5 requirements' }]}
+                            >
+                                <Select mode="tags" placeholder="Add requirements" />
                             </Form.Item>
                             <Form.Item
                                 name={['assessment', 'benchmark']}
-                                label="Benchmark Score"
+                                label="Assessment"
                                 rules={[
                                     {
                                         type: 'number',
@@ -263,41 +222,39 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                     },
                                 ]}
                             >
-                                <Form.Item
-                                    noStyle
-                                    shouldUpdate={(prevValues, currentValues) =>
-                                        prevValues.assessment?.hasAssessment !== currentValues.assessment?.hasAssessment
-                                    }
-                                >
-                                    {({ getFieldValue }) => {
-                                        const hasAssessment = getFieldValue(['assessment', 'hasAssessment']);
-                                        return (
-                                            <InputNumber
-                                                step={1}
-                                                disabled={!hasAssessment}
-                                                formatter={(value) => {
-                                                    return value ? `${value}%` : '';
-                                                }}
-                                                parser={(value) => {
-                                                    const parsedValue = value ? parseInt(value.replace('%', ''), 10) : 60;
-                                                    return isNaN(parsedValue) ? 60 : Math.max(60, Math.min(100, parsedValue));
-                                                }}
-                                                onChange={(value) => {
-                                                    if (value !== null) {
-                                                        const unitValue = typeof value === 'number' ? value / 100 : 0;
-                                                        form.setFieldsValue({
-                                                            assessment: {
-                                                                ...form.getFieldValue('assessment'),
-                                                                benchmark: unitValue,
-                                                            },
-                                                        });
-                                                    }
-                                                }}
-                                                className="w-full"
-                                            />
-                                        );
+                                <InputNumber
+                                    step={1}
+                                    formatter={(value) => (value ? `${value}%` : '')}
+                                    parser={(value) => {
+                                        const parsedValue = value ? parseInt(value.replace('%', ''), 10) : 60;
+                                        return isNaN(parsedValue) ? 60 : Math.max(60, Math.min(100, parsedValue));
                                     }}
-                                </Form.Item>
+                                    onChange={(value) => {
+                                        if (value !== null) {
+                                            const unitValue = typeof value === 'number' ? value / 100 : 0;
+                                            form.setFieldsValue({
+                                                assessment: {
+                                                    ...form.getFieldValue('assessment'),
+                                                    benchmark: unitValue,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    className="w-full"
+                                    addonBefore={
+                                        <Form.Item name={['assessment', 'hasAssessment']} valuePropName="checked" noStyle>
+                                            <Switch />
+                                        </Form.Item>
+                                    }
+                                />
+                            </Form.Item>
+                            <Form.Item
+                                name="learningOutcome"
+                                label="Learning Outcomes"
+                                className="col-span-3"
+                                rules={[{ type: 'array', max: 5, message: 'You can add up to 5 learning outcomes' }]}
+                            >
+                                <Select mode="tags" placeholder="Add learning outcomes" />
                             </Form.Item>
                         </div>
                     </div>
@@ -332,7 +289,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                                     <Spin />
                                                 ) : (
                                                     <>
-                                                        <UploadOutlined className="text-2xl mb-2" />
+                                                        <UploadOutlined className="text-xl mb-2" />
                                                         <p>Upload Thumbnail</p>
                                                     </>
                                                 )}
@@ -367,7 +324,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                                     <Spin />
                                                 ) : (
                                                     <>
-                                                        <UploadOutlined className="text-2xl mb-2" />
+                                                        <UploadOutlined className="text-xl mb-2" />
                                                         <p>Upload Preview Video</p>
                                                     </>
                                                 )}
@@ -377,27 +334,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                 </div>
                             </Form.Item>
                         </div>
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h3 className="text-lg font-semibold mb-2">Instructor Information</h3>
-                        <Form.Item name="instructorId" label="Instructor" rules={[{ required: true, message: 'Please select an instructor' }]}>
-                            <Select onChange={handleInstructorChange} loading={isInstructorsLoading}>
-                                {instructorsData?.data?.map((instructor) => (
-                                    <Option key={instructor.id} value={instructor.id}>
-                                        {instructor.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-
-                        {selectedInstructor && (
-                            <div className="mt-4">
-                                <h4 className="font-semibold">Selected Instructor:</h4>
-                                <p>{selectedInstructor.name}</p>
-                                <p>{selectedInstructor.email}</p>
-                                <Avatar size={64} src={selectedInstructor.info?.profilePictureUrl} icon={<UserOutlined />} />
-                            </div>
-                        )}
-                    </div>
                     </div>
                 </div>
             </div>
@@ -409,5 +345,4 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
         </Form>
     );
 };
-
 export default CourseForm;
