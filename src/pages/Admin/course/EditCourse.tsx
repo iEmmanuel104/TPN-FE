@@ -1,14 +1,11 @@
 // src/pages/Admin/course/EditCourse.tsx
+
 import React from 'react';
 import { message } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import DashboardLayout from '../../../components/DashboardLayout';
 import CourseForm from '../../../components/CourseForm';
-import {
-    useGetSingleCourseInfoQuery,
-    useUpdateCourseMutation,
-    CourseDto,
-} from '../../../api/courseApi';
+import { useGetSingleCourseInfoQuery, useUpdateCourseMutation, CourseDto } from '../../../api/courseApi';
 
 const EditCourse: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -34,18 +31,11 @@ const EditCourse: React.FC = () => {
                 <h1 className="text-2xl font-bold">Edit Course</h1>
                 <p className="text-gray-500">
                     <Link to="/iadmin/courses">Courses</Link> {' > '}
-                    <Link to={`/iadmin/courses/${id}`}>
-                        {courseData?.data?.title || 'Course'}
-                    </Link>{' '}
-                    {' > '}
+                    <Link to={`/iadmin/courses/${id}`}>{courseData?.data?.title || 'Course'}</Link> {' > '}
                     Edit
-                </p>{' '}
+                </p>
             </div>
-            <CourseForm
-                onFinish={onFinish}
-                initialValues={courseData?.data}
-                submitButtonText="Update Course"
-            />
+            <CourseForm onFinish={onFinish} initialValues={courseData?.data} submitButtonText="Update Course" />
         </DashboardLayout>
     );
 };
