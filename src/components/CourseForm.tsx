@@ -1,12 +1,14 @@
 // src/components/CourseForm.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, InputNumber, Switch, Spin } from 'antd';
-import { UploadOutlined, EditOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Select, InputNumber, Switch, Spin, Avatar } from 'antd';
+import { UploadOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
 import { CourseDto, CourseLevel, CourseStatus } from '../api/courseApi';
+import { InstructorDto } from '../api/instructorApi';
 import VideoPlayer from './VideoPlayer';
 import categories from '../constants/categories.json';
 import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
+import { useGetAllInstructorsQuery } from '../api/instructorApi';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -31,6 +33,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
     const [isThumbnailLoading, setIsThumbnailLoading] = useState(false);
     const [isVideoLoading, setIsVideoLoading] = useState(false);
+    const [selectedInstructor, setSelectedInstructor] = useState<InstructorDto | null>(null);
+
+    const { data: instructorsData, isLoading: isInstructorsLoading } = useGetAllInstructorsQuery();
+
 
     const { openWidget: openThumbnailWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
@@ -61,6 +67,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
             setSelectedCurrency(initialCurrency);
             setThumbnailUrl(initialValues.media?.videoThumbnail || null);
             setVideoUrl(initialValues.media?.previewVideo || null);
+            setSelectedInstructor(initialValues.instructor || null);
         }
     }, [initialValues, form]);
 
@@ -84,6 +91,11 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
     const handleOpenVideoWidget = () => {
         setIsVideoLoading(true);
         openVideoWidget();
+    };
+
+    const handleInstructorChange = (value: string) => {
+        const instructor = instructorsData?.data?.find((i) => i.id === value);
+        setSelectedInstructor(instructor || null);
     };
 
     return (
@@ -365,6 +377,27 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                                 </div>
                             </Form.Item>
                         </div>
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                        <h3 className="text-lg font-semibold mb-2">Instructor Information</h3>
+                        <Form.Item name="instructorId" label="Instructor" rules={[{ required: true, message: 'Please select an instructor' }]}>
+                            <Select onChange={handleInstructorChange} loading={isInstructorsLoading}>
+                                {instructorsData?.data?.map((instructor) => (
+                                    <Option key={instructor.id} value={instructor.id}>
+                                        {instructor.name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+
+                        {selectedInstructor && (
+                            <div className="mt-4">
+                                <h4 className="font-semibold">Selected Instructor:</h4>
+                                <p>{selectedInstructor.name}</p>
+                                <p>{selectedInstructor.email}</p>
+                                <Avatar size={64} src={selectedInstructor.info?.profilePictureUrl} icon={<UserOutlined />} />
+                            </div>
+                        )}
+                    </div>
                     </div>
                 </div>
             </div>
