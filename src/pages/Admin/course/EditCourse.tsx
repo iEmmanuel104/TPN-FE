@@ -1,11 +1,13 @@
-// src/pages/Admin/course/EditCourse.tsx
-
-import React from 'react';
-import { message } from 'antd';
+import React, { useState } from 'react';
+import { message, Tabs } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import DashboardLayout from '../../../components/DashboardLayout';
 import CourseForm from '../../../components/CourseForm';
+import ModuleForm from '../../../components/ModuleForm';
+import QuizForm from '../../../components/QuizForm';
 import { useGetSingleCourseInfoQuery, useUpdateCourseMutation, CourseDto } from '../../../api/courseApi';
+
+const { TabPane } = Tabs;
 
 const EditCourse: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -13,6 +15,7 @@ const EditCourse: React.FC = () => {
         id: id as string,
     });
     const [updateCourse] = useUpdateCourseMutation();
+    const [activeTab, setActiveTab] = useState('1');
 
     const onFinish = async (values: Partial<CourseDto>) => {
         try {
@@ -35,7 +38,17 @@ const EditCourse: React.FC = () => {
                     Edit
                 </p>
             </div>
-            <CourseForm onFinish={onFinish} initialValues={courseData?.data} submitButtonText="Update Course" />
+            <Tabs activeKey={activeTab} onChange={setActiveTab} className="bg-white rounded-lg p-4">
+                <TabPane tab="Course Details" key="1">
+                    <CourseForm onFinish={onFinish} initialValues={courseData?.data} submitButtonText="Update Course" />
+                </TabPane>
+                <TabPane tab="Module Management" key="2">
+                    <ModuleForm courseId={id as string} />
+                </TabPane>
+                <TabPane tab="Assessment Management" key="3">
+                    <QuizForm courseId={id as string} />
+                </TabPane>
+            </Tabs>
         </DashboardLayout>
     );
 };
