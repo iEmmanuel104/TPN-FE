@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Table, Button, Modal, Form, Input, message, Avatar, Space, Tag, Tooltip, Card, Row, Col, Statistic, Typography, Popconfirm } from 'antd';
+import { Table, Button, Modal, Form, Input, message, Avatar, Space, Tooltip, Card, Row, Col, Statistic, Typography, Popconfirm, Tag } from 'antd';
 import {
     PlusOutlined,
     EditOutlined,
@@ -30,6 +30,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { RootState } from '../../state/store';
 import { setTotalUsers } from '../../state/slices/adminSlice';
 import { CourseDto } from '../../api/courseApi';
+import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
@@ -44,6 +45,8 @@ const InstructorManagement: React.FC = () => {
 
     const dispatch = useDispatch();
     const totalUsers = useSelector((state: RootState) => state.admin.totalUsers);
+
+    const navigate = useNavigate();
 
     const { data: instructorsData, isLoading } = useGetAllInstructorsQuery();
     const { data: userStats } = useGetUserStatsQuery();
@@ -143,13 +146,6 @@ const InstructorManagement: React.FC = () => {
             sorter: (a: InstructorDto, b: InstructorDto) => a.email.localeCompare(b.email),
         },
         {
-            title: 'Courses',
-            dataIndex: 'courseCount',
-            key: 'courseCount',
-            render: (courseCount: number) => <Tag color="blue">{courseCount} course(s)</Tag>,
-            sorter: (a: InstructorDto, b: InstructorDto) => a.courseCount - b.courseCount,
-        },
-        {
             title: 'Socials',
             key: 'socials',
             render: (_: unknown, record: InstructorDto) => (
@@ -160,7 +156,7 @@ const InstructorManagement: React.FC = () => {
                         </a>
                     )}
                     {record.socials?.linkedin && (
-                        <a href={record.socials.linkedin} target="_blank" rel="noopener noreferrer" title='Visit LinkedIn'>
+                        <a href={record.socials.linkedin} target="_blank" rel="noopener noreferrer" title="Visit LinkedIn">
                             <LinkedinOutlined />
                         </a>
                     )}
@@ -176,7 +172,13 @@ const InstructorManagement: React.FC = () => {
                         <Button icon={<EditOutlined />} onClick={() => showModal(record)} />
                     </Tooltip>
                     <Tooltip title="View Courses">
-                        <Button icon={<BookOutlined />} onClick={() => showCoursesModal(record.id)} />
+                        <Button icon={<BookOutlined />} onClick={() => showCoursesModal(record.id)} style={{ position: 'relative' }}>
+                            {record.courseCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full px-2 py-1 text-xs">
+                                    {record.courseCount}
+                                </span>
+                            )}
+                        </Button>
                     </Tooltip>
                     <Popconfirm
                         title="Are you sure you want to delete this instructor?"
@@ -198,6 +200,9 @@ const InstructorManagement: React.FC = () => {
             title: 'Title',
             dataIndex: 'title',
             key: 'title',
+            render: (text: string, record: CourseDto) => (
+                <a onClick={() => navigate(`/iadmin/courses/${record.id}`)}>{text}</a> // Wrap the title with a link
+            ),
         },
         {
             title: 'Description',
@@ -265,7 +270,7 @@ const InstructorManagement: React.FC = () => {
             </Card>
             <Modal
                 title={editingInstructor ? 'Edit Instructor' : 'Add Instructor'}
-                visible={isModalVisible}
+                open={isModalVisible}
                 onOk={handleOk}
                 onCancel={() => setIsModalVisible(false)}
                 width={800}
@@ -301,7 +306,7 @@ const InstructorManagement: React.FC = () => {
             </Modal>
             <Modal
                 title="Instructor Courses"
-                visible={isCoursesModalVisible}
+                open={isCoursesModalVisible}
                 onCancel={() => setIsCoursesModalVisible(false)}
                 footer={null}
                 width={1000}
