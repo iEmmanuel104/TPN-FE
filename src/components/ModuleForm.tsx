@@ -193,7 +193,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_: any, record: ModuleDto) => (
+            render: (_: unknown, record: ModuleDto) => (
                 <>
                     <Button icon={<EditOutlined />} onClick={() => showModal(record)} className="mr-2" />
                     <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
@@ -373,7 +373,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                                 {
                                     title: 'Actions',
                                     key: 'actions',
-                                    render: (_: any, __: any, index: number) => (
+                                    render: (_: unknown, __: any, index: number) => (
                                         <Button onClick={() => handleDeleteFrame(index)} icon={<DeleteOutlined />} danger size="small" />
                                     ),
                                 },
