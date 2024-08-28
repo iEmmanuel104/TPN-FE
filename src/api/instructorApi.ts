@@ -50,7 +50,7 @@ export const instructorApiSlice = apiSlice.injectEndpoints({
             providesTags: ['Instructor'],
         }),
         getInstructorCourses: builder.query<ApiResponse<CourseDto[]>, { id: string }>({
-            query: () => '/instructor/courses',
+            query: ({ id }) => `/instructor/courses?id=${id}`,
             providesTags: ['Course'],
         }),
     }),
