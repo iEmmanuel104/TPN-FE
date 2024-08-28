@@ -62,4 +62,5 @@ export const {
     useDeleteInstructorMutation,
     useGetInstructorQuery,
     useGetAllInstructorsQuery,
+    useGetInstructorCoursesQuery,
 } = instructorApiSlice;
