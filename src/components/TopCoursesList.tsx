@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Avatar, Spin, Tag } from 'antd';
 import { useGetTopCoursesQuery } from '../api/adminApi';
 import { StarFilled } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 enum CourseLevel {
     Beginner = 'Beginner',
@@ -18,11 +19,7 @@ const levelColors = {
 };
 
 const TopCoursesList: React.FC = () => {
-    const {
-        data: topCoursesData,
-        isLoading,
-        error,
-    } = useGetTopCoursesQuery({ limit: 5 });
+    const { data: topCoursesData, isLoading, error } = useGetTopCoursesQuery({ limit: 5 });
 
     const columns = [
         {
@@ -32,59 +29,43 @@ const TopCoursesList: React.FC = () => {
             render: (
                 text: string,
                 record: {
+                    id: string;
                     previewImage: string;
                     instructorImage: string;
                     instructorName: string;
                 },
             ) => (
-                <div className="flex items-center">
-                    <Avatar
-                        src={record.previewImage}
-                        size={40}
-                        className="mr-3"
-                        shape="square"
-                    />
-                    <div>
-                        <div className="font-semibold text-sm">{text}</div>
-                        <div className="flex items-center text-xs text-gray-500">
-                            <Avatar
-                                src={record.instructorImage}
-                                size={20}
-                                className="mr-2"
-                            />
-                            {record.instructorName}
+                <Link to={`/iadmin/courses/${record.id}`}>
+                    <div className="flex items-center">
+                        <Avatar src={record.previewImage} size={40} className="mr-3" shape="square" />
+                        <div>
+                            <div className="font-semibold text-sm">{text}</div>
+                            <div className="flex items-center text-xs text-gray-500">
+                                <Avatar src={record.instructorImage} size={20} className="mr-2" />
+                                {record.instructorName}
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Link>
             ),
         },
         {
             title: 'Level',
             dataIndex: 'level',
             key: 'level',
-            render: (level: CourseLevel) => (
-                <Tag color={levelColors[level]}>{level}</Tag>
-            ),
+            render: (level: CourseLevel) => <Tag color={levelColors[level]}>{level}</Tag>,
         },
         {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-            render: (price: number) => (
-                <span className="font-semibold text-sm">
-                    ${price.toFixed(2)}
-                </span>
-            ),
+            render: (price: number) => <span className="font-semibold text-sm">${price.toFixed(2)}</span>,
         },
         {
             title: 'Enrollments',
             dataIndex: 'enrollments',
             key: 'enrollments',
-            render: (enrollments: number) => (
-                <span className="font-semibold text-sm">
-                    {enrollments.toLocaleString()}
-                </span>
-            ),
+            render: (enrollments: number) => <span className="font-semibold text-sm">{enrollments.toLocaleString()}</span>,
         },
         {
             title: 'Rating',
@@ -106,8 +87,7 @@ const TopCoursesList: React.FC = () => {
             </div>
         );
     }
-    if (error)
-        return <div className="text-red-500">Error loading top courses</div>;
+    if (error) return <div className="text-red-500">Error loading top courses</div>;
 
     const topCourses = topCoursesData?.data || [];
 
