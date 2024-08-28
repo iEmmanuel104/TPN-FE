@@ -9,9 +9,10 @@ import VideoPlayer from './VideoPlayer';
 import categories from '../constants/categories.json';
 import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
 import { useGetAllInstructorsQuery } from '../api/instructorApi';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const { Option } = Select;
-const { TextArea } = Input;
 
 interface CourseFormProps {
     onFinish: (values: Partial<CourseDto>) => Promise<void>;
@@ -111,7 +112,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ onFinish, initialValues, submit
                             label="Description"
                             rules={[{ required: true, message: 'Please input the course description' }]}
                         >
-                            <TextArea rows={4} />
+                            <ReactQuill theme="snow" />
                         </Form.Item>
                         <div className="grid grid-cols-3 gap-4">
                             <Form.Item

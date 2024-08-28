@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Input, message, Spin, Tooltip, Table } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
@@ -8,8 +7,8 @@ import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
 import VideoPlayer from './VideoPlayer';
 import { formatVideoLength } from '../utils/formatVideoLength';
 import { getVideoDuration } from '../utils/videoUtils';
-
-const { TextArea } = Input;
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface ModuleFormProps {
     courseId: string;
@@ -19,6 +18,8 @@ interface Frame {
     title: string;
     timestamp: number;
 }
+
+const MAX_FRAMES = 5;
 
 const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
     const [form] = Form.useForm<Partial<ModuleDto>>();
@@ -130,10 +131,14 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
         }));
 
         try {
-            for (const module of updatedModules) {
+            // Only update the modules that have changed
+            const changedModules = updatedModules.filter((module, index) => modules.data && module.episodeNumber !== modules.data[index].episodeNumber);
+
+            for (const module of changedModules) {
                 await updateModule({ id: module.id, module: { episodeNumber: module.episodeNumber } }).unwrap();
             }
             message.success('Module order updated successfully');
+            refetch(); // Refetch to ensure the UI reflects the new order
         } catch (error) {
             console.error('Failed to update module order:', error);
             message.error('Failed to update module order');
@@ -146,8 +151,12 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
     };
 
     const handleAddFrame = () => {
-        const newFrame: Frame = { title: `Frame ${frames.length + 1}`, timestamp: 0 };
-        setFrames([...frames, newFrame]);
+        if (frames.length < MAX_FRAMES) {
+            const newFrame: Frame = { title: `Frame ${frames.length + 1}`, timestamp: 0 };
+            setFrames([...frames, newFrame]);
+        } else {
+            message.warning(`You can only add up to ${MAX_FRAMES} frames.`);
+        }
     };
 
     const handleUpdateFrame = (index: number, field: keyof Frame, value: string | number) => {
@@ -268,7 +277,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                                 <Input />
                             </Form.Item>
                             <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Please input the description!' }]}>
-                                <TextArea rows={3} />
+                                <ReactQuill theme="snow" />
                             </Form.Item>
                             <div className="grid grid-cols-2 gap-4">
                                 <Form.Item
@@ -345,7 +354,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                                     title: 'Title',
                                     dataIndex: 'title',
                                     key: 'title',
-                                    render: (text: string, _: any, index: number) => (
+                                    render: (text: string, _: unknown, index: number) => (
                                         <Input
                                             value={text}
                                             onChange={(e) => handleUpdateFrame(index, 'title', e.target.value)}
@@ -358,7 +367,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                                     title: 'Timestamp',
                                     dataIndex: 'timestamp',
                                     key: 'timestamp',
-                                    render: (value: number, _: any, index: number) => (
+                                    render: (value: number, _: unknown, index: number) => (
                                         <Tooltip title="Enter timestamp in seconds">
                                             <Input
                                                 type="number"
@@ -373,7 +382,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                                 {
                                     title: 'Actions',
                                     key: 'actions',
-                                    render: (_: unknown, __: any, index: number) => (
+                                    render: (_: unknown, __: unknown, index: number) => (
                                         <Button onClick={() => handleDeleteFrame(index)} icon={<DeleteOutlined />} danger size="small" />
                                     ),
                                 },
@@ -381,9 +390,16 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                             pagination={false}
                             size="small"
                         />
-                        <Button onClick={handleAddFrame} icon={<PlusOutlined />} className="mt-2" size="small">
+                        <Button
+                            onClick={handleAddFrame}
+                            icon={<PlusOutlined />}
+                            className="mt-2"
+                            size="small"
+                            disabled={!videoUrl || frames.length >= MAX_FRAMES}
+                        >
                             Add Frame
                         </Button>
+                        {frames.length >= MAX_FRAMES && <span className="text-red-500 text-xs ml-2">Maximum number of frames reached.</span>}
                     </div>
                 </Form>
             </Modal>

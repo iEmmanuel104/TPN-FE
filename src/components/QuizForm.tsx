@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Radio, Space, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useGetCourseQuizQuery, useCreateQuizMutation, useUpdateQuizMutation, useDeleteQuizMutation, IQuiz } from '../api/quizApi';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface QuizFormProps {
     courseId: string;
@@ -78,7 +80,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (text: string, record: IQuiz) => (
+            render: (record: IQuiz) => (
                 <Space>
                     <Button icon={<EditOutlined />} onClick={() => showModal(record)} />
                     <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
@@ -95,13 +97,13 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
             <Table columns={columns} dataSource={questions} loading={isLoading} rowKey="id" />
             <Modal
                 title={editingQuestion ? 'Edit Question' : 'Add Question'}
-                visible={isModalVisible}
+                open={isModalVisible}
                 onOk={handleOk}
                 onCancel={() => setIsModalVisible(false)}
             >
                 <Form form={form} layout="vertical">
                     <Form.Item name="question" label="Question" rules={[{ required: true, message: 'Please input the question!' }]}>
-                        <Input.TextArea />
+                        <ReactQuill theme="snow" />
                     </Form.Item>
                     <Form.List name="options" initialValue={['', '', '', '']}>
                         {(fields) => (
