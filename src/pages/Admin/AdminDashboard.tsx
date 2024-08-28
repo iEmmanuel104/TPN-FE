@@ -6,14 +6,10 @@ import StatsCard from '../../components/StatsCard';
 import IncomeExpenseReport from '../../components/IncomeExpenseReport';
 import InstructorsList from '../../components/InstructorList';
 import TopCoursesList from '../../components/TopCoursesList';
-import {
-    useGetUserStatsQuery,
-} from '../../api/adminApi';
-
+import { useGetUserStatsQuery } from '../../api/adminApi';
 
 const AdminDashboard: React.FC = () => {
-    const { data: userStats, isLoading: userStatsLoading } =
-        useGetUserStatsQuery();
+    const { data: userStats, isLoading: userStatsLoading } = useGetUserStatsQuery();
 
     if (userStatsLoading) {
         return <Spin size="large" />;
@@ -33,8 +29,7 @@ const AdminDashboard: React.FC = () => {
                                 },
                                 {
                                     label: 'New Users This Month',
-                                    value:
-                                        userStats?.data.newUsersThisMonth ?? 0,
+                                    value: userStats?.data.newUsersThisMonth ?? 0,
                                 },
                             ]}
                             progress={userStats?.data.userIncrease ?? 0}
@@ -49,9 +44,7 @@ const AdminDashboard: React.FC = () => {
                                 },
                                 {
                                     label: 'New Courses This Month',
-                                    value:
-                                        userStats?.data.newCoursesThisMonth ??
-                                        0,
+                                    value: userStats?.data.newCoursesThisMonth ?? 0,
                                 },
                             ]}
                             progress={userStats?.data.courseIncrease ?? 0}
