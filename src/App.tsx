@@ -4,14 +4,16 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import ScrollToTop from './ScrollToTop';
+import NotFound from './components/NotFound';
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboard from './pages/Admin/AdminDashboard';
-import NotFound from './components/NotFound';
-import ScrollToTop from './ScrollToTop';
 import CourseList from './pages/Admin/course/CourseList';
 import AddCourse from './pages/Admin/course/AddCourse';
 import EditCourse from './pages/Admin/course/EditCourse';
 import CourseView from './pages/Admin/course/CourseView';
+import InstructorManagement from './pages/Admin/InstructorManagement';
+import AdminManagement from './pages/Admin/AdminManagement';
 
 function App() {
     return (
@@ -33,7 +35,8 @@ function App() {
                                 <Route path="edit" element={<EditCourse />} />
                             </Route>
                         </Route>
-                        {/* <Route path="users" element={<AdminUsers />} /> */}
+                        <Route path="instructors" element={<InstructorManagement />} />
+                        <Route path="admins" element={<AdminManagement />} />
                     </Route>
                     <Route path="*" element={<NotFound />} />
                 </Routes>
