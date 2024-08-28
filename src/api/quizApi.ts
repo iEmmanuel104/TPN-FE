@@ -55,7 +55,7 @@ export const quizApiSlice = apiSlice.injectEndpoints({
             query: (courseId) => `/quiz/info?courseId=${courseId}`,
             providesTags: ['Quiz'],
         }),
-        deleteQuiz: builder.mutation<ApiResponse<null>, { id: string }>({
+        deleteQuiz: builder.mutation<ApiResponse<null>, { id: number }>({
             query: ({ id }) => ({
                 url: `/quiz/?id=${id}`,
                 method: 'DELETE',
@@ -71,4 +71,5 @@ export const {
     useGradeQuizMutation,
     useRequestQuizQuery,
     useGetCourseQuizQuery,
+    useDeleteQuizMutation,
 } = quizApiSlice;
