@@ -12,6 +12,7 @@ export interface InstructorDto {
         identifier: string;
     };
     socials: Record<string, string>;
+    courseCount: number;
 }
 
 export const instructorApiSlice = apiSlice.injectEndpoints({
