@@ -10,7 +10,7 @@ export interface ModuleDto {
     courseId: string;
     episodeNumber: number;
     videoInfo: {
-        length?: number;
+        length: number;
         identifier?: string;
     };
     instructorId: string;
