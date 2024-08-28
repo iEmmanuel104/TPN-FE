@@ -172,9 +172,9 @@ const InstructorManagement: React.FC = () => {
                         <Button icon={<EditOutlined />} onClick={() => showModal(record)} />
                     </Tooltip>
                     <Tooltip title="View Courses">
-                        <Button icon={<BookOutlined />} onClick={() => showCoursesModal(record.id)} style={{ position: 'relative' }}>
+                        <Button icon={<BookOutlined />} onClick={() => showCoursesModal(record.id)} className="relative">
                             {record.courseCount > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full px-2 py-1 text-xs">
+                                <span className="absolute -top-1.5 -right-1.5 bg-blue-500 text-white text-center rounded-full w-3 h-3 flex items-center justify-center text-[9px] leading-none">
                                     {record.courseCount}
                                 </span>
                             )}
@@ -200,9 +200,6 @@ const InstructorManagement: React.FC = () => {
             title: 'Title',
             dataIndex: 'title',
             key: 'title',
-            render: (text: string, record: CourseDto) => (
-                <a onClick={() => navigate(`/iadmin/courses/${record.id}`)}>{text}</a> // Wrap the title with a link
-            ),
         },
         {
             title: 'Description',
@@ -246,12 +243,12 @@ const InstructorManagement: React.FC = () => {
                 </Col>
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <Card>
-                        <Statistic title="Total Instructors" value={instructors.length || 0} prefix={<TeamOutlined />} />
+                        <Statistic title="Total Instructors" value={instructors.length || 0} prefix={<UserOutlined />} />
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <Card>
-                        <Statistic title="Total Users" value={totalUsers || 0} prefix={<UserOutlined />} />
+                        <Statistic title="Total Users" value={totalUsers || 0} prefix={<TeamOutlined />} />
                     </Card>
                 </Col>
             </Row>
@@ -311,7 +308,18 @@ const InstructorManagement: React.FC = () => {
                 footer={null}
                 width={1000}
             >
-                <Table columns={courseColumns} dataSource={instructorCourses} loading={isCoursesLoading} rowKey="id" />
+                <Table
+                    columns={courseColumns}
+                    dataSource={instructorCourses}
+                    loading={isCoursesLoading}
+                    rowKey="id"
+                    onRow={(record) => ({
+                        onClick: () => {
+                            navigate(`/courses/${record.id}`); // Adjust this path as needed
+                        },
+                        style: { cursor: 'pointer' },
+                    })}
+                />
             </Modal>
         </DashboardLayout>
     );
