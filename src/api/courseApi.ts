@@ -81,6 +81,17 @@ export interface UserCourseDto {
     };
 }
 
+export interface GetAllCoursesParams {
+    q?: string;
+    level?: CourseLevel;
+    category?: string[];
+    minRating?: number;
+    status?: CourseStatus;
+    userId?: string;
+    page?: number;
+    size?: number;
+}
+
 export const courseApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         addCourse: builder.mutation<ApiResponse<CourseDto>, Partial<CourseDto>>({
@@ -91,11 +102,23 @@ export const courseApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Course'],
         }),
-        getAllCourses: builder.query<ApiResponse<{ courses: CourseDto[]}>, { level?: CourseLevel }>({
-            query: ({ level }) => ({
-                url: level ? `/course/?level=${level}` : '/course/',
-                method: 'GET',
-            }),
+        getAllCourses: builder.query<ApiResponse<{ courses: CourseDto[] }>, GetAllCoursesParams>({
+            query: (params) => {
+                const queryParams = new URLSearchParams();
+                if (params.q) queryParams.append('q', params.q);
+                if (params.level) queryParams.append('level', params.level);
+                if (params.category) params.category.forEach(cat => queryParams.append('category', cat));
+                if (params.minRating) queryParams.append('minRating', params.minRating.toString());
+                if (params.status) queryParams.append('status', params.status);
+                if (params.userId) queryParams.append('userId', params.userId);
+                if (params.page) queryParams.append('page', params.page.toString());
+                if (params.size) queryParams.append('size', params.size.toString());
+
+                return {
+                    url: `/course/?${queryParams.toString()}`,
+                    method: 'GET',
+                };
+            },
             providesTags: ['Course'],
         }),
         getSingleCourseInfo: builder.query<ApiResponse<CourseDto>, { id: string }>({
