@@ -42,10 +42,10 @@ const EditCourse: React.FC = () => {
                 <TabPane tab="Course Details" key="1">
                     <CourseForm onFinish={onFinish} initialValues={courseData?.data} submitButtonText="Update Course" />
                 </TabPane>
-                <TabPane tab="Module Management" key="2">
+                <TabPane tab="Modules" key="2">
                     <ModuleForm courseId={id as string} />
                 </TabPane>
-                <TabPane tab="Assessment Management" key="3">
+                <TabPane tab="Assessments" key="3">
                     <QuizForm courseId={id as string} />
                 </TabPane>
             </Tabs>
