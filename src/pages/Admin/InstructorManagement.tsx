@@ -91,6 +91,7 @@ const InstructorManagement: React.FC = () => {
     };
 
     const showCoursesModal = (instructorId: string) => {
+        console.log({ instructorId });
         setSelectedInstructorId(instructorId);
         setIsCoursesModalVisible(true);
     };
@@ -154,12 +155,12 @@ const InstructorManagement: React.FC = () => {
             render: (_: unknown, record: InstructorDto) => (
                 <Space>
                     {record.socials?.x && (
-                        <a href={record.socials.x} target="_blank" rel="noopener noreferrer">
+                        <a href={record.socials.x} target="_blank" rel="noopener noreferrer" title="Visit Twitter">
                             <TwitterOutlined />
                         </a>
                     )}
                     {record.socials?.linkedin && (
-                        <a href={record.socials.linkedin} target="_blank" rel="noopener noreferrer">
+                        <a href={record.socials.linkedin} target="_blank" rel="noopener noreferrer" title='Visit LinkedIn'>
                             <LinkedinOutlined />
                         </a>
                     )}
