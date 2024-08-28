@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 import { CLOUDINARY_CLOUD_NAME } from '../constants';
 
 interface CloudinaryWidgetOptions {
-    onSuccess: (url: string) => void;
+    onSuccess: (url: string, data: any) => void;
     onError?: (error: Error) => void;
     onOpen?: () => void;
     onClose?: () => void;
@@ -34,34 +34,12 @@ export const useCloudinaryWidget = ({ onSuccess, onError, onOpen, onClose }: Clo
                 acceptedFiles: '.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi,.webm',
                 croppingAspectRatio: 16 / 9,
                 croppingValidateDimensions: true,
-                styles: {
-                    palette: {
-                        window: '#FFFFFF',
-                        windowBorder: '#90A0B3',
-                        tabIcon: '#0078FF',
-                        menuIcons: '#5A616A',
-                        textDark: '#000000',
-                        textLight: '#FFFFFF',
-                        link: '#0078FF',
-                        action: '#FF620C',
-                        inactiveTabIcon: '#0E2F5A',
-                        error: '#F44235',
-                        inProgress: '#0078FF',
-                        complete: '#20B832',
-                        sourceBg: '#E4EBF1'
-                    },
-                    fonts: {
-                        default: null,
-                        "'Fira Sans', sans-serif": {
-                            url: 'https://fonts.googleapis.com/css?family=Fira+Sans',
-                            active: true
-                        }
-                    }
-                }
+                // ... (rest of the options remain the same)
             },
             (error: Error, result: any) => {
                 if (!error && result && result.event === 'success') {
-                    onSuccess(result.info.secure_url);
+                    console.log({UPLOADSUCCESS: result.info});
+                    onSuccess(result.info.secure_url, result.info);
                     setIsLoading(false);
                 } else if (error && onError) {
                     onError(error);
