@@ -1,6 +1,7 @@
 
 // src/api/instructorApi.ts
 import { ApiResponse, apiSlice } from './api';
+import { CourseDto } from './courseApi';
 
 export interface InstructorDto {
     id: string;
@@ -47,6 +48,10 @@ export const instructorApiSlice = apiSlice.injectEndpoints({
         getAllInstructors: builder.query<ApiResponse<InstructorDto[]>, void>({
             query: () => '/instructor/',
             providesTags: ['Instructor'],
+        }),
+        getInstructorCourses: builder.query<ApiResponse<CourseDto[]>, { id: string }>({
+            query: () => '/instructor/courses',
+            providesTags: ['Course'],
         }),
     }),
 });
