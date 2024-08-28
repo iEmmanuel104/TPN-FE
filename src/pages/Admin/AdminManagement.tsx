@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, Switch, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Switch, message, Popconfirm, Space, Tooltip } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import DashboardLayout from '../../components/DashboardLayout';
-import { useGetAllAdminsQuery, useCreateAdminMutation } from '../../api/adminApi';
+import { useGetAllAdminsQuery, useCreateAdminMutation, useDeleteAdminMutation, Admin } from '../../api/adminApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../state/store';
 
@@ -10,8 +10,9 @@ const AdminManagement: React.FC = () => {
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const { data: admins, isLoading } = useGetAllAdminsQuery();
+    const { data: admins, isLoading, refetch } = useGetAllAdminsQuery();
     const [createAdmin] = useCreateAdminMutation();
+    const [deleteAdmin] = useDeleteAdminMutation();
     const currentAdmin = useSelector((state: RootState) => state.auth.admin);
 
     const showModal = () => {
@@ -25,9 +26,21 @@ const AdminManagement: React.FC = () => {
             await createAdmin(values).unwrap();
             message.success('Admin created successfully');
             setIsModalVisible(false);
+            refetch();
         } catch (error) {
             console.error('Failed to create admin:', error);
             message.error('Failed to create admin');
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        try {
+            await deleteAdmin({ id }).unwrap();
+            message.success('Admin deleted successfully');
+            refetch();
+        } catch (error) {
+            console.error('Failed to delete Admin:', error);
+            message.error('Failed to delete Admin');
         }
     };
 
@@ -35,6 +48,26 @@ const AdminManagement: React.FC = () => {
         { title: 'Name', dataIndex: 'name', key: 'name' },
         { title: 'Email', dataIndex: 'email', key: 'email' },
         { title: 'Super Admin', dataIndex: 'isSuperAdmin', key: 'isSuperAdmin', render: (isSuperAdmin: boolean) => (isSuperAdmin ? 'Yes' : 'No') },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (_: unknown, record: Admin) => (
+                <Space size="middle">
+                    {record.email !== currentAdmin?.email && (
+                        <Popconfirm
+                            title="Are you sure you want to delete this Admin?"
+                            onConfirm={() => handleDelete(record.id)}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <Tooltip title="Delete">
+                                <Button icon={<DeleteOutlined />} danger />
+                            </Tooltip>
+                        </Popconfirm>
+                    )}
+                </Space>
+            ),
+        },
     ];
 
     if (!currentAdmin?.isSuperAdmin) {
@@ -54,7 +87,7 @@ const AdminManagement: React.FC = () => {
                 </Button>
             </div>
             <Table columns={columns} dataSource={admins?.data} loading={isLoading} rowKey="id" />
-            <Modal title="Add Admin" visible={isModalVisible} onOk={handleOk} onCancel={() => setIsModalVisible(false)}>
+            <Modal title="Add Admin" open={isModalVisible} onOk={handleOk} onCancel={() => setIsModalVisible(false)}>
                 <Form form={form} layout="vertical">
                     <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please input the name!' }]}>
                         <Input />
