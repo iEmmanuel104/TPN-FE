@@ -108,6 +108,13 @@ export const adminApiSlice = apiSlice.injectEndpoints({
                 body: adminData,
             }),
         }),
+        deleteAdmin: builder.mutation<ApiResponse<null>, { id: string }>({
+            query: ({ id }) => ({
+                url: URL_PREFIX + `/delete?id=${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Admin'],
+        }),
         getAllAdmins: builder.query<ApiResponse<Admin[]>, void>({
             query: () => URL_PREFIX + '/admins',
         }),
@@ -133,6 +140,7 @@ export const {
     useLoginAdminMutation,
     useVerifyAdminLoginMutation,
     useCreateAdminMutation,
+    useDeleteAdminMutation,
     useGetAllAdminsQuery,
     useGetUserStatsQuery,
     useGetCourseStatsQuery,
