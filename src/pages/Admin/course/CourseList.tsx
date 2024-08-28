@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Rate, Tag, Typography, Badge, Input, Select, Row, Col } from 'antd';
+import { Card, Rate, Tag, Typography, Badge, Input, Select, Row, Col, Dropdown, Button, Space } from 'antd';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../../components/DashboardLayout';
 import { useGetAllCoursesQuery } from '../../../api/courseApi';
-import { UserOutlined, ReadOutlined, SearchOutlined } from '@ant-design/icons';
+import { UserOutlined, ReadOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -33,6 +33,7 @@ const CourseList: React.FC = () => {
     const [selectedLevel, setSelectedLevel] = useState<CourseLevel | undefined>(undefined);
     const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
     const [minRating, setMinRating] = useState<number | undefined>(undefined);
+    const [isFilterVisible, setIsFilterVisible] = useState(false);
 
     const {
         data: coursesData,
@@ -70,6 +71,32 @@ const CourseList: React.FC = () => {
 
     const uniqueCategories = Array.from(new Set(courses.flatMap((course) => course.category)));
 
+    const renderFilters = () => (
+        <Space direction="vertical" size="small" className="w-full">
+            <Select style={{ width: '100%' }} placeholder="Filter by level" allowClear onChange={(value) => setSelectedLevel(value)}>
+                {Object.values(CourseLevel).map((level) => (
+                    <Option key={level} value={level}>
+                        {level}
+                    </Option>
+                ))}
+            </Select>
+            <Select style={{ width: '100%' }} placeholder="Filter by category" allowClear onChange={(value) => setSelectedCategory(value)}>
+                {uniqueCategories.map((category) => (
+                    <Option key={category} value={category}>
+                        {category}
+                    </Option>
+                ))}
+            </Select>
+            <Select style={{ width: '100%' }} placeholder="Filter by rating" allowClear onChange={(value) => setMinRating(value)}>
+                {[1, 2, 3, 4, 5].map((rating) => (
+                    <Option key={rating} value={rating}>
+                        {rating}+ Stars
+                    </Option>
+                ))}
+            </Select>
+        </Space>
+    );
+
     return (
         <DashboardLayout>
             <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4">
@@ -77,50 +104,80 @@ const CourseList: React.FC = () => {
                     All Courses
                 </Title>
                 <Text className="text-gray-500 mb-4 block text-xs">Courses {'>'} All Courses</Text>
-
-                <Row gutter={16} className="mb-4">
-                    <Col xs={24} sm={12} md={6}>
-                        <Input
-                            placeholder="Search courses"
-                            prefix={<SearchOutlined />}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </Col>
-                    <Col xs={24} sm={12} md={6}>
-                        <Select style={{ width: '100%' }} placeholder="Filter by level" allowClear onChange={(value) => setSelectedLevel(value)}>
-                            {Object.values(CourseLevel).map((level) => (
-                                <Option key={level} value={level}>
-                                    {level}
-                                </Option>
-                            ))}
-                        </Select>
-                    </Col>
-                    <Col xs={24} sm={12} md={6}>
-                        <Select
-                            style={{ width: '100%' }}
-                            placeholder="Filter by category"
-                            allowClear
-                            onChange={(value) => setSelectedCategory(value)}
-                        >
-                            {uniqueCategories.map((category) => (
-                                <Option key={category} value={category}>
-                                    {category}
-                                </Option>
-                            ))}
-                        </Select>
-                    </Col>
-                    <Col xs={24} sm={12} md={6}>
-                        <Select style={{ width: '100%' }} placeholder="Filter by rating" allowClear onChange={(value) => setMinRating(value)}>
-                            {[1, 2, 3, 4, 5].map((rating) => (
-                                <Option key={rating} value={rating}>
-                                    {rating}+ Stars
-                                </Option>
-                            ))}
-                        </Select>
-                    </Col>
-                </Row>
-
+                <div className="mb-4">
+                    <Row gutter={[16, 16]} align="middle">
+                        <Col xs={24} sm={12} md={8} lg={4}>
+                            <Input
+                                placeholder="Search courses"
+                                prefix={<SearchOutlined />}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </Col>
+                        <Col xs={24} sm={12} md={16} lg={18}>
+                            <Row gutter={[16, 16]} justify="end">
+                                <Col xs={24} md={0}>
+                                    <Dropdown
+                                        overlay={renderFilters()}
+                                        trigger={['click']}
+                                        open={isFilterVisible}
+                                        onOpenChange={setIsFilterVisible}
+                                    >
+                                        <Button icon={<FilterOutlined />} onClick={() => setIsFilterVisible(!isFilterVisible)}>
+                                            Filters
+                                        </Button>
+                                    </Dropdown>
+                                </Col>
+                                <Col xs={0} md={24}>
+                                    <Row gutter={[16, 16]}>
+                                        <Col md={8}>
+                                            <Select
+                                                style={{ width: '100%' }}
+                                                placeholder="Filter by level"
+                                                allowClear
+                                                onChange={(value) => setSelectedLevel(value)}
+                                            >
+                                                {Object.values(CourseLevel).map((level) => (
+                                                    <Option key={level} value={level}>
+                                                        {level}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Col>
+                                        <Col md={8}>
+                                            <Select
+                                                style={{ width: '100%' }}
+                                                placeholder="Filter by category"
+                                                allowClear
+                                                onChange={(value) => setSelectedCategory(value)}
+                                            >
+                                                {uniqueCategories.map((category) => (
+                                                    <Option key={category} value={category}>
+                                                        {category}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Col>
+                                        <Col md={8}>
+                                            <Select
+                                                style={{ width: '100%' }}
+                                                placeholder="Filter by rating"
+                                                allowClear
+                                                onChange={(value) => setMinRating(value)}
+                                            >
+                                                {[1, 2, 3, 4, 5].map((rating) => (
+                                                    <Option key={rating} value={rating}>
+                                                        {rating}+ Stars
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
                     {courses.map((course) => (
                         <Link to={`/iadmin/courses/${course.id}`} key={course.id}>
