@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Radio, Space, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useGetCourseQuizQuery, useCreateQuizMutation, useUpdateQuizMutation, IQuiz } from '../api/quizApi';
+import { useGetCourseQuizQuery, useCreateQuizMutation, useUpdateQuizMutation, useDeleteQuizMutation, IQuiz } from '../api/quizApi';
 
 interface QuizFormProps {
     courseId: string;
@@ -15,6 +15,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
     const { data: quizData, isLoading } = useGetCourseQuizQuery(courseId);
     const [createQuiz] = useCreateQuizMutation();
     const [updateQuiz] = useUpdateQuizMutation();
+    const [deleteQuiz] = useDeleteQuizMutation();
 
     const showModal = (question?: IQuiz) => {
         if (question) {
@@ -60,6 +61,16 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
         }
     };
 
+    const handleDelete = async (id: number) => {
+        try {
+            await deleteQuiz({ id }).unwrap();
+            message.success('Quiz deleted successfully');
+        } catch (error) {
+            console.error('Failed to delete Quiz:', error);
+            message.error('Failed to delete Quiz');
+        }
+    };
+
     const columns = [
         { title: 'Question', dataIndex: 'question', key: 'question' },
         { title: 'Options', dataIndex: 'options', key: 'options', render: (options: { text: string }[]) => options.map((o) => o.text).join(', ') },
@@ -70,7 +81,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
             render: (text: string, record: IQuiz) => (
                 <Space>
                     <Button icon={<EditOutlined />} onClick={() => showModal(record)} />
-                    <Button icon={<DeleteOutlined />} danger />
+                    <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
                 </Space>
             ),
         },
