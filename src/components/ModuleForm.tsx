@@ -66,11 +66,14 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
 
     const showModal = (module?: ModuleDto) => {
         if (module) {
+            setVideoLength(module.videoInfo?.length || null);
             setEditingModule(module);
             form.setFieldsValue(module);
             setVideoUrl(module.url);
             setFrames(module.frames || []);
-            setVideoLength(module.videoInfo?.length || null);
+            form.setFieldsValue({
+                videoInfo: { length: videoLength as number },
+            });
         } else {
             setEditingModule(null);
             form.resetFields();
