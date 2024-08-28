@@ -1,32 +1,71 @@
-import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, message, Avatar, Space, Tag, Tooltip } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, BookOutlined } from '@ant-design/icons';
-import DashboardLayout from '../../components/DashboardLayout';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Table, Button, Modal, Form, Input, message, Avatar, Space, Tag, Tooltip, Card, Row, Col, Statistic, Typography, Popconfirm } from 'antd';
+import {
+    PlusOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    UploadOutlined,
+    BookOutlined,
+    UserOutlined,
+    MailOutlined,
+    TeamOutlined,
+    SearchOutlined,
+    TwitterOutlined,
+    LinkedinOutlined,
+} from '@ant-design/icons';
 import {
     useGetAllInstructorsQuery,
     useAddInstructorMutation,
     useUpdateInstructorMutation,
     useDeleteInstructorMutation,
+    useGetInstructorCoursesQuery,
     InstructorDto,
 } from '../../api/instructorApi';
+import { useGetUserStatsQuery } from '../../api/adminApi';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import DashboardLayout from '../../components/DashboardLayout';
+import { RootState } from '../../state/store';
+import { setTotalUsers } from '../../state/slices/adminSlice';
 import { CourseDto } from '../../api/courseApi';
+
+const { Title } = Typography;
 
 const InstructorManagement: React.FC = () => {
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isCoursesModalVisible, setIsCoursesModalVisible] = useState(false);
     const [editingInstructor, setEditingInstructor] = useState<InstructorDto | null>(null);
+    const [selectedInstructorId, setSelectedInstructorId] = useState<string | null>(null);
     const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
+    const [searchText, setSearchText] = useState('');
 
-    const { data: instructors, isLoading } = useGetAllInstructorsQuery();
+    const dispatch = useDispatch();
+    const totalUsers = useSelector((state: RootState) => state.admin.totalUsers);
+
+    const { data: instructorsData, isLoading } = useGetAllInstructorsQuery();
+    const { data: userStats } = useGetUserStatsQuery();
+    const { data: instructorCoursesData, isLoading: isCoursesLoading } = useGetInstructorCoursesQuery(
+        { id: selectedInstructorId || '' },
+        { skip: !selectedInstructorId },
+    );
     const [addInstructor] = useAddInstructorMutation();
     const [updateInstructor] = useUpdateInstructorMutation();
     const [deleteInstructor] = useDeleteInstructorMutation();
 
+    const instructors = instructorsData?.data || [];
+    const instructorCourses = instructorCoursesData?.data || [];
+
+    useEffect(() => {
+        if (userStats?.data?.totalUsers) {
+            dispatch(setTotalUsers(userStats.data.totalUsers));
+        }
+    }, [userStats, dispatch]);
+
     const { openWidget: openCloudinaryWidget } = useCloudinaryWidget({
-        onSuccess: (url) => {
+        onSuccess: (url: string) => {
             setProfilePictureUrl(url);
             form.setFieldsValue({ info: { ...form.getFieldValue('info'), profilePictureUrl: url } });
         },
@@ -35,7 +74,13 @@ const InstructorManagement: React.FC = () => {
     const showModal = (instructor?: InstructorDto) => {
         if (instructor) {
             setEditingInstructor(instructor);
-            form.setFieldsValue(instructor);
+            form.setFieldsValue({
+                ...instructor,
+                socials: {
+                    x: instructor.socials?.x || '',
+                    linkedin: instructor.socials?.linkedin || '',
+                },
+            });
             setProfilePictureUrl(instructor.info?.profilePictureUrl || null);
         } else {
             setEditingInstructor(null);
@@ -43,6 +88,11 @@ const InstructorManagement: React.FC = () => {
             setProfilePictureUrl(null);
         }
         setIsModalVisible(true);
+    };
+
+    const showCoursesModal = (instructorId: string) => {
+        setSelectedInstructorId(instructorId);
+        setIsCoursesModalVisible(true);
     };
 
     const handleOk = async () => {
@@ -77,27 +127,41 @@ const InstructorManagement: React.FC = () => {
             title: 'Avatar',
             dataIndex: ['info', 'profilePictureUrl'],
             key: 'avatar',
-            render: (url: string) => <Avatar src={url} />,
+            render: (url: string) => <Avatar src={url} icon={<UserOutlined />} />,
         },
-        { title: 'Name', dataIndex: 'name', key: 'name' },
-        { title: 'Email', dataIndex: 'email', key: 'email' },
         {
-            title: 'Bio',
-            dataIndex: 'bio',
-            key: 'bio',
-            render: (bio: string) => <div dangerouslySetInnerHTML={{ __html: bio }} />,
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            sorter: (a: InstructorDto, b: InstructorDto) => a.name.localeCompare(b.name),
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            sorter: (a: InstructorDto, b: InstructorDto) => a.email.localeCompare(b.email),
         },
         {
             title: 'Courses',
-            dataIndex: 'courses',
-            key: 'courses',
-            render: (courses: CourseDto[], record: InstructorDto) => (
-                <Space direction="vertical">
-                    <Tag color="blue">{record.courseCount} course(s)</Tag>
-                    {courses && courses.length > 0 && (
-                        <Tooltip title={courses.map((course) => course.title).join(', ')}>
-                            <Button icon={<BookOutlined />}>View Courses</Button>
-                        </Tooltip>
+            dataIndex: 'courseCount',
+            key: 'courseCount',
+            render: (courseCount: number) => <Tag color="blue">{courseCount} course(s)</Tag>,
+            sorter: (a: InstructorDto, b: InstructorDto) => a.courseCount - b.courseCount,
+        },
+        {
+            title: 'Socials',
+            key: 'socials',
+            render: (_: unknown, record: InstructorDto) => (
+                <Space>
+                    {record.socials?.x && (
+                        <a href={record.socials.x} target="_blank" rel="noopener noreferrer">
+                            <TwitterOutlined />
+                        </a>
+                    )}
+                    {record.socials?.linkedin && (
+                        <a href={record.socials.linkedin} target="_blank" rel="noopener noreferrer">
+                            <LinkedinOutlined />
+                        </a>
                     )}
                 </Space>
             ),
@@ -105,24 +169,99 @@ const InstructorManagement: React.FC = () => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (text: string, record: InstructorDto) => (
+            render: (_: unknown, record: InstructorDto) => (
                 <Space size="middle">
-                    <Button icon={<EditOutlined />} onClick={() => showModal(record)} />
-                    <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
+                    <Tooltip title="Edit">
+                        <Button icon={<EditOutlined />} onClick={() => showModal(record)} />
+                    </Tooltip>
+                    <Tooltip title="View Courses">
+                        <Button icon={<BookOutlined />} onClick={() => showCoursesModal(record.id)} />
+                    </Tooltip>
+                    <Popconfirm
+                        title="Are you sure you want to delete this instructor?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Tooltip title="Delete">
+                            <Button icon={<DeleteOutlined />} danger />
+                        </Tooltip>
+                    </Popconfirm>
                 </Space>
             ),
         },
     ];
 
+    const courseColumns = [
+        {
+            title: 'Title',
+            dataIndex: 'title',
+            key: 'title',
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+            render: (description: string) => (
+                <Tooltip title={description}>
+                    <span>{description.length > 50 ? `${description.substring(0, 50)}...` : description}</span>
+                </Tooltip>
+            ),
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string) => <Tag color={status === 'PUBLISHED' ? 'green' : 'orange'}>{status}</Tag>,
+        },
+        {
+            title: 'Price',
+            dataIndex: 'price',
+            key: 'price',
+            render: (price: number, record: CourseDto) => `${record.currency.symbol}${price}`,
+        },
+        {
+            title: 'Level',
+            dataIndex: 'level',
+            key: 'level',
+        },
+    ];
+
+    const filteredInstructors = instructors.filter(
+        (instructor: InstructorDto) =>
+            instructor.name.toLowerCase().includes(searchText.toLowerCase()) || instructor.email.toLowerCase().includes(searchText.toLowerCase()),
+    );
+
     return (
         <DashboardLayout>
-            <div className="mb-4">
-                <h1 className="text-2xl font-bold">Instructor Management</h1>
-                <Button icon={<PlusOutlined />} onClick={() => showModal()} className="mt-2">
-                    Add Instructor
-                </Button>
-            </div>
-            <Table columns={columns} dataSource={instructors?.data} loading={isLoading} rowKey="id" />
+            <Row gutter={[16, 16]}>
+                <Col span={24}>
+                    <Title level={2}>Instructor Management</Title>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                    <Card>
+                        <Statistic title="Total Instructors" value={instructors.length || 0} prefix={<TeamOutlined />} />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                    <Card>
+                        <Statistic title="Total Users" value={totalUsers || 0} prefix={<UserOutlined />} />
+                    </Card>
+                </Col>
+            </Row>
+            <Card style={{ marginTop: 16 }}>
+                <Row gutter={[16, 16]} align="middle">
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <Input placeholder="Search instructors" prefix={<SearchOutlined />} onChange={(e) => setSearchText(e.target.value)} />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={() => showModal()}>
+                            Add Instructor
+                        </Button>
+                    </Col>
+                </Row>
+                <Table columns={columns} dataSource={filteredInstructors} loading={isLoading} rowKey="id" style={{ marginTop: 16 }} />
+            </Card>
             <Modal
                 title={editingInstructor ? 'Edit Instructor' : 'Add Instructor'}
                 visible={isModalVisible}
@@ -133,25 +272,40 @@ const InstructorManagement: React.FC = () => {
                 <Form form={form} layout="vertical">
                     <Form.Item label="Profile Picture">
                         <div className="flex items-center space-x-4">
-                            <Avatar size={64} src={profilePictureUrl} />
+                            <Avatar size={64} src={profilePictureUrl} icon={<UserOutlined />} />
                             <Button icon={<UploadOutlined />} onClick={openCloudinaryWidget}>
                                 {profilePictureUrl ? 'Change Picture' : 'Upload Picture'}
                             </Button>
                         </div>
                     </Form.Item>
                     <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please input the name!' }]}>
-                        <Input />
+                        <Input prefix={<UserOutlined />} />
                     </Form.Item>
                     <Form.Item name="email" label="Email" rules={[{ required: true, message: 'Please input the email!', type: 'email' }]}>
-                        <Input />
+                        <Input prefix={<MailOutlined />} />
                     </Form.Item>
                     <Form.Item name="bio" label="Bio" rules={[{ required: true, message: 'Please input the bio!' }]}>
                         <ReactQuill theme="snow" />
+                    </Form.Item>
+                    <Form.Item name={['socials', 'x']} label="Twitter URL">
+                        <Input prefix={<TwitterOutlined />} />
+                    </Form.Item>
+                    <Form.Item name={['socials', 'linkedin']} label="LinkedIn URL">
+                        <Input prefix={<LinkedinOutlined />} />
                     </Form.Item>
                     <Form.Item name={['info', 'profilePictureUrl']} hidden>
                         <Input />
                     </Form.Item>
                 </Form>
+            </Modal>
+            <Modal
+                title="Instructor Courses"
+                visible={isCoursesModalVisible}
+                onCancel={() => setIsCoursesModalVisible(false)}
+                footer={null}
+                width={1000}
+            >
+                <Table columns={courseColumns} dataSource={instructorCourses} loading={isCoursesLoading} rowKey="id" />
             </Modal>
         </DashboardLayout>
     );
