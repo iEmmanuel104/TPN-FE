@@ -29,33 +29,33 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
     const [frames, setFrames] = useState<Frame[]>([]);
     const [videoLength, setVideoLength] = useState<number | null>(null);
 
-    const { data: modules, isLoading } = useGetModulesByCourseQuery({ courseId });
+    const { data: modules, isLoading, refetch } = useGetModulesByCourseQuery({ courseId });
     const [addModule] = useAddModuleMutation();
     const [updateModule] = useUpdateModuleMutation();
     const [deleteModule] = useDeleteModuleMutation();
 
- const { openWidget: openVideoWidget } = useCloudinaryWidget({
-     onSuccess: async (url) => {
-         setVideoUrl(url);
-         setIsVideoLoading(true);
-         try {
-             const duration = await getVideoDuration(url);
-             setVideoLength(duration);
-             form.setFieldsValue({
-                 url,
-                 videoInfo: { length: duration },
-             });
-         } catch (error) {
-             console.error('Failed to get video duration:', error);
-             message.error('Failed to get video duration');
-         } finally {
-             setIsVideoLoading(false);
-         }
-     },
-     onClose: () => {
-         setIsVideoLoading(false);
-     },
- });
+    const { openWidget: openVideoWidget } = useCloudinaryWidget({
+        onSuccess: async (url) => {
+            setVideoUrl(url);
+            setIsVideoLoading(true);
+            try {
+                const duration = await getVideoDuration(url);
+                setVideoLength(duration);
+                form.setFieldsValue({
+                    url,
+                    videoInfo: { length: duration },
+                });
+            } catch (error) {
+                console.error('Failed to get video duration:', error);
+                message.error('Failed to get video duration');
+            } finally {
+                setIsVideoLoading(false);
+            }
+        },
+        onClose: () => {
+            setIsVideoLoading(false);
+        },
+    });
     useEffect(() => {
         if (videoLength !== null) {
             form.setFieldsValue({
@@ -97,6 +97,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                 message.success('Module added successfully');
             }
             setIsModalVisible(false);
+            refetch(); // Refetch the modules data after update or add
         } catch (error) {
             console.error('Failed to save module:', error);
             message.error('Failed to save module');
@@ -107,6 +108,7 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
         try {
             await deleteModule({ id }).unwrap();
             message.success('Module deleted successfully');
+            refetch(); // Refetch the modules data after delete
         } catch (error) {
             console.error('Failed to delete module:', error);
             message.error('Failed to delete module');
@@ -252,7 +254,10 @@ const ModuleForm: React.FC<ModuleFormProps> = ({ courseId }) => {
                 title={editingModule ? 'Edit Module' : 'Add Module'}
                 open={isModalVisible}
                 onOk={handleOk}
-                onCancel={() => setIsModalVisible(false)}
+                onCancel={() => {
+                    setIsModalVisible(false);
+                    refetch(); // Refetch the modules data when modal is closed
+                }}
                 maskClosable={false}
                 width={800}
             >
