@@ -14,6 +14,7 @@ import EditCourse from './pages/Admin/course/EditCourse';
 import CourseView from './pages/Admin/course/CourseView';
 import InstructorManagement from './pages/Admin/InstructorManagement';
 import AdminManagement from './pages/Admin/AdminManagement';
+import StudentManagement from './pages/Admin/StudentManagement';
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function App() {
                         </Route>
                         <Route path="instructors" element={<InstructorManagement />} />
                         <Route path="admins" element={<AdminManagement />} />
+                        <Route path="students" element={<StudentManagement />} />
                     </Route>
                     <Route path="*" element={<NotFound />} />
                 </Routes>
