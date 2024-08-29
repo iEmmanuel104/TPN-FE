@@ -4,7 +4,7 @@ import { UserInfoFromApi } from './authApi';
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getAllUsers: builder.query<ApiResponse<UserInfoFromApi[]>, { page?: number; size?: number; q: string; isBlocked?: boolean; isDeactivated?: boolean }>({
+        getAllUsers: builder.query<ApiResponse<{ users: UserInfoFromApi[], count: number, totalPages: number }>, { page?: number; size?: number; q: string; isBlocked?: boolean; isDeactivated?: boolean }>({
             query: ({ page, size, q, isBlocked, isDeactivated }) => {
                 const params = new URLSearchParams();
                 if (page !== undefined) params.append('page', String(page));
