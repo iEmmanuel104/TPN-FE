@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tabs, Input, Button, Space, Modal, message, Form, Avatar } from 'antd';
-import { SearchOutlined, ExclamationCircleOutlined, UserOutlined } from '@ant-design/icons';
+import { Table, Tabs, Input, Button, Space, Modal, message, Form, Avatar, Tooltip } from 'antd';
+import {
+    SearchOutlined,
+    ExclamationCircleOutlined,
+    UserOutlined,
+    LockOutlined,
+    UnlockOutlined,
+    StopOutlined,
+    PoweroffOutlined,
+} from '@ant-design/icons';
 import { useGetAllUsersQuery } from '../../api/userApi';
 import { useBlockUserMutation, useDeactivateUserMutation } from '../../api/adminApi';
 import DashboardLayout from '../../components/DashboardLayout';
 import { UserInfoFromApi } from '../../api/authApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../state/store';
+import { ColumnType } from 'antd/es/table';
 
 const { TabPane } = Tabs;
 const { confirm } = Modal;
@@ -17,6 +28,8 @@ const StudentManagement: React.FC = () => {
     const [blockModalVisible, setBlockModalVisible] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<UserInfoFromApi | null>(null);
     const [blockReason, setBlockReason] = useState<string>('');
+
+    const currentAdmin = useSelector((state: RootState) => state.auth.admin);
 
     const {
         data: usersData,
@@ -83,7 +96,7 @@ const StudentManagement: React.FC = () => {
 
     const handleDeactivateUser = async (id: string, isDeactivated: boolean) => {
         try {
-            await deactivateUser({ id, isDeactivated: isDeactivated ? "true" : "false" }).unwrap();
+            await deactivateUser({ id, isDeactivated: isDeactivated ? 'true' : 'false' }).unwrap();
             message.success(`User ${isDeactivated ? 'deactivated' : 'activated'} successfully`);
             refetch();
         } catch (error) {
@@ -91,7 +104,7 @@ const StudentManagement: React.FC = () => {
         }
     };
 
-    const columns = [
+    const columns: ColumnType<UserInfoFromApi>[] = [
         {
             title: 'Avatar',
             dataIndex: 'displayImage',
@@ -110,22 +123,26 @@ const StudentManagement: React.FC = () => {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
+            responsive: ['md'],
         },
         {
             title: 'Join Date',
             dataIndex: ['settings', 'joinDate'],
             key: 'joinDate',
             render: (joinDate: string) => new Date(joinDate).toLocaleDateString(),
+            responsive: ['lg'],
         },
         {
             title: 'Gender',
             dataIndex: 'gender',
             key: 'gender',
+            responsive: ['xl'],
         },
         {
             title: 'Enrolled Courses',
             dataIndex: 'enrolledCoursesCount',
             key: 'enrolledCoursesCount',
+            responsive: ['xl'],
         },
         {
             title: 'Status',
@@ -143,15 +160,22 @@ const StudentManagement: React.FC = () => {
             key: 'actions',
             render: (_: unknown, record: UserInfoFromApi) => (
                 <Space size="middle">
-                    <Button onClick={() => showBlockModal(record)} type={record.settings?.isBlocked ? 'primary' : 'default'}>
-                        {record.settings?.isBlocked ? 'Unblock' : 'Block'}
-                    </Button>
-                    <Button
-                        onClick={() => showDeactivateConfirm(record.id, !record.status.activated)}
-                        type={!record.status.activated ? 'primary' : 'default'}
-                    >
-                        {!record.status.activated ? 'Activate' : 'Deactivate'}
-                    </Button>
+                    {currentAdmin?.isSuperAdmin && (
+                        <Tooltip title={record.settings?.isBlocked ? 'Unblock User' : 'Block User'}>
+                            <Button
+                                onClick={() => showBlockModal(record)}
+                                icon={record.settings?.isBlocked ? <UnlockOutlined /> : <LockOutlined />}
+                                type={record.settings?.isBlocked ? 'primary' : 'default'}
+                            />
+                        </Tooltip>
+                    )}
+                    <Tooltip title={!record.status.activated ? 'Activate User' : 'Deactivate User'}>
+                        <Button
+                            onClick={() => showDeactivateConfirm(record.id, !record.settings?.isDeactivated)}
+                            icon={!record.settings?.isDeactivated ? <PoweroffOutlined /> : <StopOutlined />}
+                            type={!record.settings?.isDeactivated ? 'default' : 'primary'}
+                        />
+                    </Tooltip>
                 </Space>
             ),
         },
@@ -161,8 +185,8 @@ const StudentManagement: React.FC = () => {
 
     return (
         <DashboardLayout>
-            <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">Student Management</h1>
+            <div className="p-4 sm:p-6">
+                <h1 className="text-xl sm:text-2xl font-bold mb-4">Student Management</h1>
                 <Tabs activeKey={currentTab} onChange={handleTabChange}>
                     <TabPane tab="All Students" key="all">
                         <div className="mb-4">
@@ -179,9 +203,10 @@ const StudentManagement: React.FC = () => {
                                 total: usersInfo.count,
                                 onChange: (page, pageSize) => {
                                     setCurrentPage(page);
-                                    setPageSize(pageSize);
+                                    setPageSize(pageSize || 10);
                                 },
                             }}
+                            scroll={{ x: true }}
                         />
                     </TabPane>
                     <TabPane tab="Blocked Students" key="blocked">
@@ -199,9 +224,10 @@ const StudentManagement: React.FC = () => {
                                 total: usersInfo.count,
                                 onChange: (page, pageSize) => {
                                     setCurrentPage(page);
-                                    setPageSize(pageSize);
+                                    setPageSize(pageSize || 10);
                                 },
                             }}
+                            scroll={{ x: true }}
                         />
                     </TabPane>
                     <TabPane tab="Deactivated Students" key="deactivated">
@@ -223,9 +249,10 @@ const StudentManagement: React.FC = () => {
                                 total: usersInfo.count,
                                 onChange: (page, pageSize) => {
                                     setCurrentPage(page);
-                                    setPageSize(pageSize);
+                                    setPageSize(pageSize || 10);
                                 },
                             }}
+                            scroll={{ x: true }}
                         />
                     </TabPane>
                 </Tabs>
