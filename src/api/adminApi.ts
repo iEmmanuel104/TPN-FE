@@ -133,7 +133,7 @@ export const adminApiSlice = apiSlice.injectEndpoints({
         getRevenueStats: builder.query<ApiResponse<RevenueStatsResponse>, { timeFrame?: string; courseId?: string }>({
             query: ({ timeFrame, courseId }) => URL_PREFIX + `/revenue-stats?timeFrame=${timeFrame || ''}&courseId=${courseId || ''}`,
         }),
-        blockUser: builder.mutation<ApiResponse<null>, { id: string; status: string; reason: string }>({
+        blockUser: builder.mutation<ApiResponse<null>, { id: string; status: 'true' | 'false'; reason: string }>({
             query: ({ id, status, reason }) => ({
                 url: `${URL_PREFIX}/block-user?id=${id}&status=${status}`,
                 method: 'POST',
@@ -142,9 +142,9 @@ export const adminApiSlice = apiSlice.injectEndpoints({
                 },
             }),
         }),
-        deactivateUser: builder.mutation<ApiResponse<null>, { userId: string; isDeactivated: string }>({
-            query: ({ userId, isDeactivated }) => ({
-                url: `${URL_PREFIX}/deactivate-user?id=${userId}&isDeactivated=${isDeactivated}`,
+        deactivateUser: builder.mutation<ApiResponse<null>, { id: string ; isDeactivated: 'true' | 'false' }>({
+            query: ({ id, isDeactivated }) => ({
+                url: `${URL_PREFIX}/deactivate-user?id=${id}&isDeactivated=${isDeactivated}`,
                 method: 'POST',
             }),
         }),
