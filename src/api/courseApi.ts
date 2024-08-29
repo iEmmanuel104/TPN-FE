@@ -79,6 +79,12 @@ export interface UserCourseDto {
         testScore?: number;
         testPassed?: boolean;
     };
+    paymentDetails: {
+        price: number;
+        paymentMethod: string;
+        currency: string;
+        payDate: Date;
+    };
 }
 
 export interface GetAllCoursesParams {
