@@ -1,26 +1,37 @@
 // src/api/userApi.ts
-import { apiSlice } from './api';
+import { ApiResponse, apiSlice } from './api';
 import { UserInfoFromApi } from './authApi';
-
-export interface UpdateUserDto {
-    firstName?: string;
-    lastName?: string;
-    otherName?: string;
-    displayImage?: string;
-    gender?: string;
-}
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getAllUsers: builder.query<UserInfoFromApi[], { page?: number; size?: number }>({
-            query: ({ page, size }) => ({
-                url: '/user',
-                method: 'GET',
-                params: { page, size },
-            }),
+        getAllUsers: builder.query<ApiResponse<UserInfoFromApi[]>, { page?: number; size?: number; includeCourses?: boolean }>({
+            query: ({ page, size, includeCourses }) => {
+                const params = new URLSearchParams();
+                if (page !== undefined) params.append('page', String(page));
+                if (size !== undefined) params.append('size', String(size));
+                if (includeCourses) params.append('includeCourses', 'true');
+
+                return {
+                    url: `/user?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
             providesTags: ['User'],
         }),
-        updateUser: builder.mutation<UserInfoFromApi, UpdateUserDto>({
+        getUser: builder.query<ApiResponse<UserInfoFromApi>, { id: string; ongoing?: 'true' | 'false' }>({
+            query: ({ id, ongoing }) => {
+                const params = new URLSearchParams();
+                params.append('id', id);
+                if (ongoing !== undefined) params.append('ongoing', ongoing);
+
+                return {
+                    url: `/user/info?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
+            providesTags: ['User'],
+        }),
+        updateUser: builder.mutation<ApiResponse<UserInfoFromApi>, Partial<UserInfoFromApi>>({
             query: (userData) => ({
                 url: '/user/update',
                 method: 'PATCH',
@@ -28,26 +39,11 @@ export const userApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['User'],
         }),
-        searchUsers: builder.query<UserInfoFromApi[], string>({
-            query: (searchTerm) => ({
-                url: '/user/search',
-                method: 'GET',
-                params: { q: searchTerm },
-            }),
-        }),
-        uploadUserImage: builder.mutation<{ url: string }, FormData>({
-            query: (formData) => ({
-                url: '/user/upload/data',
-                method: 'POST',
-                body: formData,
-            }),
-        }),
     }),
 });
 
 export const {
     useGetAllUsersQuery,
+    useGetUserQuery,
     useUpdateUserMutation,
-    useSearchUsersQuery,
-    useUploadUserImageMutation,
 } = userApiSlice;
