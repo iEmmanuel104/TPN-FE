@@ -117,12 +117,7 @@ const CourseList: React.FC = () => {
                         <Col xs={24} sm={12} md={16} lg={18}>
                             <Row gutter={[16, 16]} justify="end">
                                 <Col xs={24} md={0}>
-                                    <Dropdown
-                                        overlay={renderFilters()}
-                                        trigger={['click']}
-                                        open={isFilterVisible}
-                                        onOpenChange={setIsFilterVisible}
-                                    >
+                                    <Dropdown overlay={renderFilters()} trigger={['click']} open={isFilterVisible} onOpenChange={setIsFilterVisible}>
                                         <Button icon={<FilterOutlined />} onClick={() => setIsFilterVisible(!isFilterVisible)}>
                                             Filters
                                         </Button>
