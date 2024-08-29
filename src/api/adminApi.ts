@@ -133,6 +133,22 @@ export const adminApiSlice = apiSlice.injectEndpoints({
         getRevenueStats: builder.query<ApiResponse<RevenueStatsResponse>, { timeFrame?: string; courseId?: string }>({
             query: ({ timeFrame, courseId }) => URL_PREFIX + `/revenue-stats?timeFrame=${timeFrame || ''}&courseId=${courseId || ''}`,
         }),
+        blockUser: builder.mutation<ApiResponse<null>, { id: string; status: string; reason: string }>({
+            query: ({ id, status, reason }) => ({
+                url: `${URL_PREFIX}/block-user?id=${id}&status=${status}`,
+                method: 'POST',
+                body: {
+                    reason,
+                },
+            }),
+        }),
+        deactivateUser: builder.mutation<ApiResponse<null>, { userId: string; isDeactivated: string }>({
+            query: ({ userId, isDeactivated }) => ({
+                url: `${URL_PREFIX}/deactivate-user?id=${userId}&isDeactivated=${isDeactivated}`,
+                method: 'POST',
+            }),
+        }),
+
     }),
 });
 
@@ -147,4 +163,6 @@ export const {
     useGetInstructorStatsQuery,
     useGetTopCoursesQuery,
     useGetRevenueStatsQuery,
+    useBlockUserMutation,
+    useDeactivateUserMutation,
 } = adminApiSlice;
