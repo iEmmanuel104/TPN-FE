@@ -10,11 +10,13 @@ export interface UserInfoFromApi {
     lastName: string;
     otherName?: string;
     displayImage?: string;
+    gender?: string;
     status: {
         activated: boolean;
         emailVerified: boolean;
     };
-    settings: Usersettings
+    settings: Usersettings;
+    enrolledCoursesCount: number;
 }
 
 export interface Usersettings {
@@ -23,6 +25,7 @@ export interface Usersettings {
     lastLogin?: Date;
     joinDate: string;
     isBlocked?: boolean;
+    isDeactivated?: boolean;
     meta?: IBlockMeta | null;
 }
 
