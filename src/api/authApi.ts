@@ -14,15 +14,25 @@ export interface UserInfoFromApi {
         activated: boolean;
         emailVerified: boolean;
     };
-    role: {
-        name: string;
-    };
-    settings: {
-        joinDate: string;
-        isBlocked: boolean;
-        lastLogin: string;
-        suggestUpgrade: boolean;
-    };
+    settings: Usersettings
+}
+
+export interface Usersettings {
+    id: string
+    userId: string;
+    lastLogin?: Date;
+    joinDate: string;
+    isBlocked?: boolean;
+    meta?: IBlockMeta | null;
+}
+
+interface IBlockUnblockEntry {
+    [date: string]: string; // Key is the date in YYYY-MM-DD format, value is the reason
+}
+
+export interface IBlockMeta {
+    blockHistory: IBlockUnblockEntry[];
+    unblockHistory: IBlockUnblockEntry[];
 }
 
 interface SignupResponse {
