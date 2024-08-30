@@ -33,6 +33,9 @@ const Sidebar: React.FC<SidebarProps> = ({ mobile = false }) => {
             <Menu.Item key="/iadmin/students" icon={<TeamOutlined />}>
                 <Link to="/iadmin/students">Students</Link>
             </Menu.Item>
+            <Menu.Item key="/iadmin/blogs" icon={<TeamOutlined />}>
+                <Link to="/iadmin/blogs">Blog</Link>
+            </Menu.Item>
             {currentAdmin?.isSuperAdmin && (
                 <Menu.Item key="/iadmin/admins" icon={<SettingOutlined />}>
                     <Link to="/iadmin/admins">Admin Management</Link>
