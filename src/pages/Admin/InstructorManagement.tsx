@@ -315,7 +315,7 @@ const InstructorManagement: React.FC = () => {
                     rowKey="id"
                     onRow={(record) => ({
                         onClick: () => {
-                            navigate(`/courses/${record.id}`); // Adjust this path as needed
+                            navigate(`/iadmin/courses/${record.id}`); // Adjust this path as needed
                         },
                         style: { cursor: 'pointer' },
                     })}
