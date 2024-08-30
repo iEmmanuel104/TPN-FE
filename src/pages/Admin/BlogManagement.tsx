@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Button, Table, Tag, Space, Modal, Form, Input, Select, message } from 'antd';
+import { Button, Table, Tag, Space, Modal, Form, Input, Select, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { motion } from 'framer-motion';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 import { useAddBlogMutation, useGetAllBlogsQuery, useUpdateBlogMutation, useDeleteBlogMutation, BlogDto, BlogStatus } from '../../api/blogApi';
+import DashboardLayout from '../../components/DashboardLayout';
 
-const { Header, Content, Sider } = Layout;
 const { Option } = Select;
 
-const BlogManagement = () => {
+const BlogManagement: React.FC = () => {
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingBlog, setEditingBlog] = useState<BlogDto | null>(null);
@@ -107,26 +107,16 @@ const BlogManagement = () => {
     const blogs = blogsData?.data || { blogs: [] };
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Sider width={200} className="site-layout-background">
-                <Menu mode="inline" defaultSelectedKeys={['1']} defaultOpenKeys={['sub1']} style={{ height: '100%', borderRight: 0 }}>
-                    <Menu.Item key="1">Blog Posts</Menu.Item>
-                    <Menu.Item key="2">Categories</Menu.Item>
-                    <Menu.Item key="3">Tags</Menu.Item>
-                </Menu>
-            </Sider>
-            <Layout className="site-layout">
-                <Header className="site-layout-background" style={{ padding: 0 }}>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)} style={{ margin: '16px' }}>
+        <DashboardLayout>
+            <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">Blog Management</h1>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
                         Add New Blog
                     </Button>
-                </Header>
-                <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-                    <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-                        <Table columns={columns} dataSource={blogs.blogs} loading={isLoading} rowKey="id" />
-                    </div>
-                </Content>
-            </Layout>
+                </div>
+                <Table columns={columns} dataSource={blogs.blogs} loading={isLoading} rowKey="id" />
+            </div>
 
             <Modal
                 title={editingBlog ? 'Edit Blog' : 'Add New Blog'}
@@ -182,7 +172,7 @@ const BlogManagement = () => {
                 </div>
                 {selectedTemplate === 'template1' ? <BlogTemplate1 blog={editingBlog} /> : <BlogTemplate2 blog={editingBlog} />}
             </Modal>
-        </Layout>
+        </DashboardLayout>
     );
 };
 
