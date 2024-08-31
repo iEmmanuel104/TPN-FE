@@ -1,4 +1,5 @@
 import { ApiResponse, apiSlice } from './api';
+import { UserInfoFromApi } from './authApi';
 
 export enum BlogStatus {
     Draft = 'Draft',
@@ -36,6 +37,7 @@ export interface BlogActivityDto {
     blogId: string;
     liked: boolean;
     comment: string | null;
+    user: UserInfoFromApi;
 }
 
 export interface GetAllBlogsParams {
