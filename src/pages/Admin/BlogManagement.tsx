@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
-import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image, Upload } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ArrowUpOutlined, ArrowDownOutlined, UploadOutlined } from '@ant-design/icons';
+import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image, Avatar, Card, Col, Row } from 'antd';
+import {
+    PlusOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    EyeOutlined,
+    ArrowUpOutlined,
+    ArrowDownOutlined,
+    UploadOutlined,
+    CameraOutlined,
+    UserOutlined,
+} from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Reorder } from 'framer-motion';
@@ -134,6 +144,7 @@ const BlogManagement: React.FC = () => {
     };
 
     const blogs = blogsData?.data?.blogs || [];
+
     return (
         <DashboardLayout>
             <div className="p-6">
@@ -162,21 +173,86 @@ const BlogManagement: React.FC = () => {
             >
                 <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key as 'edit' | 'preview')}>
                     <TabPane tab="Edit" key="edit">
-                        <div className="flex">
-                            <div className="w-2/3 pr-4">
-                                <Form form={form} layout="vertical">
+                        <Form form={form} layout="vertical">
+                            <Row gutter={24}>
+                                <Col span={16}>
                                     <Form.Item name="title" label="Title" rules={[{ required: true }]}>
                                         <Input />
                                     </Form.Item>
                                     <Form.Item name="content" label="Content" rules={[{ required: true }]}>
                                         <ReactQuill theme="snow" />
                                     </Form.Item>
-                                    <Form.Item name={['author', 'name']} label="Author Name" rules={[{ required: true }]}>
-                                        <Input />
-                                    </Form.Item>
-                                    <Form.Item name={['author', 'email']} label="Author Email" rules={[{ required: true, type: 'email' }]}>
-                                        <Input />
-                                    </Form.Item>
+                                    <Row>
+                                        <Col span={24}>
+                                            <h3 className="mb-2">Blog Images</h3>
+                                            <Reorder.Group axis="y" onReorder={handleReorderImages} values={images} className="space-y-2">
+                                                {images.map((image, index) => (
+                                                    <Reorder.Item key={image} value={image} className="flex items-center bg-gray-100 p-2 rounded">
+                                                        <Image src={image} width={100} className="mr-4" />
+                                                        <Space>
+                                                            <Button
+                                                                icon={<ArrowUpOutlined />}
+                                                                onClick={() =>
+                                                                    handleReorderImages([
+                                                                        ...images.slice(0, index - 1),
+                                                                        images[index],
+                                                                        images[index - 1],
+                                                                        ...images.slice(index + 1),
+                                                                    ])
+                                                                }
+                                                                disabled={index === 0}
+                                                            />
+                                                            <Button
+                                                                icon={<ArrowDownOutlined />}
+                                                                onClick={() =>
+                                                                    handleReorderImages([
+                                                                        ...images.slice(0, index),
+                                                                        images[index + 1],
+                                                                        images[index],
+                                                                        ...images.slice(index + 2),
+                                                                    ])
+                                                                }
+                                                                disabled={index === images.length - 1}
+                                                            />
+                                                            <Button danger onClick={() => handleRemoveImage(index)}>
+                                                                Remove
+                                                            </Button>
+                                                        </Space>
+                                                    </Reorder.Item>
+                                                ))}
+                                            </Reorder.Group>
+                                            {images.length < 3 && (
+                                                <Button icon={<UploadOutlined />} onClick={openImageWidget} className="mt-4">
+                                                    Upload Image
+                                                </Button>
+                                            )}
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col span={8}>
+                                    <Card>
+                                        <Form.Item name={['author', 'image']} valuePropName="src" noStyle>
+                                            <Avatar
+                                                size={64}
+                                                icon={<UserOutlined />}
+                                                src={authorImage}
+                                                className="mb-4 cursor-pointer"
+                                                onClick={openAuthorImageWidget}
+                                            />
+                                        </Form.Item>
+                                        <div className="absolute top-0 right-0 p-2">
+                                            <Button icon={<CameraOutlined />} shape="circle" size="small" onClick={openAuthorImageWidget} />
+                                        </div>
+                                        <Form.Item name={['author', 'name']} rules={[{ required: true }]}>
+                                            <Input placeholder="Author Name" />
+                                        </Form.Item>
+                                        <Form.Item name={['author', 'email']} rules={[{ required: true, type: 'email' }]}>
+                                            <Input placeholder="Author Email" />
+                                        </Form.Item>
+                                        <Form.Item name={['author', 'bio']}>
+                                            <Input.TextArea placeholder="Author Bio" rows={3} />
+                                        </Form.Item>
+                                    </Card>
                                     <Form.Item name="status" label="Status" rules={[{ required: true }]}>
                                         <Select>
                                             {Object.values(BlogStatus).map((status) => (
@@ -193,77 +269,9 @@ const BlogManagement: React.FC = () => {
                                             <Option value="business">Business</Option>
                                         </Select>
                                     </Form.Item>
-                                </Form>
-                            </div>
-                            <div className="w-1/3 pl-4">
-                                <div className="mb-4">
-                                    <h3 className="mb-2">Blog Images</h3>
-                                    <Reorder.Group axis="y" onReorder={handleReorderImages} values={images}>
-                                        {images.map((image, index) => (
-                                            <Reorder.Item key={image} value={image}>
-                                                <div className="flex items-center mb-2">
-                                                    <Image src={image} width={100} className="mr-4" />
-                                                    <Space>
-                                                        <Button
-                                                            icon={<ArrowUpOutlined />}
-                                                            onClick={() =>
-                                                                handleReorderImages([
-                                                                    ...images.slice(0, index - 1),
-                                                                    images[index],
-                                                                    images[index - 1],
-                                                                    ...images.slice(index + 1),
-                                                                ])
-                                                            }
-                                                            disabled={index === 0}
-                                                        />
-                                                        <Button
-                                                            icon={<ArrowDownOutlined />}
-                                                            onClick={() =>
-                                                                handleReorderImages([
-                                                                    ...images.slice(0, index),
-                                                                    images[index + 1],
-                                                                    images[index],
-                                                                    ...images.slice(index + 2),
-                                                                ])
-                                                            }
-                                                            disabled={index === images.length - 1}
-                                                        />
-                                                        <Button danger onClick={() => handleRemoveImage(index)}>
-                                                            Remove
-                                                        </Button>
-                                                    </Space>
-                                                </div>
-                                            </Reorder.Item>
-                                        ))}
-                                    </Reorder.Group>
-                                    {images.length < 3 && (
-                                        <Button icon={<UploadOutlined />} onClick={openImageWidget}>
-                                            Upload Image
-                                        </Button>
-                                    )}
-                                </div>
-                                <div>
-                                    <h3 className="mb-2">Author Image</h3>
-                                    <Upload
-                                        listType="picture-card"
-                                        fileList={authorImage ? [{ uid: '-1', name: 'author-image', status: 'done', url: authorImage }] : []}
-                                        onRemove={() => {
-                                            setAuthorImage('');
-                                            form.setFieldsValue({ 'author.image': '' });
-                                        }}
-                                        beforeUpload={() => false}
-                                        onChange={() => openAuthorImageWidget()}
-                                    >
-                                        {!authorImage && (
-                                            <div>
-                                                <PlusOutlined />
-                                                <div style={{ marginTop: 8 }}>Upload</div>
-                                            </div>
-                                        )}
-                                    </Upload>
-                                </div>
-                            </div>
-                        </div>
+                                </Col>
+                            </Row>
+                        </Form>
                     </TabPane>
                     <TabPane tab="Preview" key="preview">
                         <div className="flex justify-end mb-4">
