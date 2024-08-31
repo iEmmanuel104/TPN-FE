@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Image, Avatar, Divider, Space, Button, Tag } from 'antd';
+import { Typography, Image, Avatar, Divider, Space, Button, Tag, Carousel } from 'antd';
 import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { BlogDto, BlogActivityDto } from '../../api/blogApi';
 import QuillContent from '../QuillContent';
@@ -29,7 +29,7 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
 
             <div className="p-8">
                 <Space direction="vertical" size="large" className="w-full">
-                    <Space align="center" className="w-full justify-between">
+                    <div className="flex justify-between items-center">
                         <Space>
                             <Avatar src={blog.author?.image} icon={<UserOutlined />} size={64} />
                             <div>
@@ -42,28 +42,37 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
                                 </Text>
                             </div>
                         </Space>
-                        <Space>
-                            {blog.tags?.map((tag) => (
-                                <Tag key={tag} className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
-                                    {tag}
-                                </Tag>
-                            ))}
-                        </Space>
-                    </Space>
+                        <Button type="text" icon={<ShareAltOutlined />}>
+                            Share
+                        </Button>
+                    </div>
 
                     <Divider />
 
                     <div className="blog-content">
                         <QuillContent content={blog.content || ''} />
-                        {contentImages.map((image, index) => (
-                            <Image
-                                key={index}
-                                src={image}
-                                alt={`Content ${index + 1}`}
-                                className="w-full max-h-96 object-cover rounded-lg shadow-md my-8"
-                            />
-                        ))}
+                        {contentImages.length > 0 && (
+                            <Carousel className="my-8">
+                                {contentImages.map((image, index) => (
+                                    <div key={index}>
+                                        <Image
+                                            src={image}
+                                            alt={`Content ${index + 1}`}
+                                            className="w-full max-h-96 object-cover rounded-lg shadow-md"
+                                        />
+                                    </div>
+                                ))}
+                            </Carousel>
+                        )}
                     </div>
+
+                    <Space wrap>
+                        {blog.tags?.map((tag) => (
+                            <Tag key={tag} className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
+                                {tag}
+                            </Tag>
+                        ))}
+                    </Space>
 
                     <Divider />
 
@@ -74,9 +83,6 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
                             </Button>
                             <Button type="text" icon={<MessageOutlined />}>
                                 Comment
-                            </Button>
-                            <Button type="text" icon={<ShareAltOutlined />}>
-                                Share
                             </Button>
                         </Space>
                         <Text type="secondary">{blog.activities?.length || 0} comments</Text>
