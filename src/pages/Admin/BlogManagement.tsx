@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image, Upload } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ArrowUpOutlined, ArrowDownOutlined, UploadOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { motion, Reorder } from 'framer-motion';
+import { Reorder } from 'framer-motion';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 import { useAddBlogMutation, useGetAllBlogsQuery, useUpdateBlogMutation, useDeleteBlogMutation, BlogDto, BlogStatus } from '../../api/blogApi';
 import DashboardLayout from '../../components/DashboardLayout';
@@ -20,6 +20,7 @@ const BlogManagement: React.FC = () => {
     const [selectedTemplate, setSelectedTemplate] = useState<'template1' | 'template2'>('template1');
     const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
     const [images, setImages] = useState<string[]>([]);
+    const [authorImage, setAuthorImage] = useState<string>('');
 
     const { data: blogsData, isLoading } = useGetAllBlogsQuery({});
     const [addBlog] = useAddBlogMutation();
@@ -28,8 +29,17 @@ const BlogManagement: React.FC = () => {
 
     const { openWidget: openImageWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
-            setImages((prevImages) => [...prevImages, url]);
-            form.setFieldsValue({ 'media.images': [...images, url] });
+            if (images.length < 3) {
+                setImages((prevImages) => [...prevImages, url]);
+                form.setFieldsValue({ 'media.images': [...images, url] });
+            }
+        },
+    });
+
+    const { openWidget: openAuthorImageWidget } = useCloudinaryWidget({
+        onSuccess: (url) => {
+            setAuthorImage(url);
+            form.setFieldsValue({ 'author.image': url });
         },
     });
 
@@ -68,6 +78,7 @@ const BlogManagement: React.FC = () => {
     const handleEdit = (blog: BlogDto) => {
         setEditingBlog(blog);
         setImages(blog.media?.images || []);
+        setAuthorImage(blog.author?.image || '');
         form.setFieldsValue(blog);
         setIsModalVisible(true);
     };
@@ -85,6 +96,7 @@ const BlogManagement: React.FC = () => {
         try {
             const values = await form.validateFields();
             values.media = { ...values.media, images };
+            values.author = { ...values.author, image: authorImage };
             if (editingBlog) {
                 await updateBlog({ id: editingBlog.id, ...values }).unwrap();
                 message.success('Blog updated successfully');
@@ -96,6 +108,7 @@ const BlogManagement: React.FC = () => {
             form.resetFields();
             setEditingBlog(null);
             setImages([]);
+            setAuthorImage('');
         } catch (error) {
             message.error('Failed to save blog');
         }
@@ -106,6 +119,7 @@ const BlogManagement: React.FC = () => {
         form.resetFields();
         setEditingBlog(null);
         setImages([]);
+        setAuthorImage('');
     };
 
     const handleReorderImages = (reorderedImages: string[]) => {
@@ -120,7 +134,6 @@ const BlogManagement: React.FC = () => {
     };
 
     const blogs = blogsData?.data?.blogs || [];
-
     return (
         <DashboardLayout>
             <div className="p-6">
@@ -132,10 +145,9 @@ const BlogManagement: React.FC = () => {
                 </div>
                 <Table columns={columns} dataSource={blogs} loading={isLoading} rowKey="id" />
             </div>
-
             <Modal
                 title={editingBlog ? 'Edit Blog' : 'Add New Blog'}
-                visible={isModalVisible}
+                open={isModalVisible}
                 onOk={handleModalOk}
                 onCancel={handleModalCancel}
                 width={1200}
@@ -150,85 +162,108 @@ const BlogManagement: React.FC = () => {
             >
                 <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key as 'edit' | 'preview')}>
                     <TabPane tab="Edit" key="edit">
-                        <Form form={form} layout="vertical">
-                            <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-                                <Input />
-                            </Form.Item>
-                            <Form.Item name="content" label="Content" rules={[{ required: true }]}>
-                                <ReactQuill theme="snow" />
-                            </Form.Item>
-                            <Form.Item name={['author', 'name']} label="Author Name" rules={[{ required: true }]}>
-                                <Input />
-                            </Form.Item>
-                            <Form.Item name={['author', 'email']} label="Author Email" rules={[{ required: true, type: 'email' }]}>
-                                <Input />
-                            </Form.Item>
-                            <Form.Item name="status" label="Status" rules={[{ required: true }]}>
-                                <Select>
-                                    {Object.values(BlogStatus).map((status) => (
-                                        <Option key={status} value={status}>
-                                            {status}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                            <Form.Item name="tags" label="Tags">
-                                <Select mode="tags" style={{ width: '100%' }} placeholder="Add tags">
-                                    <Option value="technology">Technology</Option>
-                                    <Option value="design">Design</Option>
-                                    <Option value="business">Business</Option>
-                                </Select>
-                            </Form.Item>
-                            <Form.Item label="Images">
-                                <Button onClick={openImageWidget} className="mb-4">
-                                    Upload Image
-                                </Button>
-                                <Reorder.Group axis="y" onReorder={handleReorderImages} values={images}>
-                                    {images.map((image, index) => (
-                                        <Reorder.Item key={image} value={image}>
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="flex items-center mb-2"
-                                            >
-                                                <Image src={image} width={100} className="mr-4" />
-                                                <Space>
-                                                    <Button
-                                                        icon={<ArrowUpOutlined />}
-                                                        onClick={() =>
-                                                            handleReorderImages([
-                                                                ...images.slice(0, index - 1),
-                                                                images[index],
-                                                                images[index - 1],
-                                                                ...images.slice(index + 1),
-                                                            ])
-                                                        }
-                                                        disabled={index === 0}
-                                                    />
-                                                    <Button
-                                                        icon={<ArrowDownOutlined />}
-                                                        onClick={() =>
-                                                            handleReorderImages([
-                                                                ...images.slice(0, index),
-                                                                images[index + 1],
-                                                                images[index],
-                                                                ...images.slice(index + 2),
-                                                            ])
-                                                        }
-                                                        disabled={index === images.length - 1}
-                                                    />
-                                                    <Button danger onClick={() => handleRemoveImage(index)}>
-                                                        Remove
-                                                    </Button>
-                                                </Space>
-                                            </motion.div>
-                                        </Reorder.Item>
-                                    ))}
-                                </Reorder.Group>
-                            </Form.Item>
-                        </Form>
+                        <div className="flex">
+                            <div className="w-2/3 pr-4">
+                                <Form form={form} layout="vertical">
+                                    <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+                                        <Input />
+                                    </Form.Item>
+                                    <Form.Item name="content" label="Content" rules={[{ required: true }]}>
+                                        <ReactQuill theme="snow" />
+                                    </Form.Item>
+                                    <Form.Item name={['author', 'name']} label="Author Name" rules={[{ required: true }]}>
+                                        <Input />
+                                    </Form.Item>
+                                    <Form.Item name={['author', 'email']} label="Author Email" rules={[{ required: true, type: 'email' }]}>
+                                        <Input />
+                                    </Form.Item>
+                                    <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+                                        <Select>
+                                            {Object.values(BlogStatus).map((status) => (
+                                                <Option key={status} value={status}>
+                                                    {status}
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item name="tags" label="Tags">
+                                        <Select mode="tags" style={{ width: '100%' }} placeholder="Add tags">
+                                            <Option value="technology">Technology</Option>
+                                            <Option value="design">Design</Option>
+                                            <Option value="business">Business</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </Form>
+                            </div>
+                            <div className="w-1/3 pl-4">
+                                <div className="mb-4">
+                                    <h3 className="mb-2">Blog Images</h3>
+                                    <Reorder.Group axis="y" onReorder={handleReorderImages} values={images}>
+                                        {images.map((image, index) => (
+                                            <Reorder.Item key={image} value={image}>
+                                                <div className="flex items-center mb-2">
+                                                    <Image src={image} width={100} className="mr-4" />
+                                                    <Space>
+                                                        <Button
+                                                            icon={<ArrowUpOutlined />}
+                                                            onClick={() =>
+                                                                handleReorderImages([
+                                                                    ...images.slice(0, index - 1),
+                                                                    images[index],
+                                                                    images[index - 1],
+                                                                    ...images.slice(index + 1),
+                                                                ])
+                                                            }
+                                                            disabled={index === 0}
+                                                        />
+                                                        <Button
+                                                            icon={<ArrowDownOutlined />}
+                                                            onClick={() =>
+                                                                handleReorderImages([
+                                                                    ...images.slice(0, index),
+                                                                    images[index + 1],
+                                                                    images[index],
+                                                                    ...images.slice(index + 2),
+                                                                ])
+                                                            }
+                                                            disabled={index === images.length - 1}
+                                                        />
+                                                        <Button danger onClick={() => handleRemoveImage(index)}>
+                                                            Remove
+                                                        </Button>
+                                                    </Space>
+                                                </div>
+                                            </Reorder.Item>
+                                        ))}
+                                    </Reorder.Group>
+                                    {images.length < 3 && (
+                                        <Button icon={<UploadOutlined />} onClick={openImageWidget}>
+                                            Upload Image
+                                        </Button>
+                                    )}
+                                </div>
+                                <div>
+                                    <h3 className="mb-2">Author Image</h3>
+                                    <Upload
+                                        listType="picture-card"
+                                        fileList={authorImage ? [{ uid: '-1', name: 'author-image', status: 'done', url: authorImage }] : []}
+                                        onRemove={() => {
+                                            setAuthorImage('');
+                                            form.setFieldsValue({ 'author.image': '' });
+                                        }}
+                                        beforeUpload={() => false}
+                                        onChange={() => openAuthorImageWidget()}
+                                    >
+                                        {!authorImage && (
+                                            <div>
+                                                <PlusOutlined />
+                                                <div style={{ marginTop: 8 }}>Upload</div>
+                                            </div>
+                                        )}
+                                    </Upload>
+                                </div>
+                            </div>
+                        </div>
                     </TabPane>
                     <TabPane tab="Preview" key="preview">
                         <div className="flex justify-end mb-4">
@@ -238,9 +273,21 @@ const BlogManagement: React.FC = () => {
                             </Select>
                         </div>
                         {selectedTemplate === 'template1' ? (
-                            <BlogTemplate1 blog={{ ...form.getFieldsValue(), media: { images } }} />
+                            <BlogTemplate1
+                                blog={{
+                                    ...form.getFieldsValue(),
+                                    media: { images },
+                                    author: { ...form.getFieldValue('author'), image: authorImage },
+                                }}
+                            />
                         ) : (
-                            <BlogTemplate2 blog={{ ...form.getFieldsValue(), media: { images } }} />
+                            <BlogTemplate2
+                                blog={{
+                                    ...form.getFieldsValue(),
+                                    media: { images },
+                                    author: { ...form.getFieldValue('author'), image: authorImage },
+                                }}
+                            />
                         )}
                     </TabPane>
                 </Tabs>
