@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image, Avatar, Card, Col, Row } from 'antd';
 import {
     PlusOutlined,
     EditOutlined,
     DeleteOutlined,
     EyeOutlined,
-    ArrowUpOutlined,
-    ArrowDownOutlined,
+    ArrowLeftOutlined,
+    ArrowRightOutlined,
     UploadOutlined,
     CameraOutlined,
     UserOutlined,
@@ -37,20 +37,32 @@ const BlogManagement: React.FC = () => {
     const [updateBlog] = useUpdateBlogMutation();
     const [deleteBlog] = useDeleteBlogMutation();
 
-    const { openWidget: openImageWidget } = useCloudinaryWidget({
-        onSuccess: (url) => {
+    const handleImageUploadSuccess = useCallback(
+        (url: string) => {
             if (images.length < 3) {
                 setImages((prevImages) => [...prevImages, url]);
                 form.setFieldsValue({ 'media.images': [...images, url] });
             }
         },
-    });
+        [images, form],
+    );
 
-    const { openWidget: openAuthorImageWidget } = useCloudinaryWidget({
-        onSuccess: (url) => {
+    const handleAuthorImageUploadSuccess = useCallback(
+        (url: string) => {
             setAuthorImage(url);
             form.setFieldsValue({ 'author.image': url });
         },
+        [form],
+    );
+
+    const { openWidget: openImageWidget, isLoading: isImageUploading } = useCloudinaryWidget({
+        onSuccess: handleImageUploadSuccess,
+        onError: (error) => message.error(`Image upload failed: ${error.message}`),
+    });
+
+    const { openWidget: openAuthorImageWidget, isLoading: isAuthorImageUploading } = useCloudinaryWidget({
+        onSuccess: handleAuthorImageUploadSuccess,
+        onError: (error) => message.error(`Author image upload failed: ${error.message}`),
     });
 
     const columns = [
@@ -185,13 +197,22 @@ const BlogManagement: React.FC = () => {
                                     <Row>
                                         <Col span={24}>
                                             <h3 className="mb-2">Blog Images</h3>
-                                            <Reorder.Group axis="y" onReorder={handleReorderImages} values={images} className="space-y-2">
+                                            <Reorder.Group
+                                                axis="x"
+                                                onReorder={handleReorderImages}
+                                                values={images}
+                                                className="flex space-x-4 overflow-x-auto pb-4"
+                                            >
                                                 {images.map((image, index) => (
-                                                    <Reorder.Item key={image} value={image} className="flex items-center bg-gray-100 p-2 rounded">
-                                                        <Image src={image} width={100} className="mr-4" />
+                                                    <Reorder.Item
+                                                        key={image}
+                                                        value={image}
+                                                        className="flex flex-col items-center bg-gray-100 p-2 rounded"
+                                                    >
+                                                        <Image src={image} width={150} height={150} className="object-cover mb-2" />
                                                         <Space>
                                                             <Button
-                                                                icon={<ArrowUpOutlined />}
+                                                                icon={<ArrowLeftOutlined />}
                                                                 onClick={() =>
                                                                     handleReorderImages([
                                                                         ...images.slice(0, index - 1),
@@ -203,7 +224,7 @@ const BlogManagement: React.FC = () => {
                                                                 disabled={index === 0}
                                                             />
                                                             <Button
-                                                                icon={<ArrowDownOutlined />}
+                                                                icon={<ArrowRightOutlined />}
                                                                 onClick={() =>
                                                                     handleReorderImages([
                                                                         ...images.slice(0, index),
@@ -222,7 +243,12 @@ const BlogManagement: React.FC = () => {
                                                 ))}
                                             </Reorder.Group>
                                             {images.length < 3 && (
-                                                <Button icon={<UploadOutlined />} onClick={openImageWidget} className="mt-4">
+                                                <Button
+                                                    icon={<UploadOutlined />}
+                                                    onClick={openImageWidget}
+                                                    className="mt-4"
+                                                    loading={isImageUploading}
+                                                >
                                                     Upload Image
                                                 </Button>
                                             )}
@@ -231,17 +257,17 @@ const BlogManagement: React.FC = () => {
                                 </Col>
                                 <Col span={8}>
                                     <Card>
-                                        <Form.Item name={['author', 'image']} valuePropName="src" noStyle>
-                                            <Avatar
-                                                size={64}
-                                                icon={<UserOutlined />}
-                                                src={authorImage}
-                                                className="mb-4 cursor-pointer"
-                                                onClick={openAuthorImageWidget}
-                                            />
-                                        </Form.Item>
-                                        <div className="absolute top-0 right-0 p-2">
-                                            <Button icon={<CameraOutlined />} shape="circle" size="small" onClick={openAuthorImageWidget} />
+                                        <div className="relative mb-4">
+                                            <Avatar size={64} icon={<UserOutlined />} src={authorImage} className="cursor-pointer" />
+                                            <div className="absolute top-0 right-0">
+                                                <Button
+                                                    icon={<CameraOutlined />}
+                                                    shape="circle"
+                                                    size="small"
+                                                    onClick={openAuthorImageWidget}
+                                                    loading={isAuthorImageUploading}
+                                                />
+                                            </div>
                                         </div>
                                         <Form.Item name={['author', 'name']} rules={[{ required: true }]}>
                                             <Input placeholder="Author Name" />
