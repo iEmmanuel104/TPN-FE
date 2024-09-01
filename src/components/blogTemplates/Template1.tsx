@@ -1,8 +1,8 @@
 import React from 'react';
 import { Typography, Image, Avatar, Divider, Space, Button, Tag, Carousel } from 'antd';
 import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { BlogDto, BlogActivityDto } from '../../api/blogApi';
 import QuillContent from '../QuillContent';
+import { BlogDto } from '../../api/blogApi';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -18,19 +18,23 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
 
     return (
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden font-sans">
-            <div className="relative h-96">
-                <Image src={headerImage || '/api/placeholder/1200/600'} alt="Header" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                    <Title level={1} className="text-white text-4xl font-bold text-center px-4">
-                        {blog.title}
-                    </Title>
-                </div>
+            <Title level={1} className="text-center px-4 py-6 m-0">
+                {blog.title}
+            </Title>
+
+            <div className="relative">
+                <Image
+                    src={headerImage || '/api/placeholder/1200/600'}
+                    alt="Header"
+                    className="w-full h-64 object-cover mb-8 rounded-lg shadow-md"
+                    preview={false}
+                />
             </div>
 
-            <div className="p-8">
+            <div className="p-6 md:p-8">
                 <Space direction="vertical" size="large" className="w-full">
-                    <div className="flex justify-between items-center">
-                        <Space>
+                    <div className="flex flex-col md:flex-row justify-between items-center">
+                        <Space className="mb-4 md:mb-0">
                             <Avatar src={blog.author?.image} icon={<UserOutlined />} size={64} />
                             <div>
                                 <Title level={4} className="mb-0">
@@ -45,36 +49,39 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
                         <Button type="text" icon={<ShareAltOutlined />}>
                             Share
                         </Button>
-                    </div>
 
-                    <Divider />
+                    </div>
+                        <Space wrap className="my-4">
+                            {blog.tags?.map((tag) => (
+                                <Tag key={tag} className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
+                                    {tag}
+                                </Tag>
+                            ))}
+                        </Space>
+
+                    <Divider className="my-4" />
 
                     <div className="blog-content">
                         <QuillContent content={blog.content || ''} />
                         {contentImages.length > 0 && (
-                            <Carousel className="my-8">
-                                {contentImages.map((image, index) => (
-                                    <div key={index}>
-                                        <Image
-                                            src={image}
-                                            alt={`Content ${index + 1}`}
-                                            className="w-full max-h-96 object-cover rounded-lg shadow-md"
-                                        />
-                                    </div>
-                                ))}
-                            </Carousel>
+                            <div className="my-8">
+                                <Carousel>
+                                    {contentImages.map((image, index) => (
+                                        <div key={index} className="h-64 md:h-96">
+                                            <Image
+                                                src={image}
+                                                alt={`Content ${index + 1}`}
+                                                className="w-full h-full object-cover rounded-lg"
+                                                preview={false}
+                                            />
+                                        </div>
+                                    ))}
+                                </Carousel>
+                            </div>
                         )}
                     </div>
 
-                    <Space wrap>
-                        {blog.tags?.map((tag) => (
-                            <Tag key={tag} className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
-                                {tag}
-                            </Tag>
-                        ))}
-                    </Space>
-
-                    <Divider />
+                    <Divider className="my-4" />
 
                     <Space className="w-full justify-between">
                         <Space size="large">
@@ -88,18 +95,18 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
                         <Text type="secondary">{blog.activities?.length || 0} comments</Text>
                     </Space>
 
-                    <Divider />
+                    <Divider className="my-4" />
 
                     <div>
                         <Title level={4}>About the Author</Title>
                         <Paragraph>{blog.author?.bio}</Paragraph>
                     </div>
 
-                    <Divider />
+                    <Divider className="my-4" />
 
                     <div>
                         <Title level={4}>Comments</Title>
-                        {blog.activities?.map((activity: BlogActivityDto) => (
+                        {blog.activities?.map((activity) => (
                             <div key={activity.userId} className="mb-4">
                                 <Space align="start">
                                     <Avatar src={activity.user.displayImage} icon={<UserOutlined />} />
