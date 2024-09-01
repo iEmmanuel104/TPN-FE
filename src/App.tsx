@@ -24,10 +24,10 @@ function App() {
                 <ScrollToTop />
                 <ToastContainer position="top-center" limit={2} />
                 <Routes>
-                    <Route path="/login" element={<AdminLogin />} />
                     <Route path="/" element={<AdminLogin />} />
                     <Route path="/iadmin">
                         <Route index element={<AdminDashboard />} />
+                        <Route path="login" element={<AdminLogin />} />
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="courses">
                             <Route index element={<CourseList />} />
