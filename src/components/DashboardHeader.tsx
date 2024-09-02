@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Input, Avatar, Badge, Dropdown, Menu, Modal } from 'antd';
-import { BellOutlined, SettingOutlined, SearchOutlined, UserOutlined, LogoutOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Dropdown, Menu, Modal } from 'antd';
+import { BellOutlined, SettingOutlined, UserOutlined, LogoutOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../state/store';
 import { logOut } from '../state/slices/authSlice';
@@ -47,13 +47,13 @@ const DashboardHeader: React.FC = () => {
                     />
                     <span className="text-white font-bold text-sm">Texas Private Network</span>
                 </div>
-                <div className="relative flex-grow max-w-xl mx-4 hidden md:block">
+                {/* <div className="relative flex-grow max-w-xl mx-4 hidden md:block">
                     <Input
                         prefix={<SearchOutlined className="text-gray-400" />}
                         placeholder="Search"
                         className="text-gray-600 placeholder-gray-400 border-none rounded-md bg-[#F7F7F7]"
                     />
-                </div>
+                </div> */}
                 <div className="flex items-center space-x-4">
                     <Badge count={5} className="bg-transparent text-blue-600">
                         <BellOutlined className="text-lg text-blue-600" />
@@ -63,7 +63,7 @@ const DashboardHeader: React.FC = () => {
                     </Badge>
                     <Dropdown overlay={menu} trigger={['click']}>
                         <div className="flex items-center space-x-2 cursor-pointer">
-                            <Avatar size="large" icon={<UserOutlined />} />
+                            <Avatar size={32} icon={<UserOutlined />} />
                             <span className="text-sm font-medium">{admin?.name || 'Admin'}</span>
                         </div>
                     </Dropdown>
