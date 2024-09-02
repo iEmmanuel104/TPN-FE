@@ -38,6 +38,7 @@ const Home = () => {
         <Layout>
             <Navbar />
             <Content>
+                {/* Hero Section */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -64,6 +65,7 @@ const Home = () => {
                     </div>
                 </motion.div>
 
+                {/* UnderHero Section */}
                 <div className="bg-gray-300 w-full py-9">
                     <Row justify="center" gutter={32}>
                         {items.map((item, index) => (
@@ -84,10 +86,12 @@ const Home = () => {
                     </Row>
                 </div>
 
+                {/* Next Step Section */}
                 <div className="px-[225px] pt-[120px]">
                     <NextStep />
                 </div>
 
+                {/* Popular Courses Section */}
                 <div className="mt-24 px-[230px]">
                     <Row justify="space-between" align="middle">
                         <Col>
@@ -112,6 +116,7 @@ const Home = () => {
                         </Col>
                     </Row>
                 </div>
+
 
                 <Row justify="center" gutter={[32, 32]} className="py-9">
                     {[parenting, angermanage, domestic, domestic].map((image, index) => (
@@ -144,6 +149,7 @@ const Home = () => {
                     ))}
                 </Row>
 
+                {/* Events and Testimonials Section */}
                 <Row justify="center" gutter={32} className="mt-9">
                     <Col>
                         <Card className="bg-gray-100 py-6 px-16">
@@ -203,6 +209,7 @@ const Home = () => {
                     </Col>
                 </Row>
 
+                {/* Blog Section */}
                 <div className="text-center mt-12">
                     <Title level={2}>Read Latest Articles</Title>
                     <Paragraph className="max-w-[320px] mx-auto">
@@ -239,6 +246,7 @@ const Home = () => {
                     ))}
                 </Row>
 
+                {/* FAQ Section */}
                 <div className="flex justify-center">
                     <Faq />
                 </div>
