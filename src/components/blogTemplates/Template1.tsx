@@ -49,19 +49,18 @@ const BlogTemplate1: React.FC<BlogTemplate1Props> = ({ blog }) => {
                         <Button type="text" icon={<ShareAltOutlined />}>
                             Share
                         </Button>
-
                     </div>
-                        <Space wrap className="my-4">
-                            {blog.tags?.map((tag) => (
-                                <Tag key={tag} className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
-                                    {tag}
-                                </Tag>
-                            ))}
-                        </Space>
+                    <Space wrap className="my-4">
+                        {blog.tags?.map((tag) => (
+                            <Tag key={tag} className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
+                                {tag}
+                            </Tag>
+                        ))}
+                    </Space>
 
                     <Divider className="my-4" />
 
-                    <div className="blog-content">
+                    <div className="blog-content text-justify">
                         <QuillContent content={blog.content || ''} />
                         {contentImages.length > 0 && (
                             <div className="my-8">
