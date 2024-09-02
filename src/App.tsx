@@ -4,8 +4,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import ScrollToTop from './ScrollToTop';
 import NotFound from './components/NotFound';
+import { ProtectedAdminRoute, ProtectedUserRoute } from './hooks/ProtectedRoutes';
+
+// admin pages
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import CourseList from './pages/Admin/course/CourseList';
@@ -16,16 +18,17 @@ import InstructorManagement from './pages/Admin/InstructorManagement';
 import AdminManagement from './pages/Admin/AdminManagement';
 import StudentManagement from './pages/Admin/StudentManagement';
 import BlogManagement from './pages/Admin/BlogManagement';
-import { ProtectedAdminRoute, ProtectedUserRoute } from './hooks/ProtectedRoutes';
+
+// public pages
+import LandingPage from './pages/LandingPage';
 
 function App() {
     return (
         <div className="flex flex-col justify-between h-screen">
             <BrowserRouter>
-                <ScrollToTop />
                 <ToastContainer position="top-center" limit={2} />
                 <Routes>
-                    <Route path="/" element={<AdminLogin />} />
+                    <Route path="/" element={<LandingPage/>} />
 
                     {/* Admin Routes */}
                     <Route path="/iadmin/login" element={<AdminLogin />} />
