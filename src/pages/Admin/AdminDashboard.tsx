@@ -1,11 +1,11 @@
 // pages/AdminDashboard.tsx
 import React from 'react';
 import { Spin } from 'antd';
-import DashboardLayout from '../../components/DashboardLayout';
-import StatsCard from '../../components/StatsCard';
-import IncomeExpenseReport from '../../components/IncomeExpenseReport';
-import InstructorsList from '../../components/InstructorList';
-import TopCoursesList from '../../components/TopCoursesList';
+import DashboardLayout from '../../components/Admin/DashboardLayout';
+import StatsCard from '../../components/Admin/StatsCard';
+import IncomeExpenseReport from '../../components/Admin/IncomeExpenseReport';
+import InstructorsList from '../../components/Admin/InstructorList';
+import TopCoursesList from '../../components/Admin/TopCoursesList';
 import { useGetUserStatsQuery } from '../../api/adminApi';
 
 const AdminDashboard: React.FC = () => {

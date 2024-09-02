@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Radio, Space, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useGetCourseQuizQuery, useCreateQuizMutation, useUpdateQuizMutation, useDeleteQuizMutation, IQuiz } from '../api/quizApi';
+import { useGetCourseQuizQuery, useCreateQuizMutation, useUpdateQuizMutation, useDeleteQuizMutation, IQuiz } from '../../api/quizApi';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 

@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import { useGetAllUsersQuery } from '../../api/userApi';
 import { useBlockUserMutation, useDeactivateUserMutation } from '../../api/adminApi';
-import DashboardLayout from '../../components/DashboardLayout';
+import DashboardLayout from '../../components/Admin/DashboardLayout';
 import { UserInfoFromApi } from '../../api/authApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../state/store';

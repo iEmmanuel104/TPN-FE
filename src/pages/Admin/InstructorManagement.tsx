@@ -26,7 +26,7 @@ import { useGetUserStatsQuery } from '../../api/adminApi';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import DashboardLayout from '../../components/DashboardLayout';
+import DashboardLayout from '../../components/Admin/DashboardLayout';
 import { RootState } from '../../state/store';
 import { setTotalUsers } from '../../state/slices/adminSlice';
 import { CourseDto } from '../../api/courseApi';

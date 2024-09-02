@@ -10,7 +10,7 @@ import {
     Legend,
 } from 'chart.js';
 import { Card, Spin, Select } from 'antd';
-import { useGetRevenueStatsQuery } from '../api/adminApi';
+import { useGetRevenueStatsQuery } from '../../api/adminApi';
 
 ChartJS.register(
     BarElement,

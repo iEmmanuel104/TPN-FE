@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Avatar, Badge, Dropdown, Menu, Modal } from 'antd';
 import { BellOutlined, SettingOutlined, UserOutlined, LogoutOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../state/store';
-import { logOut } from '../state/slices/authSlice';
+import { RootState } from '../../state/store';
+import { logOut } from '../../state/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 const DashboardHeader: React.FC = () => {

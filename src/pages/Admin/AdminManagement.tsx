@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Switch, message, Popconfirm, Space, Tooltip } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import DashboardLayout from '../../components/DashboardLayout';
+import DashboardLayout from '../../components/Admin/DashboardLayout';
 import { useGetAllAdminsQuery, useCreateAdminMutation, useDeleteAdminMutation, Admin } from '../../api/adminApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../state/store';

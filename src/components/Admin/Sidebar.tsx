@@ -4,7 +4,7 @@ import { Menu } from 'antd';
 import { DashboardOutlined, UserOutlined, BookOutlined, TeamOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState } from '../state/store';
+import { RootState } from '../../state/store';
 
 interface SidebarProps {
     mobile?: boolean;

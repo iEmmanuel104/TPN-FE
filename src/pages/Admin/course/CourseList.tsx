@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Rate, Tag, Typography, Badge, Input, Select, Row, Col, Dropdown, Button, Space } from 'antd';
 import { Link } from 'react-router-dom';
-import DashboardLayout from '../../../components/DashboardLayout';
+import DashboardLayout from '../../../components/Admin/DashboardLayout';
 import { useGetAllCoursesQuery } from '../../../api/courseApi';
 import { UserOutlined, ReadOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 

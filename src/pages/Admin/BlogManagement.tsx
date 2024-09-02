@@ -14,10 +14,10 @@ import {
 import { Reorder } from 'framer-motion';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 import { useAddBlogMutation, useGetAllBlogsQuery, useUpdateBlogMutation, useDeleteBlogMutation, BlogDto, BlogStatus } from '../../api/blogApi';
-import DashboardLayout from '../../components/DashboardLayout';
-import BlogTemplate1 from '../../components/blogTemplates/Template1';
-import BlogTemplate2 from '../../components/blogTemplates/Template2';
-import BlogTextEditor from '../../components/BlogTextEditor';
+import DashboardLayout from '../../components/Admin/DashboardLayout';
+import BlogTemplate1 from '../../components/Admin/blogTemplates/Template1';
+import BlogTemplate2 from '../../components/Admin/blogTemplates/Template2';
+import BlogTextEditor from '../../components/Admin/BlogTextEditor';
 
 const { Option } = Select;
 const { TabPane } = Tabs;

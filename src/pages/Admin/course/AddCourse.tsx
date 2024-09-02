@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { message } from 'antd';
-import DashboardLayout from '../../../components/DashboardLayout';
-import CourseForm from '../../../components/CourseForm';
+import DashboardLayout from '../../../components/Admin/DashboardLayout';
+import CourseForm from '../../../components/Admin/CourseForm';
 import { useAddCourseMutation, CourseDto } from '../../../api/courseApi';
 import { Link, useNavigate } from 'react-router-dom';
 

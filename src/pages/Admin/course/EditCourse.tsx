@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { message, Tabs } from 'antd';
 import { Link, useParams } from 'react-router-dom';
-import DashboardLayout from '../../../components/DashboardLayout';
-import CourseForm from '../../../components/CourseForm';
-import ModuleForm from '../../../components/ModuleForm';
-import QuizForm from '../../../components/QuizForm';
+import DashboardLayout from '../../../components/Admin/DashboardLayout';
+import CourseForm from '../../../components/Admin/CourseForm';
+import ModuleForm from '../../../components/Admin/ModuleForm';
+import QuizForm from '../../../components/Admin/QuizForm';
 import { useGetSingleCourseInfoQuery, useUpdateCourseMutation, CourseDto } from '../../../api/courseApi';
 
 const { TabPane } = Tabs;

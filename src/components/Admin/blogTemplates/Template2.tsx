@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Image, Avatar, Space, Button, Tag, Carousel } from 'antd';
 import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, BookOutlined } from '@ant-design/icons';
 import QuillContent from '../QuillContent';
-import { BlogDto } from '../../api/blogApi';
+import { BlogDto } from '../../../api/blogApi';
 
 const { Title, Paragraph, Text } = Typography;
 

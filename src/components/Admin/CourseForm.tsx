@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Select, InputNumber, Switch, Spin, Avatar } from 'antd';
 import { UploadOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
-import { CourseDto, CourseLevel, CourseStatus } from '../api/courseApi';
-import { InstructorDto } from '../api/instructorApi';
-import VideoPlayer from './VideoPlayer';
-import categories from '../constants/categories.json';
-import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
-import { useGetAllInstructorsQuery } from '../api/instructorApi';
+import { CourseDto, CourseLevel, CourseStatus } from '../../api/courseApi';
+import { InstructorDto } from '../../api/instructorApi';
+import VideoPlayer from '../VideoPlayer';
+import categories from '../../constants/categories.json';
+import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
+import { useGetAllInstructorsQuery } from '../../api/instructorApi';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, Spin, Button } from 'antd';
-import { useGetInstructorStatsQuery } from '../api/adminApi';
+import { useGetInstructorStatsQuery } from '../../api/adminApi';
 import { Link } from 'react-router-dom';
 
 const InstructorsList: React.FC = () => {

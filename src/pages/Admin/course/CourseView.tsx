@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Card, Button, Tag, Descriptions, Divider, Rate, List, Typography, Collapse, Avatar, Row, Col, Progress } from 'antd';
 import { TwitterOutlined, LinkedinOutlined, UserOutlined, ReadOutlined, FileTextOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import DashboardLayout from '../../../components/DashboardLayout';
+import DashboardLayout from '../../../components/Admin/DashboardLayout';
 import { useGetSingleCourseInfoQuery } from '../../../api/courseApi';
 import VideoPlayer from '../../../components/VideoPlayer';
 import { formatVideoLength } from '../../../utils/formatVideoLength';

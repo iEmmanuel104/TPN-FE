@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Input, message, Spin, Tooltip, Table } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { useGetModulesByCourseQuery, useAddModuleMutation, useUpdateModuleMutation, useDeleteModuleMutation, ModuleDto } from '../api/moduleApi';
-import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
-import VideoPlayer from './VideoPlayer';
-import { formatVideoLength } from '../utils/formatVideoLength';
-import { getVideoDuration } from '../utils/videoUtils';
+import { useGetModulesByCourseQuery, useAddModuleMutation, useUpdateModuleMutation, useDeleteModuleMutation, ModuleDto } from '../../api/moduleApi';
+import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
+import VideoPlayer from '../VideoPlayer';
+import { formatVideoLength } from '../../utils/formatVideoLength';
+import { getVideoDuration } from '../../utils/videoUtils';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
