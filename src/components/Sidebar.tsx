@@ -1,7 +1,7 @@
 // components/Sidebar.tsx
 import React from 'react';
 import { Menu } from 'antd';
-import { DashboardOutlined, UserOutlined, BookOutlined, TeamOutlined, SettingOutlined } from '@ant-design/icons';
+import { DashboardOutlined, UserOutlined, BookOutlined, TeamOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../state/store';
@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobile = false }) => {
             <Menu.Item key="/iadmin/students" icon={<TeamOutlined />}>
                 <Link to="/iadmin/students">Students</Link>
             </Menu.Item>
-            <Menu.Item key="/iadmin/blogs" icon={<TeamOutlined />}>
+            <Menu.Item key="/iadmin/blogs" icon={<FileTextOutlined />}>
                 <Link to="/iadmin/blogs">Blog</Link>
             </Menu.Item>
             {currentAdmin?.isSuperAdmin && (
