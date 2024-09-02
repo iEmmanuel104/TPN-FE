@@ -16,8 +16,6 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
     const headerImage = blog.media?.images?.[0];
     const contentImages = blog.media?.images?.slice(1) || [];
 
-    console.log({ darte: blog.createdAt });
-
     return (
         <div className="max-w-full mx-auto bg-white font-sans">
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,7 +56,7 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
             </div>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="blog-content text-lg leading-relaxed">
+                <div className="blog-content text-lg leading-relaxed text-justify">
                     <QuillContent content={blog.content || ''} />
                 </div>
 
