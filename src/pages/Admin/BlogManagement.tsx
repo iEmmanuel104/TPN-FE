@@ -11,14 +11,13 @@ import {
     CameraOutlined,
     UserOutlined,
 } from '@ant-design/icons';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import { Reorder } from 'framer-motion';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 import { useAddBlogMutation, useGetAllBlogsQuery, useUpdateBlogMutation, useDeleteBlogMutation, BlogDto, BlogStatus } from '../../api/blogApi';
 import DashboardLayout from '../../components/DashboardLayout';
 import BlogTemplate1 from '../../components/blogTemplates/Template1';
 import BlogTemplate2 from '../../components/blogTemplates/Template2';
+import BlogTextEditor from '../../components/BlogTextEditor';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -101,7 +100,13 @@ const BlogManagement: React.FC = () => {
         setEditingBlog(blog);
         setImages(blog.media?.images || []);
         setAuthorImage(blog.author?.image || '');
-        form.setFieldsValue(blog);
+        form.setFieldsValue({
+            ...blog,
+            tags: blog.tags || [],
+            'author.name': blog.author?.name,
+            'author.email': blog.author?.email,
+            'author.bio': blog.author?.bio,
+        });
         setIsModalVisible(true);
     };
 
@@ -117,13 +122,18 @@ const BlogManagement: React.FC = () => {
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
-            values.media = { ...values.media, images };
-            values.author = { ...values.author, image: authorImage };
+            const blogData: Partial<BlogDto> = {
+                ...editingBlog, // Include all existing fields from the editing blog
+                ...values, // Override with new values from the form
+                media: { ...editingBlog?.media, images },
+                author: { ...values.author, image: authorImage },
+            };
+
             if (editingBlog) {
-                await updateBlog({ id: editingBlog.id, ...values }).unwrap();
+                await updateBlog({ id: editingBlog.id, ...blogData }).unwrap();
                 message.success('Blog updated successfully');
             } else {
-                await addBlog(values).unwrap();
+                await addBlog(blogData as BlogDto).unwrap();
                 message.success('Blog added successfully');
             }
             setIsModalVisible(false);
@@ -153,6 +163,22 @@ const BlogManagement: React.FC = () => {
         const newImages = images.filter((_, i) => i !== index);
         setImages(newImages);
         form.setFieldsValue({ 'media.images': newImages });
+    };
+
+    const getCompleteBlogData = (): Partial<BlogDto> => {
+        const formValues = form.getFieldsValue();
+        return {
+            ...editingBlog, // Include all existing fields from the editing blog
+            ...formValues, // Override with new values from the form
+            media: { ...editingBlog?.media, images },
+            author: { ...formValues.author, image: authorImage },
+            // Include any other fields that might not be in the form but are part of BlogDto
+            id: editingBlog?.id || '',
+            createdAt: editingBlog?.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            status: formValues.status || BlogStatus.Draft,
+            activities: editingBlog?.activities || [],
+        };
     };
 
     const blogs = blogsData?.data?.blogs || [];
@@ -191,9 +217,7 @@ const BlogManagement: React.FC = () => {
                                     <Form.Item name="title" label="Title" rules={[{ required: true }]}>
                                         <Input />
                                     </Form.Item>
-                                    <Form.Item name="content" label="Content" rules={[{ required: true }]}>
-                                        <ReactQuill theme="snow" />
-                                    </Form.Item>
+                                    <BlogTextEditor name="content" label="Content" />
                                     <Row>
                                         <Col span={24}>
                                             <h3 className="mb-2">Blog Images</h3>
@@ -307,21 +331,9 @@ const BlogManagement: React.FC = () => {
                             </Select>
                         </div>
                         {selectedTemplate === 'template1' ? (
-                            <BlogTemplate1
-                                blog={{
-                                    ...form.getFieldsValue(),
-                                    media: { images },
-                                    author: { ...form.getFieldValue('author'), image: authorImage },
-                                }}
-                            />
+                            <BlogTemplate1 blog={getCompleteBlogData()} />
                         ) : (
-                            <BlogTemplate2
-                                blog={{
-                                    ...form.getFieldsValue(),
-                                    media: { images },
-                                    author: { ...form.getFieldValue('author'), image: authorImage },
-                                }}
-                            />
+                            <BlogTemplate2 blog={getCompleteBlogData()} />
                         )}
                     </TabPane>
                 </Tabs>
