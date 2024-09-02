@@ -16,6 +16,7 @@ import InstructorManagement from './pages/Admin/InstructorManagement';
 import AdminManagement from './pages/Admin/AdminManagement';
 import StudentManagement from './pages/Admin/StudentManagement';
 import BlogManagement from './pages/Admin/BlogManagement';
+import { ProtectedAdminRoute, ProtectedUserRoute } from './hooks/ProtectedRoutes';
 
 function App() {
     return (
@@ -25,9 +26,11 @@ function App() {
                 <ToastContainer position="top-center" limit={2} />
                 <Routes>
                     <Route path="/" element={<AdminLogin />} />
-                    <Route path="/iadmin">
+
+                    {/* Admin Routes */}
+                    <Route path="/iadmin/login" element={<AdminLogin />} />
+                    <Route path="/iadmin" element={<ProtectedAdminRoute />}>
                         <Route index element={<AdminDashboard />} />
-                        <Route path="login" element={<AdminLogin />} />
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="courses">
                             <Route index element={<CourseList />} />
@@ -42,6 +45,13 @@ function App() {
                         <Route path="students" element={<StudentManagement />} />
                         <Route path="blogs" element={<BlogManagement />} />
                     </Route>
+
+                    {/* Add protected user routes here */}
+
+                    <Route path="/user" element={<ProtectedUserRoute />}>
+                        {/* Add your user routes here */}
+                    </Route>
+                    
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </BrowserRouter>
