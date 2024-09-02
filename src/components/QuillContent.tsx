@@ -3,14 +3,15 @@ import DOMPurify from 'dompurify';
 
 interface QuillContentProps {
     content: string;
+    className?: string;
 }
 
-const QuillContent: React.FC<QuillContentProps> = ({ content }) => {
+const QuillContent: React.FC<QuillContentProps> = ({ content, className = '' }) => {
     const sanitizedContent = DOMPurify.sanitize(content);
 
     return (
         <div
-            className="quill-content"
+            className={`quill-content ${className}`}
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             style={
                 {
