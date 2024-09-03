@@ -1,7 +1,6 @@
 import React from 'react';
 import { Row, Col, Typography, Card } from 'antd';
 import { BookOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
 
 import image2 from '../assets/image2.jpg';
 import image3 from '../assets/image3.jpg';
@@ -10,13 +9,11 @@ const { Title, Paragraph } = Typography;
 
 const NextStep: React.FC = () => {
     return (
-        <Row gutter={[32, 32]} className="bg-white">
+        <Row gutter={[32, 32]} className="bg-white px-12">
             <Col xs={24} md={12}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12}>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            <img src={image2} alt="Experience" className="h-[200px] object-cover rounded-lg" />
-                        </motion.div>
+                        <img src={image2} alt="Experience" className="h-[200px] object-cover rounded-lg" />
                         <Card className="mt-3 bg-green-500 text-white text-center">
                             <Paragraph strong className="mb-0">
                                 7 years of
@@ -31,15 +28,13 @@ const NextStep: React.FC = () => {
                             </Title>
                             <Paragraph className="mb-0">Positive Reviews</Paragraph>
                         </Card>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            <img src={image3} alt="Reviews" className="h-[200px] object-cover rounded-lg" />
-                        </motion.div>
+                        <img src={image3} alt="Reviews" className="h-[200px] object-cover rounded-lg" />
                     </Col>
                 </Row>
             </Col>
             <Col xs={24} md={12}>
                 <Paragraph className="text-sm text-purple-600 font-semibold mb-2">WHAT'S OUR MAIN GOAL</Paragraph>
-                <Title level={2} className="text-purple-800 mb-4">
+                <Title level={2} className="text-purple-400 mb-4">
                     Take The Next Step Toward Your Personal Life With TexasPreventiveNetwork
                 </Title>
                 <Paragraph className="text-gray-600 mb-6">

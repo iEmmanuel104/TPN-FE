@@ -67,10 +67,10 @@ const Navbar = () => {
     );
 
     return (
-        <Header className="bg-white px-9 py-4 flex items-center justify-between">
+        <Header className="bg-white px-64 py-4 flex items-center justify-between">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                 <Link to="/" className="text-2xl font-bold">
-                    TPNetwork
+                    TPN
                 </Link>
             </motion.div>
 
@@ -84,19 +84,20 @@ const Navbar = () => {
                 </Dropdown>
 
                 <Search
-                    placeholder="Search"
+                    placeholder="Search..."
                     allowClear
-                    enterButton={<SearchOutlined />}
+                    enterButton={<SearchOutlined style={{ background: 'none', backgroundColor: 'transparent' }} />}
                     size="large"
                     onSearch={handleSearch}
-                    style={{ width: 450 }}
+                    style={{ 
+                        width: 450, background: 'none', backgroundColor: 'transparent' }}
                 />
             </div>
 
             <div className="flex items-center gap-x-4">
                 <Dropdown overlay={pagesMenu} trigger={['click']}>
                     <a className="ant-dropdown-link flex items-center cursor-pointer">
-                        <Text strong>Pages</Text>
+                        <Text>Page</Text>
                         <DownOutlined className="ml-2" />
                     </a>
                 </Dropdown>
