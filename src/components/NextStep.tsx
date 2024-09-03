@@ -34,7 +34,7 @@ const NextStep = () => {
             </Col>
             <Col span={12}>
                 <Paragraph className="text-sm">WHAT'S OUR MAIN GOAL</Paragraph>
-                <Title level={2} className="text-violet-900">
+                <Title level={2} className="text-violet-500">
                     Take The Next Step Toward Your Personal Life With TexasPreventiveNetwork
                 </Title>
                 <Paragraph className="text-gray-800">
@@ -42,19 +42,19 @@ const NextStep = () => {
                     enim ad minim veniam, quis nostrud.
                 </Paragraph>
                 <Row gutter={[16, 16]} className="mt-3">
-                    <Col span={24}>
+                    <Col span={18}>
                         <Card>
                             <Card.Meta
-                                avatar={<CarOutlined className="text-3xl text-blue-600" />}
+                                avatar={<CarOutlined className="text-xl text-blue-600" />}
                                 title="Learn From the Professional"
                                 description="Lorem ipsum dolor sit amet, consectetur adipiscing elit"
                             />
                         </Card>
                     </Col>
-                    <Col span={24}>
+                    <Col span={18}>
                         <Card>
                             <Card.Meta
-                                avatar={<VideoCameraOutlined className="text-3xl text-blue-600" />}
+                                avatar={<VideoCameraOutlined className="text-xl text-blue-600" />}
                                 title="Video Tutorial"
                                 description="Lorem ipsum dolor sit amet, consectetur adipiscing elit"
                             />

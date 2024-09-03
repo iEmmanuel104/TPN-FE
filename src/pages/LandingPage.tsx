@@ -151,78 +151,64 @@ const Home = () => {
                         </Row>
 
                         {/* Events and Testimonials Section */}
-                        <div className="bg-gray-100 py-16">
-                            <Row justify="center" gutter={[32, 32]} className="max-w-7xl mx-auto">
-                                <Col xs={24} md={12}>
-                                    <Card className="h-full shadow-lg">
-                                        <Title level={3} className="mb-6">
-                                            Upcoming Events
-                                        </Title>
-                                        <List
-                                            itemLayout="horizontal"
-                                            dataSource={events}
-                                            renderItem={(item, index) => (
-                                                <motion.div
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: index * 0.2 }}
-                                                >
-                                                    <List.Item className="border-b last:border-b-0">
-                                                        <List.Item.Meta
-                                                            avatar={
-                                                                <div className="bg-blue-500 text-white text-center p-3 rounded-lg">
-                                                                    <Text strong className="text-2xl block">
-                                                                        {item.date.day}
-                                                                    </Text>
-                                                                    <Text className="text-sm block">{item.date.month}</Text>
-                                                                </div>
-                                                            }
-                                                            title={
-                                                                <Text strong className="text-xl">
-                                                                    {item.title}
-                                                                </Text>
-                                                            }
-                                                            description={
-                                                                <div>
-                                                                    <Text className="text-gray-500 block">{item.time}</Text>
-                                                                    <Text className="text-gray-500 block">{item.location}</Text>
-                                                                </div>
-                                                            }
-                                                        />
-                                                    </List.Item>
-                                                </motion.div>
-                                            )}
-                                        />
-                                    </Card>
-                                </Col>
-                                <Col xs={24} md={12}>
-                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                                        <Card className="h-full shadow-lg">
-                                            <Title level={3} className="mb-6">
-                                                Testimonials
-                                            </Title>
-                                            <Paragraph className="text-lg mb-6">
-                                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                                                et dolore magna aliqua. The courses here have transformed my career path!"
-                                            </Paragraph>
-                                            <div className="flex items-center">
-                                                <Avatar
-                                                    size={64}
-                                                    src="https://www.shutterstock.com/shutterstock/photos/1865153395/display_1500/stock-photo-portrait-of-young-smiling-woman-looking-at-camera-with-crossed-arms-happy-girl-standing-in-1865153395.jpg"
-                                                    className="mr-4"
+                        <Row justify="center" gutter={32} className="mt-9">
+                            <Col span={12} className="flex justify-center">
+                                <Card className="bg-gray-100 w-full">
+                                    <Title level={3} className="text-center">
+                                        Events
+                                    </Title>
+                                    <List
+                                        itemLayout="horizontal"
+                                        dataSource={events}
+                                        renderItem={(item) => (
+                                            <List.Item className="border-b-0">
+                                                <List.Item.Meta
+                                                    avatar={
+                                                        <div className="text-center p-2 rounded bg-white">
+                                                            <Text strong className="text-xl block">
+                                                                {item.date.day}
+                                                            </Text>
+                                                            <Text className="text-xl block">{item.date.month}</Text>
+                                                        </div>
+                                                    }
+                                                    title={
+                                                        <Text strong className="text-lg">
+                                                            {item.title}
+                                                        </Text>
+                                                    }
+                                                    description={<Text className="text-gray-500">{`${item.time} ${item.location}`}</Text>}
                                                 />
-                                                <div>
-                                                    <Title level={4} className="mb-0">
-                                                        Antonia Bells
-                                                    </Title>
-                                                    <Paragraph className="text-green-600 font-semibold">Director of Biography</Paragraph>
-                                                </div>
+                                            </List.Item>
+                                        )}
+                                    />
+                                </Card>
+                            </Col>
+                            <Col>
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                                    <Card className="bg-gray-100 px-9 py-6">
+                                        <Title level={3}>Testimonials</Title>
+                                        <Paragraph className="max-w-[400px]">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                                            dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+                                            ea commodo consequat.
+                                        </Paragraph>
+                                        <div className="flex mt-4 items-center">
+                                            <Avatar
+                                                size={64}
+                                                src="https://www.shutterstock.com/shutterstock/photos/1865153395/display_1500/stock-photo-portrait-of-young-smiling-woman-looking-at-camera-with-crossed-arms-happy-girl-standing-in-1865153395.jpg"
+                                                className="mr-4"
+                                            />
+                                            <div>
+                                                <Title level={4} className="mb-0">
+                                                    Antonia Bells
+                                                </Title>
+                                                <Paragraph className="text-green-600 font-semibold">Director Biography</Paragraph>
                                             </div>
-                                        </Card>
-                                    </motion.div>
-                                </Col>
-                            </Row>
-                        </div>
+                                        </div>
+                                    </Card>
+                                </motion.div>
+                            </Col>
+                        </Row>
 
                         {/* Blog Section */}
                         <div className="text-center mt-12">
