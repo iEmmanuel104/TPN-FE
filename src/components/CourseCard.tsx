@@ -63,7 +63,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, instructor, lessons, stu
     return (
         <Card
             hoverable
-            className="flex flex-col h-full overflow-hidden"
+            className="flex flex-col h-full overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
             bodyStyle={{ padding: '16px' }}
             cover={
                 <div className="relative">
@@ -72,28 +72,24 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, instructor, lessons, stu
             }
             onClick={onClick}
         >
-            <div className="flex flex-col items-center -mt-8">
-                <Avatar size={64} src={instructor.avatar} icon={<UserOutlined />} className="border-4 border-white shadow-md" />
-            </div>
-            <div className="flex flex-col items-center mt-2">
-                <Text className="text-gray-600">{instructor.name}</Text>
-                <Title level={5} className="mb-2 text-center mt-2">
+            <div className="flex flex-col mt-2">
+                <Text className="text-gray-600 mb-1">{instructor.name}</Text>
+                <Text strong className="text-lg mb-2 line-clamp-2" style={{ height: '3rem' }}>
                     {title}
-                </Title>
+                </Text>
             </div>
-            <Divider className="my-2" />
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mt-auto">
                 <div className="flex space-x-4">
                     <span className="flex items-center text-gray-500 text-sm">
                         <FileTextOutlined className="mr-1" />
-                        {lessons}
+                        {lessons} Lessons
                     </span>
                     <span className="flex items-center text-gray-500 text-sm">
                         <UserOutlined className="mr-1" />
                         {students}
                     </span>
                 </div>
-                <Text strong className="text-green-500">
+                <Text strong className="text-lg" style={{ color: price === 'Free' ? '#52c41a' : '#f5222d' }}>
                     {price}
                 </Text>
             </div>

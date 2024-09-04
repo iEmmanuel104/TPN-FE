@@ -12,6 +12,7 @@ import {
     YoutubeOutlined,
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
+import CourseCard from '../components/CourseCard';
 import { courseData } from '../constants/courseData';
 
 const { Title, Text, Paragraph } = Typography;
@@ -205,33 +206,23 @@ const CoursePage: React.FC = () => {
                     </Row>
                 </div>
 
-                <div className="bg-gray-100 py-12">
+                <div className="py-12">
                     <div className="container mx-auto px-4">
                         <Title level={3} className="mb-6">
                             YOU MAY LIKE
                         </Title>
-                        <Row gutter={[24, 24]} className="max-w-4xl mx-auto">
+                        <Row gutter={[24, 24]} className="max-w-5xl mx-auto">
                             {courseData.relatedCourses.map((course, index) => (
                                 <Col xs={24} sm={12} md={8} key={index}>
-                                    <Card
-                                        cover={<img alt={course.title} src={course.image} className="h-48 object-cover" />}
-                                        actions={[
-                                            <span>
-                                                <BookOutlined /> {course.lessons}
-                                            </span>,
-                                            <span>
-                                                <TeamOutlined /> {course.students}
-                                            </span>,
-                                            <span className={course.price === 'Free' ? 'text-green-500' : 'text-blue-500'}>{course.price}</span>,
-                                        ]}
-                                        className="shadow-sm hover:shadow-md transition-shadow duration-300"
-                                    >
-                                        <Card.Meta
-                                            avatar={<Avatar src={course.instructor.avatar} />}
-                                            title={course.title}
-                                            description={<Text>{course.instructor.name}</Text>}
-                                        />
-                                    </Card>
+                                    <CourseCard
+                                        title={course.title}
+                                        instructor={course.instructor}
+                                        lessons={course.lessons}
+                                        students={course.students}
+                                        image={course.image}
+                                        price={course.price}
+                                        onClick={() => console.log(`Clicked on course: ${course.title}`)}
+                                    />
                                 </Col>
                             ))}
                         </Row>
