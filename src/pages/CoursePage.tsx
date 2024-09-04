@@ -29,10 +29,11 @@ const CoursePage: React.FC = () => {
     useEffect(() => {
         const handleScroll = () => {
             const sections = ['overview', 'curriculum', 'instructor', 'reviews'];
-            for (const section of sections) {
+            for (const section of sections.reverse()) {
                 const element = document.getElementById(section);
                 if (element && window.scrollY >= element.offsetTop - 100) {
                     setActiveSection(section);
+                    break;
                 }
             }
         };
@@ -81,23 +82,6 @@ const CoursePage: React.FC = () => {
                         </Row>
                     </div>
                 </div>
-
-                <Affix offsetTop={0}>
-                    <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-b">
-                        <Menu.Item key="overview" onClick={() => scrollToSection('overview')}>
-                            Overview
-                        </Menu.Item>
-                        <Menu.Item key="curriculum" onClick={() => scrollToSection('curriculum')}>
-                            Curriculum
-                        </Menu.Item>
-                        <Menu.Item key="instructor" onClick={() => scrollToSection('instructor')}>
-                            Instructor
-                        </Menu.Item>
-                        <Menu.Item key="reviews" onClick={() => scrollToSection('reviews')}>
-                            Reviews
-                        </Menu.Item>
-                    </Menu>
-                </Affix>
 
                 <div className="container mx-auto px-4 py-12 relative">
                     <Row gutter={24}>
@@ -226,7 +210,7 @@ const CoursePage: React.FC = () => {
                         <Title level={3} className="mb-6">
                             YOU MAY LIKE
                         </Title>
-                        <Row gutter={[24, 24]}>
+                        <Row gutter={[24, 24]} className="max-w-4xl mx-auto">
                             {courseData.relatedCourses.map((course, index) => (
                                 <Col xs={24} sm={12} md={8} key={index}>
                                     <Card
@@ -254,6 +238,23 @@ const CoursePage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <Affix offsetBottom={0}>
+                <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-t justify-start p-8">
+                    <Menu.Item key="overview" onClick={() => scrollToSection('overview')}>
+                        Overview
+                    </Menu.Item>
+                    <Menu.Item key="curriculum" onClick={() => scrollToSection('curriculum')}>
+                        Curriculum
+                    </Menu.Item>
+                    <Menu.Item key="instructor" onClick={() => scrollToSection('instructor')}>
+                        Instructor
+                    </Menu.Item>
+                    <Menu.Item key="reviews" onClick={() => scrollToSection('reviews')}>
+                        Reviews
+                    </Menu.Item>
+                </Menu>
+            </Affix>
         </PublicLayout>
     );
 };
