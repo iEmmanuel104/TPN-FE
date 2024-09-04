@@ -22,6 +22,7 @@ import BlogManagement from './pages/Admin/BlogManagement';
 
 // public pages
 import LandingPage from './pages/LandingPage';
+import CourseOverView from './pages/CourseOverview';
 
 // Ant Design theme configuration
 const theme: ThemeConfig = {
@@ -38,6 +39,7 @@ function App() {
                     <ToastContainer position="top-center" limit={2} />
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
+                        <Route path="/courses" element={<CourseOverView />} />
 
                         {/* Admin Routes */}
                         <Route path="/iadmin/login" element={<AdminLogin />} />
