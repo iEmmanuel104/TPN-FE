@@ -33,31 +33,22 @@ const Home: React.FC = () => {
 
     return (
         <PublicLayout>
-            {/* Hero Section */}
-            <HeroSection />
-
-            {/* UnderHero Section */}
-            <UnderHeroSection items={items} />
-
-            <div className="px-[120px]">
-                {/* Next Step Section */}
-                <section className="px-[225px] pt-[120px]">
-                    <NextStep />
-                </section>
-
-                {/* Popular Courses Section */}
-                <PopularCoursesSection navigate={navigate} />
-
-                {/* Events and Testimonials Section */}
-                <EventsAndTestimonialsSection events={events} />
-
-                {/* Blog Section */}
-                <BlogSection blogs={blogs} />
-
-                {/* FAQ Section */}
-                <section className="px-[105px]">
-                    <Faq />
-                </section>
+            <div className="flex flex-col">
+                <div className="h-screen flex flex-col">
+                    <HeroSection />
+                    <UnderHeroSection items={items} />
+                </div>
+                <div className="px-4 sm:px-6 lg:px-8">
+                    <section className="py-12 lg:py-24">
+                        <NextStep />
+                    </section>
+                    <PopularCoursesSection navigate={navigate} />
+                    <EventsAndTestimonialsSection events={events} />
+                    <BlogSection blogs={blogs} />
+                    <section className="py-12">
+                        <Faq />
+                    </section>
+                </div>
             </div>
         </PublicLayout>
     );
@@ -68,19 +59,21 @@ const HeroSection: React.FC = () => (
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="relative h-[680px] w-full bg-cover bg-center"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
+        className="relative w-full bg-cover bg-center flex-grow"
+        style={{
+            backgroundImage: `url(${backgroundImage})`,
+        }}
     >
         <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative z-10 flex justify-start px-4 md:px-12 lg:px-24 pt-32">
+        <div className="relative z-10 flex justify-start px-4 sm:px-6 lg:px-12 h-full items-center mx-auto">
             <motion.div
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="bg-white py-8 px-6 max-w-md"
+                className="bg-white py-6 px-4 sm:px-6 max-w-sm sm:max-w-md"
             >
-                <Paragraph className="text-black text-xl font-semibold">Course</Paragraph>
-                <Title level={2} className="text-gray-600">
+                <Paragraph className="text-black text-lg sm:text-xl font-semibold">Course</Paragraph>
+                <Title level={2} className="text-gray-600 text-2xl sm:text-3xl lg:text-4xl">
                     Get The Best Addiction Courses
                 </Title>
                 <Button type="primary" size="large" className="mt-4">
@@ -92,35 +85,39 @@ const HeroSection: React.FC = () => (
 );
 
 const UnderHeroSection: React.FC<{ items: { icon: React.ReactNode; text: string }[] }> = ({ items }) => (
-    <div className="bg-gray-300 w-full py-9">
-        <Row justify="center" gutter={[16, 16]}>
-            {items.map((item, index) => (
-                <Col key={index} xs={24} sm={8}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.2 }}
-                        className="flex items-center justify-center"
-                    >
-                        {React.cloneElement(item.icon as React.ReactElement, { style: { fontSize: '35px', marginRight: '12px' } })}
-                        <Text strong className="text-lg md:text-xl">
-                            {item.text}
-                        </Text>
-                    </motion.div>
-                </Col>
-            ))}
-        </Row>
+    <div className="bg-gray-300 w-full py-6 sm:py-9">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+            <Row justify="center" gutter={[16, 16]}>
+                {items.map((item, index) => (
+                    <Col key={index} xs={24} sm={8}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.2 }}
+                            className="flex items-center justify-center"
+                        >
+                            {React.cloneElement(item.icon as React.ReactElement, { style: { fontSize: '24px', marginRight: '8px' } })}
+                            <Text strong className="text-base sm:text-lg">
+                                {item.text}
+                            </Text>
+                        </motion.div>
+                    </Col>
+                ))}
+            </Row>
+        </div>
     </div>
 );
 
 const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({ navigate }) => (
-    <section className="mt-16 px-4 md:px-12 lg:px-24">
-        <Row justify="space-between" align="middle" className="mb-8">
+    <section className="mt-12 sm:mt-16">
+        <Row justify="space-between" align="middle" className="mb-6 sm:mb-8">
             <Col>
-                <Title level={2}>Popular Courses</Title>
+                <Title level={2} className="text-2xl sm:text-3xl">
+                    Popular Courses
+                </Title>
                 <Paragraph>Discover what people are learning</Paragraph>
             </Col>
-            <Col>
+            <Col className="hidden sm:block">
                 <Row gutter={[8, 8]}>
                     {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
                         <Col key={category}>
@@ -130,37 +127,30 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
                 </Row>
             </Col>
         </Row>
-        <Row gutter={[16, 16]} className="py-9">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[parenting, angermanage, domestic, domestic].map((image, index) => (
-                <Col key={index} xs={24} sm={12} md={6}>
-                    <Card hoverable cover={<img alt="course" src={image} className="h-40 object-cover" />} onClick={() => navigate('/coursedetails')}>
-                        <Card.Meta
-                            title="Course Title"
-                            description={
-                                <>
-                                    <Paragraph>by Andrew Iwe</Paragraph>
-                                    <Row justify="space-between" align="middle">
-                                        <Col>
-                                            <Button type="link">8 lectures</Button>
-                                        </Col>
-                                        <Col>
-                                            <Rate disabled defaultValue={4} character={<StarFilled />} />
-                                        </Col>
-                                    </Row>
-                                </>
-                            }
-                        />
-                    </Card>
-                </Col>
+                <div key={index} className="cursor-pointer" onClick={() => navigate('/coursedetails')}>
+                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                        <img src={image} alt="course" className="w-full h-48 object-cover" />
+                        <div className="p-4">
+                            <h3 className="text-lg font-semibold mb-2">Course Title</h3>
+                            <p className="text-sm text-gray-600 mb-2">by Andrew Iwe</p>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-blue-600">8 lectures</span>
+                                <Rate disabled defaultValue={4} character={<StarFilled />} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             ))}
-        </Row>
+        </div>
     </section>
 );
 
 const EventsAndTestimonialsSection: React.FC<{
     events: { date: { day: number; month: string }; title: string; time: string; location: string }[];
 }> = ({ events }) => (
-    <Row justify="center" gutter={[16, 16]} className="m-8 px-4 md:px-6 lg:px-12">
+    <Row justify="center" gutter={[16, 16]} className="my-8">
         <Col xs={24} md={11} lg={10}>
             <Card className="bg-gray-100 w-full h-full" size="small">
                 <Title level={4}>Events</Title>
@@ -217,33 +207,32 @@ const EventsAndTestimonialsSection: React.FC<{
 );
 
 const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => (
-    <section className="mt-16 px-4 md:px-12 lg:px-24">
-        <div className="text-center mb-8">
-            <Title level={2}>Read Latest Articles</Title>
+    <section className="mt-12 sm:mt-16">
+        <div className="text-center mb-6 sm:mb-8">
+            <Title level={2} className="text-2xl sm:text-3xl">
+                Read Latest Articles
+            </Title>
             <Paragraph className="max-w-[320px] mx-auto">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</Paragraph>
         </div>
-        <Row gutter={[16, 16]}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {blogs.map((blog) => (
-                <Col key={blog.id} xs={24} sm={12} md={8}>
-                    <Link to="/blogdetails">
-                        <Card hoverable cover={<img alt="blog" src={umbrella} className="h-[180px] object-cover" />}>
-                            <Card.Meta
-                                title="The Unseen of spending three years at Pixelgrade"
-                                description={
-                                    <Paragraph className="text-gray-500">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    </Paragraph>
-                                }
-                            />
-                            <div className="flex items-center justify-between mt-4">
+                <Link key={blog.id} to="/blogdetails" className="block">
+                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                        <img src={umbrella} alt="blog" className="w-full h-48 object-cover" />
+                        <div className="p-4">
+                            <h3 className="text-lg font-semibold mb-2">The Unseen of spending three years at Pixelgrade</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                            </p>
+                            <div className="flex items-center justify-between">
                                 <Text strong>Continue Reading</Text>
                                 <ArrowRightOutlined />
                             </div>
-                        </Card>
-                    </Link>
-                </Col>
+                        </div>
+                    </div>
+                </Link>
             ))}
-        </Row>
+        </div>
     </section>
 );
 

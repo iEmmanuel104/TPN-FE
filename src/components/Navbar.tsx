@@ -1,24 +1,19 @@
-import { SetStateAction, useState } from 'react';
-import { Layout, Menu, Input, Avatar, Dropdown, Typography } from 'antd';
-import { SearchOutlined, MenuOutlined, DownOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Layout, Menu, Input, Button, Drawer, Dropdown } from 'antd';
+import { SearchOutlined, MenuOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 const { Header } = Layout;
 const { Search } = Input;
-const { Text } = Typography;
 
-const Navbar = () => {
-    const [search, setSearch] = useState('');
+const Navbar: React.FC = () => {
+    const [drawerVisible, setDrawerVisible] = useState(false);
     const navigate = useNavigate();
 
-    const handleSearch = (value: SetStateAction<string>) => {
+    const handleSearch = (value: string) => {
         console.log(value);
-        setSearch(value);
         // Implement search functionality here
     };
-
-    console.log(search)
 
     const categoryMenu = (
         <Menu>
@@ -50,67 +45,87 @@ const Navbar = () => {
         </Menu>
     );
 
-    const userMenu = (
-        <Menu>
-            <Menu.Item key="1">
-                <div className="flex flex-col items-center">
-                    <Avatar size={64} icon={<UserOutlined />} className="bg-blue-800" />
-                    <Text strong className="text-blue-600 mt-2">
-                        Henry Eyo
-                    </Text>
-                    <Text className="text-blue-900">henry.eyo2@gmail.com</Text>
-                </div>
-            </Menu.Item>
-            <Menu.Divider />
-            <Menu.Item key="2">Logout</Menu.Item>
-        </Menu>
-    );
-
     return (
-        <Header className="bg-white px-64 py-4 flex items-center justify-between">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-                <Link to="/" className="text-2xl font-bold">
-                    TPN
+        <Header className="bg-white py-0 sticky top-0 z-50 w-full max-w-full overflow-x-hidden shadow-md">
+            <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between h-full">
+                <Link to="/" className="text-2xl font-bold text-indigo-700">
+                    Eduma
                 </Link>
-            </motion.div>
 
-            <div className="flex items-center gap-x-4">
-                <Dropdown overlay={categoryMenu} trigger={['click']}>
-                    <a className="ant-dropdown-link flex items-center cursor-pointer">
-                        <MenuOutlined className="mr-2" />
-                        <Text strong>Categories</Text>
-                        <DownOutlined className="ml-2" />
-                    </a>
-                </Dropdown>
+                {/* Mobile menu button */}
+                <Button className="lg:hidden" icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
 
-                <Search
-                    placeholder="Search..."
-                    allowClear
-                    enterButton={<SearchOutlined style={{ background: 'none', backgroundColor: 'transparent' }} />}
-                    size="large"
-                    onSearch={handleSearch}
-                    style={{ 
-                        width: 450, background: 'none', backgroundColor: 'transparent' }}
-                />
+                {/* Desktop menu */}
+                <div className="hidden lg:flex items-center space-x-6 flex-grow justify-center">
+                    <Dropdown overlay={categoryMenu} trigger={['click']}>
+                        <a className="ant-dropdown-link flex items-center cursor-pointer">
+                            <MenuOutlined className="mr-2" />
+                            Categories
+                            <DownOutlined className="ml-2" />
+                        </a>
+                    </Dropdown>
+
+                    <Search placeholder="Search..." allowClear onSearch={handleSearch} className="w-64" />
+
+                    <Dropdown overlay={pagesMenu} trigger={['click']}>
+                        <a className="ant-dropdown-link flex items-center cursor-pointer">
+                            Page
+                            <DownOutlined className="ml-2" />
+                        </a>
+                    </Dropdown>
+
+                    <Link to="/become-teacher" className="text-gray-700 hover:text-indigo-600">
+                        Become a Teacher
+                    </Link>
+                </div>
+
+                <Button type="primary" className="hidden lg:inline-block bg-indigo-600 hover:bg-indigo-700">
+                    LOGIN
+                </Button>
             </div>
 
-            <div className="flex items-center gap-x-4">
-                <Dropdown overlay={pagesMenu} trigger={['click']}>
-                    <a className="ant-dropdown-link flex items-center cursor-pointer">
-                        <Text>Page</Text>
-                        <DownOutlined className="ml-2" />
-                    </a>
-                </Dropdown>
-
-                <Dropdown overlay={userMenu} trigger={['click']}>
-                    <a className="ant-dropdown-link flex items-center cursor-pointer">
-                        <Text strong className="mr-2">
-                            Henry
-                        </Text>
-                        <DownOutlined />
-                    </a>
-                </Dropdown>
-            </div>
+            {/* Mobile menu drawer */}
+            <Drawer
+                title="Menu"
+                placement="left"
+                closable={false}
+                onClose={() => setDrawerVisible(false)}
+                open={drawerVisible}
+                bodyStyle={{ padding: 0 }}
+                headerStyle={{ display: 'none' }}
+                width="80%"
+            >
+                <div className="p-4 h-full flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                        <Link to="/" className="text-2xl font-bold text-indigo-700" onClick={() => setDrawerVisible(false)}>
+                            Eduma
+                        </Link>
+                        <Button icon={<CloseOutlined />} onClick={() => setDrawerVisible(false)} />
+                    </div>
+                    <Search
+                        placeholder="Search..."
+                        allowClear
+                        enterButton={<SearchOutlined />}
+                        size="large"
+                        onSearch={handleSearch}
+                        className="w-full mb-4"
+                    />
+                    <Menu mode="inline" className="w-full border-r-0">
+                        <Menu.SubMenu key="categories" title="Categories" icon={<MenuOutlined />}>
+                            {categoryMenu.props.children}
+                        </Menu.SubMenu>
+                        <Menu.SubMenu key="pages" title="Page" icon={<DownOutlined />}>
+                            {pagesMenu.props.children}
+                        </Menu.SubMenu>
+                        <Menu.Item key="become-teacher">
+                            <Link to="/become-teacher">Become a Teacher</Link>
+                        </Menu.Item>
+                    </Menu>
+                    <Button type="primary" className="mt-4 bg-indigo-600 hover:bg-indigo-700">
+                        LOGIN
+                    </Button>
+                </div>
+            </Drawer>
         </Header>
     );
 };

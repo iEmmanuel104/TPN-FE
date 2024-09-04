@@ -14,7 +14,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         <Layout className="min-h-screen flex flex-col">
             <Navbar />
             <Content className="flex-grow">
-                    {children}
+                <div className="w-full mx-auto ">{children}</div>
             <CustomFooter />
             </Content>
         </Layout>
