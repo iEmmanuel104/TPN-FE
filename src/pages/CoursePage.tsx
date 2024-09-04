@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu } from 'antd';
 import {
     UserOutlined,
@@ -18,6 +18,10 @@ const { Title, Text, Paragraph } = Typography;
 
 const CoursePage: React.FC = () => {
     const [activeSection, setActiveSection] = useState('overview');
+    const [showBottomNav, setShowBottomNav] = useState(false);
+    const [affixBottom, setAffixBottom] = useState<number | undefined>(undefined);
+    const youMayLikeRef = useRef<HTMLDivElement>(null);
+    const overviewRef = useRef<HTMLDivElement>(null);
 
     const scrollToSection = (sectionId: string) => {
         const element = document.getElementById(sectionId);
@@ -34,6 +38,22 @@ const CoursePage: React.FC = () => {
                 if (element && window.scrollY >= element.offsetTop - 100) {
                     setActiveSection(section);
                     break;
+                }
+            }
+
+            // Show bottom nav only when scrolling past the overview section
+            if (overviewRef.current) {
+                setShowBottomNav(window.scrollY > overviewRef.current.offsetTop);
+            }
+
+            // Update Affix bottom position
+            if (youMayLikeRef.current) {
+                const youMayLikeBottom = youMayLikeRef.current.offsetTop + youMayLikeRef.current.offsetHeight;
+                const scrollPosition = window.scrollY + window.innerHeight;
+                if (scrollPosition > youMayLikeBottom) {
+                    setAffixBottom(window.innerHeight - (scrollPosition - youMayLikeBottom));
+                } else {
+                    setAffixBottom(undefined);
                 }
             }
         };
@@ -93,19 +113,21 @@ const CoursePage: React.FC = () => {
                 <div className="container mx-auto px-4 py-12 relative">
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
-                            <Card id="overview" className="mb-8 ">
-                                <SectionTitle title="OVERVIEW" />
-                                <h3 className="text-lg font-semibold mb-2">Course Description</h3>
-                                <Paragraph>{courseData.description}</Paragraph>
-                                <h3 className="text-lg font-semibold mb-2">Certification</h3>
-                                <Paragraph>{courseData.description}</Paragraph>
-                                <h3 className="text-lg font-semibold mb-2">Learning Outcomes</h3>
-                                <ul className="list-disc pl-5 text-gray-600">
-                                    {courseData.outcomes.map((outcome, index) => (
-                                        <li key={index}>{outcome}</li>
-                                    ))}
-                                </ul>
-                            </Card>
+                            <div ref={overviewRef}>
+                                <Card id="overview" className="mb-8 ">
+                                    <SectionTitle title="OVERVIEW" />
+                                    <h3 className="text-lg font-semibold mb-2">Course Description</h3>
+                                    <Paragraph>{courseData.description}</Paragraph>
+                                    <h3 className="text-lg font-semibold mb-2">Certification</h3>
+                                    <Paragraph>{courseData.description}</Paragraph>
+                                    <h3 className="text-lg font-semibold mb-2">Learning Outcomes</h3>
+                                    <ul className="list-disc pl-5 text-gray-600">
+                                        {courseData.outcomes.map((outcome, index) => (
+                                            <li key={index}>{outcome}</li>
+                                        ))}
+                                    </ul>
+                                </Card>
+                            </div>
 
                             <Card id="curriculum" className="mb-8 ">
                                 <SectionTitle title="CURRICULUM" />
@@ -186,7 +208,7 @@ const CoursePage: React.FC = () => {
                         </Col>
 
                         <Col xs={24} lg={8} className="relative" style={{ marginTop: '-280px' }}>
-                            <Affix offsetTop={80}>
+                            <Affix offsetTop={80} offsetBottom={affixBottom}>
                                 <Card className=" border-0" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
                                     <div className="-mx-6 -mt-6 mb-6">
                                         <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover" />
@@ -246,7 +268,7 @@ const CoursePage: React.FC = () => {
                     </Row>
                 </div>
 
-                <div className="py-12">
+                <div className="py-12" ref={youMayLikeRef}>
                     <div className="container mx-auto px-4">
                         <Title level={3} className="mb-6">
                             YOU MAY LIKE
@@ -270,22 +292,24 @@ const CoursePage: React.FC = () => {
                 </div>
             </div>
 
-            <Affix offsetBottom={0}>
-                <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-t justify-start p-4">
-                    <Menu.Item key="overview" onClick={() => scrollToSection('overview')}>
-                        Overview
-                    </Menu.Item>
-                    <Menu.Item key="curriculum" onClick={() => scrollToSection('curriculum')}>
-                        Curriculum
-                    </Menu.Item>
-                    <Menu.Item key="instructor" onClick={() => scrollToSection('instructor')}>
-                        Instructor
-                    </Menu.Item>
-                    <Menu.Item key="reviews" onClick={() => scrollToSection('reviews')}>
-                        Reviews
-                    </Menu.Item>
-                </Menu>
-            </Affix>
+            {showBottomNav && (
+                <Affix offsetBottom={0}>
+                    <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-t justify-start p-4">
+                        <Menu.Item key="overview" onClick={() => scrollToSection('overview')}>
+                            Overview
+                        </Menu.Item>
+                        <Menu.Item key="curriculum" onClick={() => scrollToSection('curriculum')}>
+                            Curriculum
+                        </Menu.Item>
+                        <Menu.Item key="instructor" onClick={() => scrollToSection('instructor')}>
+                            Instructor
+                        </Menu.Item>
+                        <Menu.Item key="reviews" onClick={() => scrollToSection('reviews')}>
+                            Reviews
+                        </Menu.Item>
+                    </Menu>
+                </Affix>
+            )}
         </PublicLayout>
     );
 };
