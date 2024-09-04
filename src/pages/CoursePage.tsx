@@ -90,7 +90,7 @@ const CoursePage: React.FC = () => {
                 <div className="container mx-auto px-4 py-12 relative">
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
-                            <Card id="overview" className="mb-8 shadow-sm">
+                            <Card id="overview" className="mb-8 ">
                                 <SectionTitle title="OVERVIEW" />
                                 <h3 className="text-lg font-semibold mb-2">Course Description</h3>
                                 <Paragraph>{courseData.description}</Paragraph>
@@ -104,18 +104,18 @@ const CoursePage: React.FC = () => {
                                 </ul>
                             </Card>
 
-                            <Card id="curriculum" className="mb-8 shadow-sm">
+                            <Card id="curriculum" className="mb-8 ">
                                 <SectionTitle title="CURRICULUM" />
                                 <Paragraph>The curriculum is empty</Paragraph>
                             </Card>
 
-                            <Card id="instructor" className="mb-8 shadow-sm">
+                            <Card id="instructor" className="mb-8 ">
                                 <SectionTitle title="INSTRUCTOR" />
                                 <div className="flex items-start">
                                     <img
                                         src={courseData.instructor.avatar}
                                         alt={courseData.instructor.name}
-                                        className="w-16 h-16 rounded-full object-cover mr-4"
+                                        className="w-16 h-16 -full object-cover mr-4"
                                     />
                                     <div>
                                         <Title level={4} className="mb-0">
@@ -132,12 +132,27 @@ const CoursePage: React.FC = () => {
                                     </div>
                                 </div>
                             </Card>
-
-                            <Card id="reviews" className="mb-8 shadow-sm">
-                                <SectionTitle title="REVIEWS" />
+                            <Card id="reviews" className="mb-8 ">
+                                <Title level={3} className="mb-4 pb-2 border-b border-gray-200">
+                                    REVIEWS
+                                </Title>
                                 <Row gutter={24} className="items-stretch">
+                                    <Col span={24}>
+                                        <Row gutter={24}>
+                                            <Col span={8}>
+                                                <Text strong className="text-sm">
+                                                    Average Rating
+                                                </Text>
+                                            </Col>
+                                            <Col span={16}>
+                                                <Text strong className="text-sm">
+                                                    Detailed Rating
+                                                </Text>
+                                            </Col>
+                                        </Row>
+                                    </Col>
                                     <Col span={8}>
-                                        <div className="border rounded p-4 h-full flex flex-col justify-center items-center">
+                                        <div className="border  mt-4 p-2 h-full flex flex-col justify-center items-center">
                                             <Title level={1} className="mb-0 text-6xl">
                                                 0
                                             </Title>
@@ -145,34 +160,7 @@ const CoursePage: React.FC = () => {
                                                 disabled
                                                 defaultValue={0}
                                                 className="text-2xl my-2"
-                                                style={{
-                                                    color: 'transparent',
-                                                }}
-                                                character={
-                                                    <span
-                                                        style={{
-                                                            display: 'inline-block',
-                                                            width: '1em',
-                                                            height: '1em',
-                                                            border: '2px solid #fadb14',
-                                                            borderRadius: '50%',
-                                                            position: 'relative',
-                                                        }}
-                                                    >
-                                                        <span
-                                                            style={{
-                                                                position: 'absolute',
-                                                                top: '50%',
-                                                                left: '50%',
-                                                                transform: 'translate(-50%, -50%)',
-                                                                fontSize: '0.8em',
-                                                                color: '#fadb14',
-                                                            }}
-                                                        >
-                                                            ★
-                                                        </span>
-                                                    </span>
-                                                }
+                                                character={() => <span className="text-yellow-400">&#9734;</span>}
                                             />
                                             <Text type="secondary" className="block mt-2">
                                                 0 rating
@@ -180,15 +168,12 @@ const CoursePage: React.FC = () => {
                                         </div>
                                     </Col>
                                     <Col span={16}>
-                                        <div className="border rounded p-4 h-full">
-                                            <Title level={5} className="mb-4 text-sm">
-                                                Detailed Rating
-                                            </Title>
+                                        <div className="border mt-4  p-2 h-full">
                                             {[5, 4, 3, 2, 1].map((star) => (
-                                                <div key={star} className="flex items-center mb-2">
+                                                <div key={star} className="flex items-center mb-4">
                                                     <Text className="mr-2 w-4">{star}</Text>
-                                                    <div className="w-full bg-gray-200 h-4 flex-grow rounded">
-                                                        <div className="bg-yellow-400 h-4 rounded" style={{ width: '0%' }}></div>
+                                                    <div className="w-full bg-gray-200 h-6 flex-grow ">
+                                                        <div className="bg-yellow-400 h-6 w-0"></div>
                                                     </div>
                                                     <Text className="ml-2 w-8 text-right">0%</Text>
                                                 </div>
@@ -201,7 +186,7 @@ const CoursePage: React.FC = () => {
 
                         <Col xs={24} lg={8} className="relative" style={{ marginTop: '-240px' }}>
                             <Affix offsetTop={80}>
-                                <Card className="shadow-md border-0" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
+                                <Card className=" border-0" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
                                     <div className="-mx-6 -mt-6 mb-6">
                                         <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover" />
                                     </div>
