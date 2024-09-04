@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, CSSProperties } from 'react';
 import { Layout, Menu, Input, Button, Drawer, Dropdown } from 'antd';
 import { SearchOutlined, MenuOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -45,9 +45,16 @@ const Navbar: React.FC = () => {
         </Menu>
     );
 
+    const headerStyle: CSSProperties = {
+        padding: '0 16px',
+    };
+
     return (
-        <Header className="bg-white py-0 sticky top-0 z-50 w-full max-w-full overflow-x-hidden shadow-md">
-            <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between h-full">
+        <Header
+            className="bg-white py-0 sticky top-0 z-50 w-full max-w-full overflow-x-hidden shadow-md sm:px-6 lg:px-24 xl:px-32"
+            style={headerStyle}
+        >
+            <div className="container mx-auto flex items-center justify-between h-full">
                 <Link to="/" className="text-2xl font-bold text-indigo-700">
                     TPN
                 </Link>
