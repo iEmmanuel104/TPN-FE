@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Typography, Avatar, Divider } from 'antd';
 import { FileTextOutlined, UserOutlined } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 type CourseCardProps = {
     title: string;
@@ -13,7 +13,6 @@ type CourseCardProps = {
     lessons: number;
     students: number;
     image: string;
-    bio?: string;
     price: number | string;
     onClick: () => void;
     isList?: boolean;
@@ -23,35 +22,41 @@ type CourseCardProps = {
 const CourseCard: React.FC<CourseCardProps> = ({ title, instructor, lessons, students, image, price, onClick, isList = false, description }) => {
     if (isList) {
         return (
-            <div onClick={onClick} className="flex items-start space-x-4 p-4 hover:bg-gray-50 cursor-pointer">
-                <img src={image} alt={title} className="w-48 h-32 object-cover rounded" />
+            <div onClick={onClick} className="flex items-center space-x-4 p-4 hover:bg-gray-50 cursor-pointer border-b">
+                <img src={image} alt={title} className="w-64 h-40 object-cover rounded" />
                 <div className="flex-grow">
                     <Title level={4} className="mb-2">
                         {title}
                     </Title>
-                    <Text className="block text-sm text-gray-500 mb-2">{description}</Text>
-                    <div className="flex items-center space-x-4 mb-2">
-                        <Avatar src={instructor.avatar} icon={<UserOutlined />} />
-                        <Text>{instructor.name}</Text>
-                    </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>
-                            <FileTextOutlined className="mr-1" />
-                            {lessons} lessons
-                        </span>
-                        <span>
-                            <UserOutlined className="mr-1" />
-                            {students} students
-                        </span>
-                        <Text strong className="text-green-500">
-                            {price}
-                        </Text>
+                    <Paragraph className="text-sm text-gray-600 mb-4">{description}</Paragraph>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                            <Avatar src={instructor.avatar} icon={<UserOutlined />} />
+                            <Text className="text-gray-500">{instructor.name}</Text>
+                            <Divider type="vertical" className="h-6" />
+                            <div className="flex items-center space-x-4">
+                                <span className="flex items-center text-gray-500 text-sm">
+                                    <FileTextOutlined className="mr-1" />
+                                    {lessons} modules
+                                </span>
+                                <Divider type="vertical" className="h-6" />
+                                <span className="flex items-center text-gray-500 text-sm">
+                                    <UserOutlined className="mr-1" />
+                                    {students} students
+                                </span>
+                                <Divider type="vertical" className="h-6" />
+                                <Text strong className="text-lg" style={{ color: price === 'Free' ? '#52c41a' : '#f5222d' }}>
+                                    {price}
+                                </Text>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         );
     }
 
+    // Grid view card remains unchanged
     return (
         <Card
             hoverable

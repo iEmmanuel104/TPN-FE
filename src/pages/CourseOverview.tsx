@@ -19,7 +19,8 @@ const CourseOverview: React.FC = () => {
         lessons: 6,
         students: 412,
         image: parenting,
-        bio: 'LearnPress is a comprehensive LMS solution for WordPress.',
+        description:
+            'This tutorial will introduce you to PHP, a server-side scripting language you can use to make dynamic websites and web applications.',
         price: 'Free',
     };
 
