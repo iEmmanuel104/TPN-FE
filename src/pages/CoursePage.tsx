@@ -144,7 +144,7 @@ const CoursePage: React.FC = () => {
                             </Card>
                         </Col>
 
-                        <Col xs={24} lg={8} className="relative" style={{ marginTop: '-120px' }}>
+                        <Col xs={24} lg={8} className="relative" style={{ marginTop: '-240px' }}>
                             <Affix offsetTop={80}>
                                 <Card className="shadow-md border-0" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
                                     <div className="-mx-6 -mt-6 mb-6">
