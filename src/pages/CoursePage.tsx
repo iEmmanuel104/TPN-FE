@@ -163,7 +163,7 @@ const CoursePage: React.FC = () => {
                                     <Title level={4} className="mt-8 mb-4">
                                         Course Features
                                     </Title>
-                                    <ul className="space-y-3">
+                                    <ul className="space-y-3 border-0">
                                         <li className="flex items-center">
                                             <BookOutlined className="mr-3 text-gray-500" />
                                             <span className="flex-grow">Lectures</span>
@@ -211,7 +211,7 @@ const CoursePage: React.FC = () => {
                         <Title level={3} className="mb-6">
                             YOU MAY LIKE
                         </Title>
-                        <Row gutter={[24, 24]} className="max-w-5xl mx-auto">
+                        <Row gutter={[24, 24]} className="max-w-4xl mx-auto">
                             {courseData.relatedCourses.map((course, index) => (
                                 <Col xs={24} sm={12} md={8} key={index}>
                                     <CourseCard

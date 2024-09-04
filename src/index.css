@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 button.btn-rounded {
     @apply rounded-full md:px-8 py-[14px] text-white text-xs md:text-sm font-medium px-3 sm:px-[19.5px];
 
@@ -25,20 +24,20 @@ body {
 .custom-pagination .ant-pagination-item {
     border-radius: 0;
     border: none;
-    background-color: #e5e7eb;  /* Tailwind's gray-200 */
+    background-color: #e5e7eb; /* Tailwind's gray-200 */
     margin-right: 6px;
 }
 
 .custom-pagination .ant-pagination-item a {
-    color: #374151;  /* Tailwind's gray-700 */
+    color: #374151; /* Tailwind's gray-700 */
 }
 
 .custom-pagination .ant-pagination-item:hover {
-    background-color: #d1d5db;  /* Tailwind's gray-300 */
+    background-color: #d1d5db; /* Tailwind's gray-300 */
 }
 
 .custom-pagination .ant-pagination-item-active {
-    background-color: #7c3aed;  /* Tailwind's purple-600 */
+    background-color: #7c3aed; /* Tailwind's purple-600 */
 }
 
 .custom-pagination .ant-pagination-item-active a {
@@ -47,12 +46,39 @@ body {
 
 .custom-pagination .ant-pagination-prev button,
 .custom-pagination .ant-pagination-next button {
-    background-color: #e5e7eb;  /* Tailwind's gray-200 */
+    background-color: #e5e7eb; /* Tailwind's gray-200 */
     border: none;
-    color: #374151;  /* Tailwind's gray-700 */
+    color: #374151; /* Tailwind's gray-700 */
 }
 
 .custom-pagination .ant-pagination-prev:hover button,
 .custom-pagination .ant-pagination-next:hover button {
-    background-color: #d1d5db;  /* Tailwind's gray-300 */
+    background-color: #d1d5db; /* Tailwind's gray-300 */
+}
+
+/* Custom styles for CourseCard */
+.ant-card.course-card {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.ant-card.course-card .ant-card-cover img {
+    border-radius: 0;
+}
+
+.ant-card.course-card .ant-card-body {
+    border-radius: 0;
+    padding: 0;
+}
+
+.ant-card.course-card .card-content {
+    border-top: 1px solid #e5e7eb; /* Tailwind's gray-200 */
+    border-left: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+    padding: 1rem;
+}
+
+.ant-card.course-card .card-footer {
+    height: 4px;
+    background-color: #7c3aed; /* Tailwind's purple-600 */
 }
