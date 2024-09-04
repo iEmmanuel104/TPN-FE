@@ -7,7 +7,7 @@ import CourseCard from '../components/CourseCard';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-import parenting from '../assets/parenting.jpeg';
+import CourseImage from '../assets/hero2.jpg';
 import Instructor from '../assets/man.jpg';
 
 const CourseOverview: React.FC = () => {
@@ -21,7 +21,7 @@ const CourseOverview: React.FC = () => {
         instructor: { name: 'Keny White', avatar: Instructor },
         lessons: 6,
         students: 412,
-        image: parenting,
+        image: CourseImage,
         description:
             'This tutorial will introduce you to PHP, a server-side scripting language you can use to make dynamic websites and web applications.',
         price: 'Free',

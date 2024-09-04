@@ -82,45 +82,49 @@ const CoursePage: React.FC = () => {
 
     return (
         <PublicLayout>
-            <div className="bg-gray-100 min-h-screen">
-                <Breadcrumb className="container m-4 mx-auto px-4">
+            <div className="bg-white min-h-screen">
+                <Breadcrumb className="container mx-auto px-4 py-4">
                     <Breadcrumb.Item>Home</Breadcrumb.Item>
                     <Breadcrumb.Item>Courses</Breadcrumb.Item>
                     <Breadcrumb.Item>Language</Breadcrumb.Item>
                 </Breadcrumb>
 
-                <div className="bg-[#333333] text-white w-full px-12 py-8 ">
-                    <Row gutter={24} className="container m-4 mx-auto px-4">
-                        <Col xs={24} lg={16}>
-                            <Title level={2} className="text-white mb-4">
-                                {courseData.title}
-                            </Title>
-                            <Paragraph className="text-gray-300">{courseData.description}</Paragraph>
-                            <div className="flex items-center mt-4">
-                                <div className="flex flex-col items-center mr-8">
-                                    <Text className="text-gray-400 mb-2">Teacher</Text>
-                                    <Avatar size={48} src={courseData.instructor.avatar} icon={<UserOutlined />} />
-                                    <Text className="mt-2 text-white">{courseData.instructor.name}</Text>
+                <div className="bg-[#333333] text-white w-full py-12">
+                    <div className="container mx-auto px-4">
+                        <Row gutter={24}>
+                            <Col xs={24} lg={16}>
+                                <Title level={2} className="text-white mb-4">
+                                    {courseData.title}
+                                </Title>
+                                <Paragraph className="text-gray-300">{courseData.description}</Paragraph>
+                                <div className="flex items-center mt-8">
+                                    <div className="flex items-center mr-8">
+                                        <Avatar size={48} src={courseData.instructor.avatar} icon={<UserOutlined />} />
+                                        <div className="ml-4">
+                                            <Text className="text-white block">{courseData.instructor.name}</Text>
+                                            <Text className="text-gray-400">Teacher</Text>
+                                        </div>
+                                    </div>
+                                    <Divider type="vertical" className="h-12 bg-gray-600 mx-4" />
+                                    <div className="flex flex-col mr-8">
+                                        <Text className="text-white">{courseData.categories.join(', ')}</Text>
+                                        <Text className="text-gray-400">Categories</Text>
+                                    </div>
+                                    <Divider type="vertical" className="h-12 bg-gray-600 mx-4" />
+                                    <div className="flex flex-col">
+                                        <Rate disabled defaultValue={courseData.rating} className="text-yellow-400" />
+                                        <Text className="text-gray-400">Review</Text>
+                                    </div>
                                 </div>
-                                <Divider type="vertical" className="h-16 bg-gray-600" />
-                                <div className="flex flex-col mr-8">
-                                    <Text className="text-gray-400 mb-2">Categories</Text>
-                                    <Text className="text-white">{courseData.categories.join(', ')}</Text>
-                                </div>
-                                <Divider type="vertical" className="h-16 bg-gray-600" />
-                                <div className="flex flex-col">
-                                    <Text className="text-gray-400 mb-2">Review</Text>
-                                    <Rate disabled defaultValue={courseData.rating} className="text-yellow-400" />
-                                </div>
-                            </div>
-                        </Col>
-                    </Row>
+                            </Col>
+                        </Row>
+                    </div>
                 </div>
 
-                <div className="container mx-auto px-4 py-8 relative">
+                <div className="container mx-auto px-4 py-12 relative">
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
-                            <Card title="OVERVIEW" className="mb-8">
+                            <Card title="OVERVIEW" className="mb-8 shadow-none border">
                                 <Title level={4}>Course Description</Title>
                                 <Paragraph>{courseData.description}</Paragraph>
                                 <Title level={4}>Certification</Title>
@@ -133,11 +137,11 @@ const CoursePage: React.FC = () => {
                                 </ul>
                             </Card>
 
-                            <Card title="CURRICULUM" className="mb-8">
+                            <Card title="CURRICULUM" className="mb-8 shadow-none border">
                                 <Paragraph>The curriculum is empty</Paragraph>
                             </Card>
 
-                            <Card title="INSTRUCTOR" className="mb-8">
+                            <Card title="INSTRUCTOR" className="mb-8 shadow-none border">
                                 <div className="flex items-start">
                                     <Avatar size={64} src={courseData.instructor.avatar} icon={<UserOutlined />} />
                                     <div className="ml-4">
@@ -153,7 +157,7 @@ const CoursePage: React.FC = () => {
                                 </div>
                             </Card>
 
-                            <Card title="REVIEWS" className="mb-8">
+                            <Card title="REVIEWS" className="mb-8 shadow-none border">
                                 <Row gutter={24}>
                                     <Col span={8}>
                                         <div className="text-center">
@@ -180,13 +184,15 @@ const CoursePage: React.FC = () => {
 
                         <Col xs={24} lg={8}>
                             <Affix offsetTop={20}>
-                                <Card className="mb-8 -mt-40">
-                                    <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover -t-lg mb-4" />
+                                <Card className="mb-8 shadow-none border">
+                                    <div className="-mx-6 -mt-6 mb-6">
+                                        <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover" />
+                                    </div>
                                     <Text className="block text-2xl font-bold mt-4">{courseData.price}</Text>
-                                    <Button type="primary" block size="large" className="mt-2 bg-purple-600 hover:bg-purple-700 border-none">
+                                    <Button type="primary" block size="large" className="mt-4 bg-purple-600 hover:bg-purple-700 border-none">
                                         START NOW
                                     </Button>
-                                    <Title level={4} className="mt-4">
+                                    <Title level={4} className="mt-6">
                                         Course Features
                                     </Title>
                                     <ul className="space-y-2">
@@ -217,10 +223,10 @@ const CoursePage: React.FC = () => {
                         </Col>
                     </Row>
 
-                    <Title level={3} className="mt-8 mb-4">
+                    <Title level={3} className="mt-12 mb-6">
                         YOU MAY LIKE
                     </Title>
-                    <Row gutter={[16, 16]}>
+                    <Row gutter={[24, 24]}>
                         {courseData.relatedCourses.map((course, index) => (
                             <Col xs={24} sm={12} md={8} key={index}>
                                 <Card
@@ -234,9 +240,10 @@ const CoursePage: React.FC = () => {
                                         </span>,
                                         <span className={course.price === 'Free' ? 'text-green-500' : 'text-red-500'}>{course.price}</span>,
                                     ]}
+                                    className="shadow-none border"
                                 >
                                     <Card.Meta
-                                        avatar={<Avatar src={courseData.instructor.avatar} />}
+                                        avatar={<Avatar src={course.instructor.avatar} />}
                                         title={course.title}
                                         description={<Text>{course.instructor.name}</Text>}
                                     />

@@ -10,7 +10,7 @@ import NextStep from '../components/NextStep';
 import Faq from '../components/Faq';
 
 import backgroundImage from '../assets/schoolwork.jpg';
-import parenting from '../assets/parenting.jpeg';
+import CourseImage from '../assets/hero2.jpg';
 import umbrella from '../assets/umbrella.jpeg';
 import Instructor from '../assets/man.jpg'
 import CourseCard from '../components/CourseCard';
@@ -132,7 +132,7 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
         {
@@ -140,7 +140,7 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
         {
@@ -148,7 +148,7 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
         {
@@ -156,7 +156,7 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
         // Add more course objects here...
