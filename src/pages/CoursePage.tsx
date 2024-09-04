@@ -21,8 +21,9 @@ const CoursePage: React.FC = () => {
     const [showBottomNav, setShowBottomNav] = useState(false);
     const [affixBottom, setAffixBottom] = useState<number | undefined>(undefined);
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-    const youMayLikeRef = useRef<HTMLDivElement>(null);
+    const SimilarCoursesRef = useRef<HTMLDivElement>(null);
     const overviewRef = useRef<HTMLDivElement>(null);
+    const courseInfoRef = useRef<HTMLDivElement>(null);
 
     const scrollToSection = (sectionId: string) => {
         const element = document.getElementById(sectionId);
@@ -47,11 +48,15 @@ const CoursePage: React.FC = () => {
                 setShowBottomNav(window.scrollY > overviewRef.current.offsetTop);
             }
 
-            if (youMayLikeRef.current && window.innerWidth >= 1024) {
-                const youMayLikeBottom = youMayLikeRef.current.offsetTop + youMayLikeRef.current.offsetHeight;
+            if (SimilarCoursesRef.current && courseInfoRef.current && window.innerWidth >= 1024) {
+                const youMayLikeTop = SimilarCoursesRef.current.offsetTop;
+                const courseInfoHeight = courseInfoRef.current.offsetHeight;
                 const scrollPosition = window.scrollY + window.innerHeight;
-                if (scrollPosition > youMayLikeBottom) {
-                    setAffixBottom(window.innerHeight - (scrollPosition - youMayLikeBottom));
+
+                if (scrollPosition > youMayLikeTop + courseInfoHeight) {
+                    setAffixBottom(window.innerHeight - (scrollPosition - (youMayLikeTop + courseInfoHeight)));
+                } else if (scrollPosition > youMayLikeTop) {
+                    setAffixBottom(0);
                 } else {
                     setAffixBottom(undefined);
                 }
@@ -269,17 +274,19 @@ const CoursePage: React.FC = () => {
 
                         <Col xs={24} lg={8} className="relative hidden lg:block" style={{ marginTop: '-280px' }}>
                             <Affix offsetTop={80} offsetBottom={affixBottom}>
-                                <CourseInfo />
+                                <div ref={courseInfoRef}>
+                                    <CourseInfo />
+                                </div>
                             </Affix>
                         </Col>
                     </Row>
                 </div>
 
-                <div className="container mx-auto px-4 lg:px-12 py-12 relative" ref={youMayLikeRef}>
+                <div className="container mx-auto px-4 lg:px-12 py-12 relative" ref={SimilarCoursesRef}>
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
                             <Title level={3} className="mb-6">
-                                YOU MAY LIKE
+                                Similar Courses
                             </Title>
                             <CourseFrame courses={courseData.relatedCourses} columns={3} />
                         </Col>

@@ -59,12 +59,9 @@ const Navbar: React.FC = () => {
                     TPN
                 </Link>
 
-                {/* Mobile menu button */}
-                <Button className="lg:hidden" icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
-
                 {/* Desktop menu */}
                 <div className="hidden lg:flex items-center space-x-6 flex-grow justify-center">
-                    <Dropdown overlay={categoryMenu} trigger={['click']}>
+                    <Dropdown overlay={categoryMenu} trigger={['hover']}>
                         <a className="ant-dropdown-link flex items-center cursor-pointer">
                             <MenuOutlined className="mr-2" />
                             Categories
@@ -72,23 +69,37 @@ const Navbar: React.FC = () => {
                         </a>
                     </Dropdown>
 
-                    <Search placeholder="Search..." allowClear onSearch={handleSearch} className="w-64" />
+                    <Search placeholder="Search..." allowClear onSearch={handleSearch} className="w-[32rem] max-w-[40%]" />
 
-                    <Dropdown overlay={pagesMenu} trigger={['click']}>
+                    <Dropdown overlay={pagesMenu} trigger={['hover']}>
                         <a className="ant-dropdown-link flex items-center cursor-pointer">
-                            Page
+                            Discover
                             <DownOutlined className="ml-2" />
                         </a>
                     </Dropdown>
 
-                    <Link to="/become-teacher" className="text-gray-700 hover:text-indigo-600">
-                        Become a Teacher
+                    <Link to="/events" className="text-gray-700 hover:text-indigo-600">
+                        Events
                     </Link>
                 </div>
 
-                <Button type="primary" className="hidden lg:inline-block bg-indigo-600 hover:bg-indigo-700">
-                    LOGIN
-                </Button>
+                {/* Login and Signup buttons */}
+                <div className="hidden lg:flex items-center space-x-4">
+                    <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700">
+                        LOGIN
+                    </Button>
+                    <Button type="primary" className="bg-gray-600 hover:bg-indigo-700">
+                        SIGNUP
+                    </Button>
+                </div>
+
+                {/* Mobile buttons */}
+                <div className="flex lg:hidden items-center space-x-4">
+                    <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700">
+                        LOGIN
+                    </Button>
+                    <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
+                </div>
             </div>
 
             {/* Mobile menu drawer */}
@@ -124,13 +135,18 @@ const Navbar: React.FC = () => {
                         <Menu.SubMenu key="pages" title="Page" icon={<DownOutlined />}>
                             {pagesMenu.props.children}
                         </Menu.SubMenu>
-                        <Menu.Item key="become-teacher">
-                            <Link to="/become-teacher">Become a Teacher</Link>
+                        <Menu.Item key="events">
+                            <Link to="/events">Events</Link>
                         </Menu.Item>
                     </Menu>
-                    <Button type="primary" className="mt-4 bg-indigo-600 hover:bg-indigo-700">
-                        LOGIN
-                    </Button>
+                    <div className="mt-4 flex space-x-4">
+                        <Button type="primary" className="flex-1 bg-indigo-600 hover:bg-indigo-700">
+                            LOGIN
+                        </Button>
+                        <Button type="primary" className="flex-1 bg-gray-600 hover:bg-indigo-700">
+                            SIGNUP
+                        </Button>
+                    </div>
                 </div>
             </Drawer>
         </Header>
