@@ -6,12 +6,15 @@ export default {
         './node_modules/flowbite/**/*.js',
     ],
     theme: {
+        fontFamily: {
+            sans: ['"Roboto Slab"', 'serif'],
+        },
         extend: {
             colors: {
-                primary: '#EB1D25', 
-                fontSize: {
-                    'xxs': '0.625rem', // 10px
-                },
+                primary: '#EB1D25',
+            },
+            fontSize: {
+                'xxs': '0.625rem', // 10px
             },
         },
     },

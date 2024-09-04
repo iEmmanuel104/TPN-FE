@@ -75,7 +75,7 @@ const HeroSection: React.FC = () => (
             >
                 <Paragraph className="text-black text-lg sm:text-xl font-semibold">Course</Paragraph>
                 <Title level={2} className="text-gray-600 text-2xl sm:text-3xl lg:text-4xl">
-                    Get The Best Addiction Courses
+                    Get The Best Educational Courses
                 </Title>
                 <Button type="primary" size="large" className="mt-4">
                     Get Started
@@ -149,7 +149,7 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
         <section className="py-8 sm:py-12">
             <Row justify="space-between" align="middle" className="mb-6">
                 <Col>
-                    <Title level={2} className="text-2xl sm:text-3xl">
+                    <Title level={2} className="text-2xl sm:text-3xl font-bold">
                         Popular Courses
                     </Title>
                     <Paragraph>Discover what people are learning</Paragraph>
@@ -158,7 +158,9 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
                     <Row gutter={[8, 8]}>
                         {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
                             <Col key={category}>
-                                <Button type="link">{category}</Button>
+                                <Button className="font-semibold" type="link">
+                                    {category}
+                                </Button>
                             </Col>
                         ))}
                     </Row>
@@ -176,62 +178,101 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
 
 const EventsAndTestimonialsSection: React.FC<{
     events: { date: { day: number; month: string }; title: string; time: string; location: string }[];
-}> = ({ events }) => (
-    <Row justify="center" gutter={[16, 16]} className="py-8 sm:py-12">
-        <Col xs={24} lg={11}>
-            <Card className="bg-gray-100 w-full h-full" size="small">
-                <Title level={4}>Events</Title>
-                <List
-                    itemLayout="horizontal"
-                    dataSource={events}
-                    renderItem={(item) => (
-                        <List.Item className="border-b-0 py-2">
-                            <List.Item.Meta
-                                avatar={
-                                    <div className="text-center p-1 rounded bg-white">
-                                        <Text strong className="text-base block">
-                                            {item.date.day}
+}> = ({ events }) => {
+    const testimonialCarouselRef = useRef<CarouselRef>(null);
+
+    const testimonials = [
+        {
+            name: 'Antonia Bells',
+            role: 'Director Biography',
+            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            avatar: 'https://www.shutterstock.com/shutterstock/photos/1865153395/display_1500/stock-photo-portrait-of-young-smiling-woman-looking-at-camera-with-crossed-arms-happy-girl-standing-in-1865153395.jpg',
+        },
+        {
+            name: 'John Doe',
+            role: 'Marketing Specialist',
+            content: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            avatar: 'https://example.com/john-doe-avatar.jpg',
+        },
+        {
+            name: 'Jane Smith',
+            role: 'Product Manager',
+            content: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+            avatar: 'https://example.com/jane-smith-avatar.jpg',
+        },
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (testimonialCarouselRef.current) {
+                testimonialCarouselRef.current.next();
+            }
+        }, 10000); // Change testimonial every 10 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <Row justify="center" gutter={[16, 16]} className="py-8 sm:py-12">
+            <Col xs={24} lg={11}>
+                <Card className="bg-gray-100 w-full h-full" size="small">
+                    <Title level={4} className="font-bold">
+                        Events
+                    </Title>
+                    <List
+                        itemLayout="horizontal"
+                        dataSource={events}
+                        renderItem={(item) => (
+                            <List.Item className="border-b-0 py-2">
+                                <List.Item.Meta
+                                    avatar={
+                                        <div className="text-center p-1 rounded bg-white">
+                                            <Text strong className="text-base block">
+                                                {item.date.day}
+                                            </Text>
+                                            <Text className="text-sm block">{item.date.month}</Text>
+                                        </div>
+                                    }
+                                    title={
+                                        <Text strong className="text-base">
+                                            {item.title}
                                         </Text>
-                                        <Text className="text-sm block">{item.date.month}</Text>
-                                    </div>
-                                }
-                                title={
-                                    <Text strong className="text-base">
-                                        {item.title}
-                                    </Text>
-                                }
-                                description={<Text className="text-gray-500 text-sm">{`${item.time} ${item.location}`}</Text>}
-                            />
-                        </List.Item>
-                    )}
-                />
-            </Card>
-        </Col>
-        <Col xs={24} lg={11}>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                <Card className="bg-gray-100 px-4 py-4" size="small">
-                    <Title level={4}>Testimonials</Title>
-                    <Paragraph className="max-w-[300px] text-sm">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </Paragraph>
-                    <div className="flex mt-2 items-center">
-                        <Avatar
-                            size={48}
-                            src="https://www.shutterstock.com/shutterstock/photos/1865153395/display_1500/stock-photo-portrait-of-young-smiling-woman-looking-at-camera-with-crossed-arms-happy-girl-standing-in-1865153395.jpg"
-                            className="mr-3"
-                        />
-                        <div>
-                            <Title level={5} className="mb-0">
-                                Antonia Bells
-                            </Title>
-                            <Text className="text-green-600 font-semibold text-sm">Director Biography</Text>
-                        </div>
-                    </div>
+                                    }
+                                    description={<Text className="text-gray-500 text-sm">{`${item.time} ${item.location}`}</Text>}
+                                />
+                            </List.Item>
+                        )}
+                    />
                 </Card>
-            </motion.div>
-        </Col>
-    </Row>
-);
+            </Col>
+            <Col xs={24} lg={11}>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                    <Card className="bg-gray-100 px-4 py-4" size="small">
+                        <Title level={4} className="font-bold">
+                            Testimonials
+                        </Title>
+                        <Carousel autoplay ref={testimonialCarouselRef}>
+                            {testimonials.map((testimonial, index) => (
+                                <div key={index}>
+                                    <Paragraph className="max-w-[300px] text-sm">{testimonial.content}</Paragraph>
+                                    <div className="flex mt-2 items-center">
+                                        <Avatar size={48} src={testimonial.avatar} className="mr-3" />
+                                        <div>
+                                            <Title level={5} className="mb-0">
+                                                {testimonial.name}
+                                            </Title>
+                                            <Text className="text-green-600 font-semibold text-sm">{testimonial.role}</Text>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </Carousel>
+                    </Card>
+                </motion.div>
+            </Col>
+        </Row>
+    );
+};
 
 const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
     const carouselRef = useRef<CarouselRef>(null);
@@ -255,7 +296,11 @@ const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
                 onClick={() => (window.location.href = '/blogdetails')}
             >
                 <Card.Meta
-                    title="The Unseen of spending three years at Pixelgrade"
+                    title={
+                        <Typography.Title level={4} className="!mb-0">
+                            The Unseen of spending three years at Pixelgrade
+                        </Typography.Title>
+                    }
                     description={
                         <>
                             <p className="text-sm text-gray-600 mb-4">
@@ -275,7 +320,7 @@ const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
     return (
         <section className="py-8 sm:py-12">
             <div className="text-center mb-6">
-                <Title level={2} className="text-2xl sm:text-3xl">
+                <Title level={2} className="text-2xl sm:text-3xl font-bold">
                     Read Latest Articles
                 </Title>
                 <Paragraph className="max-w-[320px] mx-auto">

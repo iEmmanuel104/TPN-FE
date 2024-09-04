@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { ConfigProvider, ThemeConfig } from 'antd';
 import NotFound from './components/NotFound';
 import { ProtectedAdminRoute, ProtectedUserRoute } from './hooks/ProtectedRoutes';
 
@@ -22,43 +23,52 @@ import BlogManagement from './pages/Admin/BlogManagement';
 // public pages
 import LandingPage from './pages/LandingPage';
 
+// Ant Design theme configuration
+const theme: ThemeConfig = {
+  token: {
+    fontFamily: '"Roboto Slab", serif',
+  },
+};
+
 function App() {
     return (
-        <div className="flex flex-col justify-between h-screen">
-            <BrowserRouter>
-                <ToastContainer position="top-center" limit={2} />
-                <Routes>
-                    <Route path="/" element={<LandingPage/>} />
+        <ConfigProvider theme={theme}>
+            <div className="flex flex-col justify-between h-screen">
+                <BrowserRouter>
+                    <ToastContainer position="top-center" limit={2} />
+                    <Routes>
+                        <Route path="/" element={<LandingPage />} />
 
-                    {/* Admin Routes */}
-                    <Route path="/iadmin/login" element={<AdminLogin />} />
-                    <Route path="/iadmin" element={<ProtectedAdminRoute />}>
-                        <Route index element={<AdminDashboard />} />
-                        <Route path="dashboard" element={<AdminDashboard />} />
-                        <Route path="courses">
-                            <Route index element={<CourseList />} />
-                            <Route path="add" element={<AddCourse />} />
-                            <Route path=":id">
-                                <Route index element={<CourseView />} />
-                                <Route path="edit" element={<EditCourse />} />
+                        {/* Admin Routes */}
+                        <Route path="/iadmin/login" element={<AdminLogin />} />
+                        <Route path="/iadmin" element={<ProtectedAdminRoute />}>
+                            <Route index element={<AdminDashboard />} />
+                            <Route path="dashboard" element={<AdminDashboard />} />
+                            <Route path="courses">
+                                <Route index element={<CourseList />} />
+                                <Route path="add" element={<AddCourse />} />
+                                <Route path=":id">
+                                    <Route index element={<CourseView />} />
+                                    <Route path="edit" element={<EditCourse />} />
+                                </Route>
                             </Route>
+                            <Route path="instructors" element={<InstructorManagement />} />
+                            <Route path="admins" element={<AdminManagement />} />
+                            <Route path="students" element={<StudentManagement />} />
+                            <Route path="blogs" element={<BlogManagement />} />
                         </Route>
-                        <Route path="instructors" element={<InstructorManagement />} />
-                        <Route path="admins" element={<AdminManagement />} />
-                        <Route path="students" element={<StudentManagement />} />
-                        <Route path="blogs" element={<BlogManagement />} />
-                    </Route>
 
-                    {/* Add protected user routes here */}
+                        {/* Add protected user routes here */}
 
-                    <Route path="/user" element={<ProtectedUserRoute />}>
-                        {/* Add your user routes here */}
-                    </Route>
-                    
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </BrowserRouter>
-        </div>
+                        <Route path="/user" element={<ProtectedUserRoute />}>
+                            {/* Add your user routes here */}
+                        </Route>
+
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </BrowserRouter>
+            </div>
+        </ConfigProvider>
     );
 }
 
