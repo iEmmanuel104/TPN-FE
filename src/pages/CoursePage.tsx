@@ -7,9 +7,7 @@ import {
     GlobalOutlined,
     TeamOutlined,
     FileTextOutlined,
-    FacebookOutlined,
     TwitterOutlined,
-    YoutubeOutlined,
     LinkedinOutlined,
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
@@ -55,31 +53,36 @@ const CoursePage: React.FC = () => {
                     <Breadcrumb.Item>Language</Breadcrumb.Item>
                 </Breadcrumb>
 
-                <div className="bg-[#333333] text-white w-full py-12">
+                <div className="bg-[#333333] text-white w-full py-24">
                     <div className="container mx-auto px-4">
                         <Row gutter={24}>
                             <Col xs={24} lg={16}>
-                                <Title level={2} className="text-white mb-4">
+                                <Title level={2} className="text-white mb-12" style={{ color: 'white' }}>
                                     {courseData.title}
                                 </Title>
-                                <Paragraph className="text-gray-300">{courseData.description}</Paragraph>
+                                <Paragraph className="text-gray-300 mb-8">{courseData.description}</Paragraph>
                                 <div className="flex items-center mt-8">
                                     <div className="flex items-center mr-8">
                                         <Avatar size={48} src={courseData.instructor.avatar} icon={<UserOutlined />} />
                                         <div className="ml-4">
-                                            <Text className="text-white block">{courseData.instructor.name}</Text>
                                             <Text className="text-gray-400">Teacher</Text>
+                                            <Text className="text-white block">{courseData.instructor.name}</Text>
                                         </div>
                                     </div>
                                     <Divider type="vertical" className="h-12 bg-gray-600 mx-4" />
                                     <div className="flex flex-col mr-8">
-                                        <Text className="text-white">{courseData.categories.join(', ')}</Text>
                                         <Text className="text-gray-400">Categories</Text>
+                                        <Text className="text-white">{courseData.categories.join(', ')}</Text>
                                     </div>
                                     <Divider type="vertical" className="h-12 bg-gray-600 mx-4" />
                                     <div className="flex flex-col">
-                                        <Rate disabled defaultValue={courseData.rating} className="text-yellow-400" />
                                         <Text className="text-gray-400">Review</Text>
+                                        <Rate
+                                            disabled
+                                            defaultValue={courseData.rating}
+                                            className="text-2xl "
+                                            character={() => <span className="text-yellow-400">&#9734;</span>}
+                                        />
                                     </div>
                                 </div>
                             </Col>
@@ -123,9 +126,7 @@ const CoursePage: React.FC = () => {
                                         </Title>
                                         <Text type="secondary">{courseData.instructor.role}</Text>
                                         <div className="mt-2 mb-2">
-                                            <FacebookOutlined className="mr-2 text-blue-600" />
                                             <TwitterOutlined className="mr-2 text-blue-400" />
-                                            <YoutubeOutlined className="mr-2 text-red-600" />
                                             <LinkedinOutlined className="text-blue-800" />
                                         </div>
                                         <Paragraph className="text-gray-600">{courseData.instructor.bio}</Paragraph>
