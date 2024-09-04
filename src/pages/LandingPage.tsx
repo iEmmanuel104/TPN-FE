@@ -1,8 +1,9 @@
-import React from 'react';
-import { Typography, Button, Card, Rate, Row, Col, Avatar, List } from 'antd';
+import React, { useRef, useEffect } from 'react';
+import { Typography, Button, Card, Rate, Row, Col, Avatar, List, Carousel } from 'antd';
 import { motion } from 'framer-motion';
 import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined, StarFilled } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import type { CarouselRef } from 'antd/lib/carousel';
 
 import PublicLayout from '../components/PublicLayout';
 import NextStep from '../components/NextStep';
@@ -38,14 +39,14 @@ const Home: React.FC = () => {
                     <HeroSection />
                     <UnderHeroSection items={items} />
                 </div>
-                <div className="px-4 sm:px-6 lg:px-8">
-                    <section className="py-12 lg:py-24">
+                <div className="px-4 sm:px-6 lg:px-24 xl:px-32">
+                    <section className="py-8 sm:py-12 lg:py-24">
                         <NextStep />
                     </section>
                     <PopularCoursesSection navigate={navigate} />
                     <EventsAndTestimonialsSection events={events} />
                     <BlogSection blogs={blogs} />
-                    <section className="py-12">
+                    <section className="py-8 sm:py-12">
                         <Faq />
                     </section>
                 </div>
@@ -94,10 +95,12 @@ const UnderHeroSection: React.FC<{ items: { icon: React.ReactNode; text: string 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.2 }}
-                            className="flex items-center justify-center"
+                            className="flex items-center justify-start sm:justify-center"
                         >
-                            {React.cloneElement(item.icon as React.ReactElement, { style: { fontSize: '24px', marginRight: '8px' } })}
-                            <Text strong className="text-base sm:text-lg">
+                            <div className="flex-shrink-0 w-8 flex justify-center">
+                                {React.cloneElement(item.icon as React.ReactElement, { style: { fontSize: '24px' } })}
+                            </div>
+                            <Text strong className="text-base sm:text-lg ml-2">
                                 {item.text}
                             </Text>
                         </motion.div>
@@ -108,50 +111,74 @@ const UnderHeroSection: React.FC<{ items: { icon: React.ReactNode; text: string 
     </div>
 );
 
-const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({ navigate }) => (
-    <section className="mt-12 sm:mt-16">
-        <Row justify="space-between" align="middle" className="mb-6 sm:mb-8">
-            <Col>
-                <Title level={2} className="text-2xl sm:text-3xl">
-                    Popular Courses
-                </Title>
-                <Paragraph>Discover what people are learning</Paragraph>
-            </Col>
-            <Col className="hidden sm:block">
-                <Row gutter={[8, 8]}>
-                    {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
-                        <Col key={category}>
-                            <Button type="link">{category}</Button>
-                        </Col>
-                    ))}
-                </Row>
-            </Col>
-        </Row>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[parenting, angermanage, domestic, domestic].map((image, index) => (
-                <div key={index} className="cursor-pointer" onClick={() => navigate('/coursedetails')}>
-                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                        <img src={image} alt="course" className="w-full h-48 object-cover" />
-                        <div className="p-4">
-                            <h3 className="text-lg font-semibold mb-2">Course Title</h3>
-                            <p className="text-sm text-gray-600 mb-2">by Andrew Iwe</p>
-                            <div className="flex justify-between items-center">
+
+const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({ navigate }) => {
+    const carouselRef = useRef<CarouselRef>(null);
+
+    useEffect(() => {
+        const handleFocus = () => {
+            if (carouselRef.current) {
+                carouselRef.current.next();
+            }
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, []);
+
+    const courseCards = [parenting, angermanage, domestic, domestic].map((image, index) => (
+        <div key={index} className="px-2">
+            <Card hoverable cover={<img alt="course" src={image} className="h-48 object-cover" />} onClick={() => navigate('/coursedetails')}>
+                <Card.Meta
+                    title="Course Title"
+                    description={
+                        <>
+                            <p className="text-sm text-gray-600">by Andrew Iwe</p>
+                            <div className="flex justify-between items-center mt-2">
                                 <span className="text-sm text-blue-600">8 lectures</span>
                                 <Rate disabled defaultValue={4} character={<StarFilled />} />
                             </div>
-                        </div>
-                    </div>
-                </div>
-            ))}
+                        </>
+                    }
+                />
+            </Card>
         </div>
-    </section>
-);
+    ));
+
+    return (
+        <section className="py-8 sm:py-12">
+            <Row justify="space-between" align="middle" className="mb-6">
+                <Col>
+                    <Title level={2} className="text-2xl sm:text-3xl">
+                        Popular Courses
+                    </Title>
+                    <Paragraph>Discover what people are learning</Paragraph>
+                </Col>
+                <Col className="hidden sm:block">
+                    <Row gutter={[8, 8]}>
+                        {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
+                            <Col key={category}>
+                                <Button type="link">{category}</Button>
+                            </Col>
+                        ))}
+                    </Row>
+                </Col>
+            </Row>
+            <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">{courseCards}</div>
+            <div className="sm:hidden">
+                <Carousel autoplay ref={carouselRef}>
+                    {courseCards}
+                </Carousel>
+            </div>
+        </section>
+    );
+};
 
 const EventsAndTestimonialsSection: React.FC<{
     events: { date: { day: number; month: string }; title: string; time: string; location: string }[];
 }> = ({ events }) => (
-    <Row justify="center" gutter={[16, 16]} className="my-8">
-        <Col xs={24} md={11} lg={10}>
+    <Row justify="center" gutter={[16, 16]} className="py-8 sm:py-12">
+        <Col xs={24} lg={11}>
             <Card className="bg-gray-100 w-full h-full" size="small">
                 <Title level={4}>Events</Title>
                 <List
@@ -180,7 +207,7 @@ const EventsAndTestimonialsSection: React.FC<{
                 />
             </Card>
         </Col>
-        <Col xs={24} md={11} lg={10}>
+        <Col xs={24} lg={11}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                 <Card className="bg-gray-100 px-4 py-4" size="small">
                     <Title level={4}>Testimonials</Title>
@@ -206,21 +233,31 @@ const EventsAndTestimonialsSection: React.FC<{
     </Row>
 );
 
-const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => (
-    <section className="mt-12 sm:mt-16">
-        <div className="text-center mb-6 sm:mb-8">
-            <Title level={2} className="text-2xl sm:text-3xl">
-                Read Latest Articles
-            </Title>
-            <Paragraph className="max-w-[320px] mx-auto">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor</Paragraph>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {blogs.map((blog) => (
-                <Link key={blog.id} to="/blogdetails" className="block">
-                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                        <img src={umbrella} alt="blog" className="w-full h-48 object-cover" />
-                        <div className="p-4">
-                            <h3 className="text-lg font-semibold mb-2">The Unseen of spending three years at Pixelgrade</h3>
+const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
+    const carouselRef = useRef<CarouselRef>(null);
+
+    useEffect(() => {
+        const handleFocus = () => {
+            if (carouselRef.current) {
+                carouselRef.current.next();
+            }
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, []);
+
+    const blogCards = blogs.map((blog) => (
+        <div key={blog.id} className="px-2">
+            <Card
+                hoverable
+                cover={<img alt="blog" src={umbrella} className="h-48 object-cover" />}
+                onClick={() => (window.location.href = '/blogdetails')}
+            >
+                <Card.Meta
+                    title="The Unseen of spending three years at Pixelgrade"
+                    description={
+                        <>
                             <p className="text-sm text-gray-600 mb-4">
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                             </p>
@@ -228,12 +265,31 @@ const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => (
                                 <Text strong>Continue Reading</Text>
                                 <ArrowRightOutlined />
                             </div>
-                        </div>
-                    </div>
-                </Link>
-            ))}
+                        </>
+                    }
+                />
+            </Card>
         </div>
-    </section>
-);
+    ));
+
+    return (
+        <section className="py-8 sm:py-12">
+            <div className="text-center mb-6">
+                <Title level={2} className="text-2xl sm:text-3xl">
+                    Read Latest Articles
+                </Title>
+                <Paragraph className="max-w-[320px] mx-auto">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                </Paragraph>
+            </div>
+            <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 gap-6">{blogCards}</div>
+            <div className="sm:hidden">
+                <Carousel autoplay ref={carouselRef}>
+                    {blogCards}
+                </Carousel>
+            </div>
+        </section>
+    );
+};
 
 export default Home;

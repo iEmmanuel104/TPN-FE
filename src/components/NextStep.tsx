@@ -9,11 +9,11 @@ const { Title, Paragraph } = Typography;
 
 const NextStep: React.FC = () => {
     return (
-        <Row gutter={[32, 32]} className="bg-white px-12">
+        <Row gutter={[32, 32]} className="bg-white px-0 sm:px-12">
             <Col xs={24} md={12}>
                 <Row gutter={[16, 16]}>
                     <Col xs={24} sm={12}>
-                        <img src={image2} alt="Experience" className="h-[200px] object-cover rounded-lg" />
+                        <img src={image2} alt="Experience" className="w-full h-[200px] object-cover rounded-lg" />
                         <Card className="mt-3 bg-green-500 text-white text-center">
                             <Paragraph strong className="mb-0">
                                 7 years of
@@ -28,14 +28,14 @@ const NextStep: React.FC = () => {
                             </Title>
                             <Paragraph className="mb-0">Positive Reviews</Paragraph>
                         </Card>
-                        <img src={image3} alt="Reviews" className="h-[200px] object-cover rounded-lg" />
+                        <img src={image3} alt="Reviews" className="w-full h-[200px] object-cover rounded-lg" />
                     </Col>
                 </Row>
             </Col>
             <Col xs={24} md={12}>
                 <Paragraph className="text-sm text-purple-600 font-semibold mb-2">WHAT'S OUR MAIN GOAL</Paragraph>
                 <Title level={2} className="text-purple-400 mb-4">
-                    Take The Next Step Toward Your Personal Life With TexasPreventiveNetwork
+                    Take The Next Step Toward Your Personal Life With TPN
                 </Title>
                 <Paragraph className="text-gray-600 mb-6">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
