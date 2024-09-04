@@ -209,7 +209,7 @@ const CoursePage: React.FC = () => {
 
                         <Col xs={24} lg={8} className="relative" style={{ marginTop: '-280px' }}>
                             <Affix offsetTop={80} offsetBottom={affixBottom}>
-                                <Card className=" border-0" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
+                                <Card className=" border" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
                                     <div className="-mx-6 -mt-6 mb-6">
                                         <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover" />
                                     </div>
@@ -225,7 +225,7 @@ const CoursePage: React.FC = () => {
                                     <Title level={4} className="mt-8 mb-4">
                                         Course Features
                                     </Title>
-                                    <ul className="space-y-3 border-b">
+                                    <ul className="space-y-3">
                                         <li className="flex items-center">
                                             <BookOutlined className="mr-3 text-gray-500" />
                                             <span className="flex-grow">Lectures</span>
