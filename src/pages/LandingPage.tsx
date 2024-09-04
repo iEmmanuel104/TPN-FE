@@ -111,7 +111,6 @@ const UnderHeroSection: React.FC<{ items: { icon: React.ReactNode; text: string 
     </div>
 );
 
-
 const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({ navigate }) => {
     const carouselRef = useRef<CarouselRef>(null);
 
