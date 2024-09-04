@@ -112,8 +112,12 @@ const CoursePage: React.FC = () => {
                             <Card id="instructor" className="mb-8 shadow-sm">
                                 <SectionTitle title="INSTRUCTOR" />
                                 <div className="flex items-start">
-                                    <Avatar size={64} src={courseData.instructor.avatar} icon={<UserOutlined />} />
-                                    <div className="ml-4">
+                                    <img
+                                        src={courseData.instructor.avatar}
+                                        alt={courseData.instructor.name}
+                                        className="w-16 h-16 rounded-full object-cover mr-4"
+                                    />
+                                    <div>
                                         <Title level={4} className="mb-0">
                                             {courseData.instructor.name}
                                         </Title>
@@ -131,31 +135,65 @@ const CoursePage: React.FC = () => {
 
                             <Card id="reviews" className="mb-8 shadow-sm">
                                 <SectionTitle title="REVIEWS" />
-                                <Row gutter={24}>
+                                <Row gutter={24} className="items-stretch">
                                     <Col span={8}>
-                                        <div className="text-center">
-                                            <Title level={1} className="mb-0">
+                                        <div className="border rounded p-4 h-full flex flex-col justify-center items-center">
+                                            <Title level={1} className="mb-0 text-6xl">
                                                 0
                                             </Title>
-                                            <Rate disabled defaultValue={0} className="text-yellow-400" />
-                                            <Text type="secondary" className="block">
+                                            <Rate
+                                                disabled
+                                                defaultValue={0}
+                                                className="text-2xl my-2"
+                                                style={{
+                                                    color: 'transparent',
+                                                }}
+                                                character={
+                                                    <span
+                                                        style={{
+                                                            display: 'inline-block',
+                                                            width: '1em',
+                                                            height: '1em',
+                                                            border: '2px solid #fadb14',
+                                                            borderRadius: '50%',
+                                                            position: 'relative',
+                                                        }}
+                                                    >
+                                                        <span
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '50%',
+                                                                left: '50%',
+                                                                transform: 'translate(-50%, -50%)',
+                                                                fontSize: '0.8em',
+                                                                color: '#fadb14',
+                                                            }}
+                                                        >
+                                                            ★
+                                                        </span>
+                                                    </span>
+                                                }
+                                            />
+                                            <Text type="secondary" className="block mt-2">
                                                 0 rating
                                             </Text>
                                         </div>
                                     </Col>
                                     <Col span={16}>
-                                        <Title level={5} className="mb-4">
-                                            Detailed Rating
-                                        </Title>
-                                        {[5, 4, 3, 2, 1].map((star) => (
-                                            <div key={star} className="flex items-center mb-2">
-                                                <Text className="mr-2">{star}</Text>
-                                                <div className="w-full bg-gray-200 h-2 flex-grow">
-                                                    <div className="bg-yellow-400 h-2" style={{ width: '0%' }}></div>
+                                        <div className="border rounded p-4 h-full">
+                                            <Title level={5} className="mb-4 text-sm">
+                                                Detailed Rating
+                                            </Title>
+                                            {[5, 4, 3, 2, 1].map((star) => (
+                                                <div key={star} className="flex items-center mb-2">
+                                                    <Text className="mr-2 w-4">{star}</Text>
+                                                    <div className="w-full bg-gray-200 h-4 flex-grow rounded">
+                                                        <div className="bg-yellow-400 h-4 rounded" style={{ width: '0%' }}></div>
+                                                    </div>
+                                                    <Text className="ml-2 w-8 text-right">0%</Text>
                                                 </div>
-                                                <Text className="ml-2">0%</Text>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </Col>
                                 </Row>
                             </Card>
