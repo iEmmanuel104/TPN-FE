@@ -10,6 +10,7 @@ import {
     FacebookOutlined,
     TwitterOutlined,
     YoutubeOutlined,
+    LinkedinOutlined,
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import CourseCard from '../components/CourseCard';
@@ -42,6 +43,8 @@ const CoursePage: React.FC = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const SectionTitle = ({ title }: { title: string }) => <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200">{title}</h2>;
 
     return (
         <PublicLayout>
@@ -87,57 +90,70 @@ const CoursePage: React.FC = () => {
                 <div className="container mx-auto px-4 py-12 relative">
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
-                            <Card id="overview" title="OVERVIEW" className="mb-8 shadow-none border">
-                                <Title level={4}>Course Description</Title>
+                            <Card id="overview" className="mb-8 shadow-sm">
+                                <SectionTitle title="OVERVIEW" />
+                                <h3 className="text-lg font-semibold mb-2">Course Description</h3>
                                 <Paragraph>{courseData.description}</Paragraph>
-                                <Title level={4}>Certification</Title>
+                                <h3 className="text-lg font-semibold mb-2">Certification</h3>
                                 <Paragraph>{courseData.description}</Paragraph>
-                                <Title level={4}>Learning Outcomes</Title>
-                                <ul className="list-disc pl-5">
+                                <h3 className="text-lg font-semibold mb-2">Learning Outcomes</h3>
+                                <ul className="list-disc pl-5 text-gray-600">
                                     {courseData.outcomes.map((outcome, index) => (
                                         <li key={index}>{outcome}</li>
                                     ))}
                                 </ul>
                             </Card>
 
-                            <Card id="curriculum" title="CURRICULUM" className="mb-8 shadow-none border">
+                            <Card id="curriculum" className="mb-8 shadow-sm">
+                                <SectionTitle title="CURRICULUM" />
                                 <Paragraph>The curriculum is empty</Paragraph>
                             </Card>
 
-                            <Card id="instructor" title="INSTRUCTOR" className="mb-8 shadow-none border">
+                            <Card id="instructor" className="mb-8 shadow-sm">
+                                <SectionTitle title="INSTRUCTOR" />
                                 <div className="flex items-start">
                                     <Avatar size={64} src={courseData.instructor.avatar} icon={<UserOutlined />} />
                                     <div className="ml-4">
-                                        <Title level={4}>{courseData.instructor.name}</Title>
+                                        <Title level={4} className="mb-0">
+                                            {courseData.instructor.name}
+                                        </Title>
                                         <Text type="secondary">{courseData.instructor.role}</Text>
-                                        <div className="mt-2">
-                                            <FacebookOutlined className="mr-2" />
-                                            <TwitterOutlined className="mr-2" />
-                                            <YoutubeOutlined />
+                                        <div className="mt-2 mb-2">
+                                            <FacebookOutlined className="mr-2 text-blue-600" />
+                                            <TwitterOutlined className="mr-2 text-blue-400" />
+                                            <YoutubeOutlined className="mr-2 text-red-600" />
+                                            <LinkedinOutlined className="text-blue-800" />
                                         </div>
-                                        <Paragraph className="mt-2">{courseData.instructor.bio}</Paragraph>
+                                        <Paragraph className="text-gray-600">{courseData.instructor.bio}</Paragraph>
                                     </div>
                                 </div>
                             </Card>
 
-                            <Card id="reviews" title="REVIEWS" className="mb-8 shadow-none border">
+                            <Card id="reviews" className="mb-8 shadow-sm">
+                                <SectionTitle title="REVIEWS" />
                                 <Row gutter={24}>
                                     <Col span={8}>
                                         <div className="text-center">
-                                            <Title level={1}>{courseData.rating}</Title>
-                                            <Rate disabled defaultValue={courseData.rating} />
-                                            <Text type="secondary">0 rating</Text>
+                                            <Title level={1} className="mb-0">
+                                                0
+                                            </Title>
+                                            <Rate disabled defaultValue={0} className="text-yellow-400" />
+                                            <Text type="secondary" className="block">
+                                                0 rating
+                                            </Text>
                                         </div>
                                     </Col>
                                     <Col span={16}>
-                                        <Title level={4}>Detailed Rating</Title>
+                                        <Title level={5} className="mb-4">
+                                            Detailed Rating
+                                        </Title>
                                         {[5, 4, 3, 2, 1].map((star) => (
-                                            <div key={star} className="flex items-center">
-                                                <Text>{star}</Text>
-                                                <div className="w-full bg-gray-200 h-2 mx-2">
+                                            <div key={star} className="flex items-center mb-2">
+                                                <Text className="mr-2">{star}</Text>
+                                                <div className="w-full bg-gray-200 h-2 flex-grow">
                                                     <div className="bg-yellow-400 h-2" style={{ width: '0%' }}></div>
                                                 </div>
-                                                <Text>0%</Text>
+                                                <Text className="ml-2">0%</Text>
                                             </div>
                                         ))}
                                     </Col>
