@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card, Typography, Avatar, Divider } from 'antd';
 import { FileTextOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -12,48 +13,84 @@ type CourseCardProps = {
     lessons: number;
     students: number;
     image: string;
+    bio?: string;
     price: number | string;
     onClick: () => void;
+    isList?: boolean;
+    description?: string;
 };
 
-const CourseCard = ({ title, instructor, lessons, students, image, price, onClick }: CourseCardProps) => (
-    <Card
-        hoverable
-        className="flex flex-col h-full overflow-hidden"
-        bodyStyle={{ padding: '16px' }}
-        cover={
-            <div className="relative">
-                <img alt={title} src={image} className="w-full h-48 object-cover" />
+const CourseCard: React.FC<CourseCardProps> = ({ title, instructor, lessons, students, image, price, onClick, isList = false, description }) => {
+    if (isList) {
+        return (
+            <div onClick={onClick} className="flex items-start space-x-4 p-4 hover:bg-gray-50 cursor-pointer">
+                <img src={image} alt={title} className="w-48 h-32 object-cover rounded" />
+                <div className="flex-grow">
+                    <Title level={4} className="mb-2">
+                        {title}
+                    </Title>
+                    <Text className="block text-sm text-gray-500 mb-2">{description}</Text>
+                    <div className="flex items-center space-x-4 mb-2">
+                        <Avatar src={instructor.avatar} icon={<UserOutlined />} />
+                        <Text>{instructor.name}</Text>
+                    </div>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span>
+                            <FileTextOutlined className="mr-1" />
+                            {lessons} lessons
+                        </span>
+                        <span>
+                            <UserOutlined className="mr-1" />
+                            {students} students
+                        </span>
+                        <Text strong className="text-green-500">
+                            {price}
+                        </Text>
+                    </div>
+                </div>
             </div>
-        }
-        onClick={onClick}
-    >
-        <div className="flex flex-col items-center -mt-8">
-            <Avatar size={64} src={instructor.avatar} icon={<UserOutlined />} className="border-4 border-white shadow-md" />
-        </div>
-        <div className="flex flex-col items-center mt-2">
-            <Text className="text-gray-600">{instructor.name}</Text>
-            <Title level={5} className="mb-2 text-center mt-2">
-                {title}
-            </Title>
-        </div>
-        <Divider className="my-2" />
-        <div className="flex justify-between items-center">
-            <div className="flex space-x-4">
-                <span className="flex items-center text-gray-500 text-sm">
-                    <FileTextOutlined className="mr-1" />
-                    {lessons}
-                </span>
-                <span className="flex items-center text-gray-500 text-sm">
-                    <UserOutlined className="mr-1" />
-                    {students}
-                </span>
+        );
+    }
+
+    return (
+        <Card
+            hoverable
+            className="flex flex-col h-full overflow-hidden"
+            bodyStyle={{ padding: '16px' }}
+            cover={
+                <div className="relative">
+                    <img alt={title} src={image} className="w-full h-48 object-cover" />
+                </div>
+            }
+            onClick={onClick}
+        >
+            <div className="flex flex-col items-center -mt-8">
+                <Avatar size={64} src={instructor.avatar} icon={<UserOutlined />} className="border-4 border-white shadow-md" />
             </div>
-            <Text strong className="text-green-500">
-                {price}
-            </Text>
-        </div>
-    </Card>
-);
+            <div className="flex flex-col items-center mt-2">
+                <Text className="text-gray-600">{instructor.name}</Text>
+                <Title level={5} className="mb-2 text-center mt-2">
+                    {title}
+                </Title>
+            </div>
+            <Divider className="my-2" />
+            <div className="flex justify-between items-center">
+                <div className="flex space-x-4">
+                    <span className="flex items-center text-gray-500 text-sm">
+                        <FileTextOutlined className="mr-1" />
+                        {lessons}
+                    </span>
+                    <span className="flex items-center text-gray-500 text-sm">
+                        <UserOutlined className="mr-1" />
+                        {students}
+                    </span>
+                </div>
+                <Text strong className="text-green-500">
+                    {price}
+                </Text>
+            </div>
+        </Card>
+    );
+};
 
 export default CourseCard;

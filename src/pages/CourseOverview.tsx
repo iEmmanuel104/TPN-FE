@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Row, Col, Breadcrumb, Select, Input } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import CourseCard from '../components/CourseCard';
 
@@ -11,12 +11,15 @@ import parenting from '../assets/parenting.jpeg';
 import Instructor from '../assets/man.jpg';
 
 const CourseOverview: React.FC = () => {
+    const [isListView, setIsListView] = useState(false);
+
     const singleCourse = {
         title: 'Introduction LearnPress – LMS Plugin',
         instructor: { name: 'Keny White', avatar: Instructor },
         lessons: 6,
         students: 412,
         image: parenting,
+        bio: 'LearnPress is a comprehensive LMS solution for WordPress.',
         price: 'Free',
     };
 
@@ -90,20 +93,19 @@ const CourseOverview: React.FC = () => {
                     <Col xs={24} md={18}>
                         <div className="flex justify-between items-center mb-6">
                             <div className="flex items-center">
-                                <button title="btn1" className="mr-2 bg-purple-600 text-white p-2 rounded">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor" />
-                                        <rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor" />
-                                        <rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor" />
-                                        <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" />
-                                    </svg>
+                                <button
+                                    title="Grid View"
+                                    onClick={() => setIsListView(false)}
+                                    className={`mr-2 p-2 rounded ${!isListView ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
+                                >
+                                    <AppstoreOutlined />
                                 </button>
-                                <button title="btn2" className="bg-gray-200 p-2 rounded">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3 5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                        <path d="M3 12H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                        <path d="M3 19H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                    </svg>
+                                <button
+                                    title="List View"
+                                    onClick={() => setIsListView(true)}
+                                    className={`p-2 rounded ${isListView ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}
+                                >
+                                    <UnorderedListOutlined />
                                 </button>
                                 <Text className="ml-4">Showing 1-9 of 18 results</Text>
                             </div>
@@ -118,13 +120,21 @@ const CourseOverview: React.FC = () => {
                             </div>
                         </div>
 
-                        <Row gutter={[16, 16]}>
-                            {courses.map((course, index) => (
-                                <Col xs={24} sm={12} lg={8} key={index}>
-                                    <CourseCard onClick={() => handleCourseClick(course.title)} {...course} />
-                                </Col>
-                            ))}
-                        </Row>
+                        {isListView ? (
+                            <div>
+                                {courses.map((course, index) => (
+                                    <CourseCard key={index} onClick={() => handleCourseClick(course.title)} {...course} isList={true} />
+                                ))}
+                            </div>
+                        ) : (
+                            <Row gutter={[16, 16]}>
+                                {courses.map((course, index) => (
+                                    <Col xs={24} sm={12} lg={8} key={index}>
+                                        <CourseCard onClick={() => handleCourseClick(course.title)} {...course} />
+                                    </Col>
+                                ))}
+                            </Row>
+                        )}
                     </Col>
                 </Row>
             </div>
