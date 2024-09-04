@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
         <Header className="bg-white py-0 sticky top-0 z-50 w-full max-w-full overflow-x-hidden shadow-md">
             <div className="container mx-auto px-2 sm:px-4 flex items-center justify-between h-full">
                 <Link to="/" className="text-2xl font-bold text-indigo-700">
-                    Eduma
+                    TPN
                 </Link>
 
                 {/* Mobile menu button */}
@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
                 <div className="p-4 h-full flex flex-col">
                     <div className="flex justify-between items-center mb-4">
                         <Link to="/" className="text-2xl font-bold text-indigo-700" onClick={() => setDrawerVisible(false)}>
-                            Eduma
+                            TPN
                         </Link>
                         <Button icon={<CloseOutlined />} onClick={() => setDrawerVisible(false)} />
                     </div>
