@@ -67,18 +67,18 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, instructor, lessons, stu
             cover={
                 <div className="relative">
                     <img alt={title} src={image} className="w-full h-48 object-cover" />
-                    <Avatar src={instructor.avatar} icon={<UserOutlined />} className="absolute -bottom-4 left-4 border-2 border-white" size={48} />
                 </div>
             }
             onClick={onClick}
         >
             <div className="card-content">
-                <div className="flex flex-col mt-2">
-                    <Text className="text-gray-600 mb-1">{instructor.name}</Text>
-                    <Text strong className="text-lg mb-4 line-clamp-2" style={{ height: '3rem' }}>
-                        {title}
-                    </Text>
+                <div className="flex flex-col items-center -mt-12 mb-4">
+                    <Avatar src={instructor.avatar} icon={<UserOutlined />} className="border-4 border-white" size={64} />
+                    <Text className="text-gray-600 mt-2">{instructor.name}</Text>
                 </div>
+                <Text strong className="text-lg mb-4 line-clamp-2 text-center" style={{ height: '3.5rem' }}>
+                    {title}
+                </Text>
                 <div className="flex justify-between items-center mt-auto">
                     <div className="flex space-x-4">
                         <span className="flex items-center text-gray-500 text-sm">

@@ -231,7 +231,7 @@ const CoursePage: React.FC = () => {
             </div>
 
             <Affix offsetBottom={0}>
-                <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-t justify-start p-8">
+                <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-t justify-start p-4">
                     <Menu.Item key="overview" onClick={() => scrollToSection('overview')}>
                         Overview
                     </Menu.Item>

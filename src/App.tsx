@@ -29,6 +29,7 @@ import CoursePage from './pages/CoursePage';
 const theme: ThemeConfig = {
   token: {
     fontFamily: '"Roboto Slab", serif',
+    borderRadius: 0
   },
 };
 
