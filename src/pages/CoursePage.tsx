@@ -11,8 +11,8 @@ import {
     LinkedinOutlined,
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
-import CourseCard from '../components/CourseCard';
 import { courseData } from '../constants/courseData';
+import CourseFrame from '../components/CourseFrame';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -273,21 +273,7 @@ const CoursePage: React.FC = () => {
                         <Title level={3} className="mb-6">
                             YOU MAY LIKE
                         </Title>
-                        <Row gutter={[24, 24]} className="max-w-4xl mx-auto">
-                            {courseData.relatedCourses.map((course, index) => (
-                                <Col xs={24} sm={12} md={8} key={index}>
-                                    <CourseCard
-                                        title={course.title}
-                                        instructor={course.instructor}
-                                        lessons={course.lessons}
-                                        students={course.students}
-                                        image={course.image}
-                                        price={course.price}
-                                        onClick={() => console.log(`Clicked on course: ${course.title}`)}
-                                    />
-                                </Col>
-                            ))}
-                        </Row>
+                        <CourseFrame courses={courseData.relatedCourses} />
                     </div>
                 </div>
             </div>

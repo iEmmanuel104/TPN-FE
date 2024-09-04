@@ -61,3 +61,39 @@ export const courseData = {
         },
     ],
 };
+
+export const courses = [
+    {
+        title: 'Introduction LearnPress – LMS Plugin',
+        instructor: { name: 'Keny White', avatar: Instructor },
+        lessons: 6,
+        students: 412,
+        image: CourseImage,
+        price: 'Free',
+    },
+    {
+        title: 'Introduction LearnPress – LMS Plugin',
+        instructor: { name: 'Keny White', avatar: Instructor },
+        lessons: 6,
+        students: 412,
+        image: CourseImage,
+        price: 'Free',
+    },
+    {
+        title: 'Introduction LearnPress – LMS Plugin',
+        instructor: { name: 'Keny White', avatar: Instructor },
+        lessons: 6,
+        students: 412,
+        image: CourseImage,
+        price: 'Free',
+    },
+    {
+        title: 'Introduction LearnPress – LMS Plugin',
+        instructor: { name: 'Keny White', avatar: Instructor },
+        lessons: 6,
+        students: 412,
+        image: CourseImage,
+        price: 'Free',
+    },
+    // Add more course objects here...
+];

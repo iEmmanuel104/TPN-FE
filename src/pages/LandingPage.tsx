@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { Typography, Button, Card, Row, Col, Avatar, List, Carousel } from 'antd';
 import { motion } from 'framer-motion';
 import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
 import type { CarouselRef } from 'antd/lib/carousel';
 
 import PublicLayout from '../components/PublicLayout';
@@ -10,15 +9,13 @@ import NextStep from '../components/NextStep';
 import Faq from '../components/Faq';
 
 import backgroundImage from '../assets/schoolwork.jpg';
-import CourseImage from '../assets/hero2.jpg';
 import umbrella from '../assets/umbrella.jpeg';
-import Instructor from '../assets/man.jpg'
-import CourseCard from '../components/CourseCard';
+import CourseFrame from '../components/CourseFrame';
+import { courses } from '../constants/courseData';
 
 const { Title, Paragraph, Text } = Typography;
 
 const Home: React.FC = () => {
-    const navigate = useNavigate();
     const blogs = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
     const events = [
@@ -43,7 +40,28 @@ const Home: React.FC = () => {
                     <section className="py-8 sm:py-12 lg:py-24">
                         <NextStep />
                     </section>
-                    <PopularCoursesSection navigate={navigate} />
+                    <section className="py-8 sm:py-12">
+                        <Row justify="space-between" align="middle" className="mb-6">
+                            <Col>
+                                <Title level={2} className="text-2xl sm:text-3xl font-bold">
+                                    Popular Courses
+                                </Title>
+                                <Paragraph>Discover what people are learning</Paragraph>
+                            </Col>
+                            <Col className="hidden sm:block">
+                                <Row gutter={[8, 8]}>
+                                    {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
+                                        <Col key={category}>
+                                            <Button className="font-semibold" type="link">
+                                                {category}
+                                            </Button>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            </Col>
+                        </Row>
+                        <CourseFrame courses={courses} />
+                    </section>
                     <EventsAndTestimonialsSection events={events} />
                     <BlogSection blogs={blogs} />
                     <section className="py-8 sm:py-12">
@@ -110,93 +128,6 @@ const UnderHeroSection: React.FC<{ items: { icon: React.ReactNode; text: string 
         </div>
     </div>
 );
-
-const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({ navigate }) => {
-    const carouselRef = useRef<CarouselRef>(null);
-
-    useEffect(() => {
-        const handleFocus = () => {
-            if (carouselRef.current) {
-                carouselRef.current.next();
-            }
-        };
-
-        window.addEventListener('focus', handleFocus);
-        return () => window.removeEventListener('focus', handleFocus);
-    }, []);
-
-    const courses = [
-        {
-            title: 'Introduction LearnPress – LMS Plugin',
-            instructor: { name: 'Keny White', avatar: Instructor },
-            lessons: 6,
-            students: 412,
-            image: CourseImage,
-            price: 'Free',
-        },
-        {
-            title: 'Introduction LearnPress – LMS Plugin',
-            instructor: { name: 'Keny White', avatar: Instructor },
-            lessons: 6,
-            students: 412,
-            image: CourseImage,
-            price: 'Free',
-        },
-        {
-            title: 'Introduction LearnPress – LMS Plugin',
-            instructor: { name: 'Keny White', avatar: Instructor },
-            lessons: 6,
-            students: 412,
-            image: CourseImage,
-            price: 'Free',
-        },
-        {
-            title: 'Introduction LearnPress – LMS Plugin',
-            instructor: { name: 'Keny White', avatar: Instructor },
-            lessons: 6,
-            students: 412,
-            image: CourseImage,
-            price: 'Free',
-        },
-        // Add more course objects here...
-    ];
-
-    const courseCards = courses.map((course, index) => (
-        <div key={index} className="px-2">
-            <CourseCard {...course} onClick={() => navigate('/coursedetails')} />
-        </div>
-    ));
-
-    return (
-        <section className="py-8 sm:py-12">
-            <Row justify="space-between" align="middle" className="mb-6">
-                <Col>
-                    <Title level={2} className="text-2xl sm:text-3xl font-bold">
-                        Popular Courses
-                    </Title>
-                    <Paragraph>Discover what people are learning</Paragraph>
-                </Col>
-                <Col className="hidden sm:block">
-                    <Row gutter={[8, 8]}>
-                        {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
-                            <Col key={category}>
-                                <Button className="font-semibold" type="link">
-                                    {category}
-                                </Button>
-                            </Col>
-                        ))}
-                    </Row>
-                </Col>
-            </Row>
-            <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">{courseCards}</div>
-            <div className="sm:hidden">
-                <Carousel autoplay ref={carouselRef}>
-                    {courseCards}
-                </Carousel>
-            </div>
-        </section>
-    );
-};
 
 const EventsAndTestimonialsSection: React.FC<{
     events: { date: { day: number; month: string }; title: string; time: string; location: string }[];
