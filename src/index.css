@@ -21,3 +21,38 @@ button.btn-rounded {
 body {
     font-family: 'Roboto Slab', serif;
 }
+
+.custom-pagination .ant-pagination-item {
+    border-radius: 0;
+    border: none;
+    background-color: #e5e7eb;  /* Tailwind's gray-200 */
+    margin-right: 6px;
+}
+
+.custom-pagination .ant-pagination-item a {
+    color: #374151;  /* Tailwind's gray-700 */
+}
+
+.custom-pagination .ant-pagination-item:hover {
+    background-color: #d1d5db;  /* Tailwind's gray-300 */
+}
+
+.custom-pagination .ant-pagination-item-active {
+    background-color: #7c3aed;  /* Tailwind's purple-600 */
+}
+
+.custom-pagination .ant-pagination-item-active a {
+    color: white;
+}
+
+.custom-pagination .ant-pagination-prev button,
+.custom-pagination .ant-pagination-next button {
+    background-color: #e5e7eb;  /* Tailwind's gray-200 */
+    border: none;
+    color: #374151;  /* Tailwind's gray-700 */
+}
+
+.custom-pagination .ant-pagination-prev:hover button,
+.custom-pagination .ant-pagination-next:hover button {
+    background-color: #d1d5db;  /* Tailwind's gray-300 */
+}

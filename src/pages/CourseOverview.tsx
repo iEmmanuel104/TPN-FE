@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Row, Col, Breadcrumb, Select, Input, Drawer, Button } from 'antd';
+import { Typography, Row, Col, Breadcrumb, Select, Input, Drawer, Button, Pagination } from 'antd';
 import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined, FilterOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import CourseCard from '../components/CourseCard';
@@ -13,6 +13,8 @@ import Instructor from '../assets/man.jpg';
 const CourseOverview: React.FC = () => {
     const [isListView, setIsListView] = useState(false);
     const [isFilterDrawerVisible, setIsFilterDrawerVisible] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 9; // Number of courses per page
 
     const singleCourse = {
         title: 'Introduction LearnPress – LMS Plugin',
@@ -25,11 +27,21 @@ const CourseOverview: React.FC = () => {
         price: 'Free',
     };
 
-    const courses = Array(9).fill(singleCourse);
+    // Create an array of 18 courses (2 pages worth)
+    const allCourses = Array(18).fill(singleCourse);
 
     const handleCourseClick = (courseTitle: string) => {
         console.log(`Clicked on course: ${courseTitle}`);
     };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    // Get current courses
+    const indexOfLastCourse = currentPage * pageSize;
+    const indexOfFirstCourse = indexOfLastCourse - pageSize;
+    const currentCourses = allCourses.slice(indexOfFirstCourse, indexOfLastCourse);
 
     const FilterContent = () => (
         <div>
@@ -119,19 +131,31 @@ const CourseOverview: React.FC = () => {
 
                         {isListView ? (
                             <div>
-                                {courses.map((course, index) => (
+                                {currentCourses.map((course, index) => (
                                     <CourseCard key={index} onClick={() => handleCourseClick(course.title)} {...course} isList={true} />
                                 ))}
                             </div>
                         ) : (
                             <Row gutter={[16, 16]}>
-                                {courses.map((course, index) => (
+                                {currentCourses.map((course, index) => (
                                     <Col xs={24} sm={12} lg={8} key={index}>
                                         <CourseCard onClick={() => handleCourseClick(course.title)} {...course} />
                                     </Col>
                                 ))}
                             </Row>
                         )}
+
+                        {/* Pagination */}
+                        <div className="mt-8 flex justify-center">
+                            <Pagination
+                                current={currentPage}
+                                total={allCourses.length}
+                                pageSize={pageSize}
+                                onChange={handlePageChange}
+                                showSizeChanger={false}
+                                className="custom-pagination"
+                            />
+                        </div>
                     </Col>
                 </Row>
             </div>
