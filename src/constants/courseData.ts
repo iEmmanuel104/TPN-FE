@@ -1,4 +1,3 @@
-import parenting from '../assets/parenting.jpeg';
 import Instructor from '../assets/man.jpg';
 import CourseImage from '../assets/hero2.jpg';
 
@@ -40,7 +39,7 @@ export const courseData = {
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
         {
@@ -48,7 +47,7 @@ export const courseData = {
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
         {
@@ -56,7 +55,7 @@ export const courseData = {
             instructor: { name: 'Keny White', avatar: Instructor },
             lessons: 6,
             students: 412,
-            image: parenting,
+            image: CourseImage,
             price: 'Free',
         },
     ],

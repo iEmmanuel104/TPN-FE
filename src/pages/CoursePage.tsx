@@ -74,7 +74,7 @@ const CoursePage: React.FC = () => {
                 </Breadcrumb>
 
                 <div className="bg-[#333333] text-white w-full py-24">
-                    <div className="container mx-auto px-4">
+                    <div className="container mx-auto px-12">
                         <Row gutter={24}>
                             <Col xs={24} lg={16}>
                                 <Title level={2} className="text-white mb-12" style={{ color: 'white' }}>
@@ -110,7 +110,7 @@ const CoursePage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="container mx-auto px-4 py-12 relative">
+                <div className="container mx-auto px-12 py-12 relative">
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
                             <div ref={overviewRef}>
@@ -269,11 +269,13 @@ const CoursePage: React.FC = () => {
                 </div>
 
                 <div className="py-12" ref={youMayLikeRef}>
-                    <div className="container mx-auto px-4">
+                    <div className="container mx-auto px-12">
                         <Title level={3} className="mb-6">
                             YOU MAY LIKE
                         </Title>
-                        <CourseFrame courses={courseData.relatedCourses} />
+                        <Row gutter={[24, 24]} className="max-w-4xl mx-auto">
+                            <CourseFrame courses={courseData.relatedCourses} columns={3} />
+                        </Row>
                     </div>
                 </div>
             </div>

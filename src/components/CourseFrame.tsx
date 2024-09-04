@@ -15,9 +15,10 @@ interface Course {
 
 interface CourseFrameProps {
     courses: Course[];
+    columns?: 3 | 4;
 }
 
-const CourseFrame: React.FC<CourseFrameProps> = ({ courses }) => {
+const CourseFrame: React.FC<CourseFrameProps> = ({ courses, columns = 4 }) => {
     const carouselRef = useRef<CarouselRef>(null);
     const navigate = useNavigate();
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -37,9 +38,11 @@ const CourseFrame: React.FC<CourseFrameProps> = ({ courses }) => {
         setCurrentSlide(current);
     };
 
+    const gridColumns = columns === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
+
     return (
         <>
-            <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">{courseCards}</div>
+            <div className={`hidden sm:grid sm:grid-cols-2 md:grid-cols-3 ${gridColumns} gap-6`}>{courseCards}</div>
             <div className="sm:hidden">
                 <Carousel ref={carouselRef} afterChange={handleSlideChange}>
                     {courseCards}
