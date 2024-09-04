@@ -1,5 +1,5 @@
-import React from 'react';
-import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu } from 'antd';
 import {
     UserOutlined,
     BookOutlined,
@@ -12,73 +12,34 @@ import {
     YoutubeOutlined,
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
+import { courseData } from '../constants/courseData';
 
 const { Title, Text, Paragraph } = Typography;
 
-import parenting from '../assets/parenting.jpeg';
-import Instructor from '../assets/man.jpg';
-import CourseImage from '../assets/hero2.jpg';
-
 const CoursePage: React.FC = () => {
-    const courseData = {
-        title: 'Prenatal Yoga',
-        description: 'Build and deploy a few Nodejs, MongoDB & Expressjs apps while watching to lectures by the author of 9 books on JS/Node.',
-        instructor: {
-            name: 'Keny White',
-            avatar: Instructor,
-            role: 'Professor',
-            bio: 'Lorem ipsum dolor sit amet, Qui incidunt dolores non similique ducimus et debitis mollitiae. Et autem quia eum reprehenderit voluptates est reprehenderi illo est enim perferendis est neque sunt. Nam amet sunt aut vero.',
-        },
-        categories: ['Health & Fitness', 'Language'],
-        rating: 0,
-        price: 'Free',
-        features: {
-            lectures: 0,
-            quizzes: 0,
-            duration: '33 hours',
-            skillLevel: 'All levels',
-            language: 'English',
-            students: 79,
-            assessments: 'Yes',
-        },
-        image: CourseImage,
-        outcomes: [
-            'Over 37 lectures and 55.5 hours of content!',
-            'LIVE PROJECT End to End Software Testing Training included.',
-            'Learn Software Testing and Automation basics from a professional trainer from your own desk.',
-            'Information packed practical training starting from basics to advanced testing techniques.',
-            'Best suitable for beginners to advanced level users and who learn faster when demonstrated.',
-            'Course content designed by considering current software testing technology and the job market.',
-            'Practical assignments at the end of every session.',
-            'Practical learning experience with live project work and examples.',
-        ],
-        relatedCourses: [
-            {
-                title: 'Introduction LearnPress – LMS Plugin',
-                instructor: { name: 'Keny White', avatar: Instructor },
-                lessons: 6,
-                students: 412,
-                image: parenting,
-                price: 'Free',
-            },
-            {
-                title: 'Introduction LearnPress – LMS Plugin',
-                instructor: { name: 'Keny White', avatar: Instructor },
-                lessons: 6,
-                students: 412,
-                image: parenting,
-                price: 'Free',
-            },
-            {
-                title: 'Introduction LearnPress – LMS Plugin',
-                instructor: { name: 'Keny White', avatar: Instructor },
-                lessons: 6,
-                students: 412,
-                image: parenting,
-                price: 'Free',
-            },
-        ],
+    const [activeSection, setActiveSection] = useState('overview');
+
+    const scrollToSection = (sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
     };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const sections = ['overview', 'curriculum', 'instructor', 'reviews'];
+            for (const section of sections) {
+                const element = document.getElementById(section);
+                if (element && window.scrollY >= element.offsetTop - 100) {
+                    setActiveSection(section);
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <PublicLayout>
@@ -121,10 +82,27 @@ const CoursePage: React.FC = () => {
                     </div>
                 </div>
 
+                <Affix offsetTop={0}>
+                    <Menu mode="horizontal" selectedKeys={[activeSection]} className="border-b">
+                        <Menu.Item key="overview" onClick={() => scrollToSection('overview')}>
+                            Overview
+                        </Menu.Item>
+                        <Menu.Item key="curriculum" onClick={() => scrollToSection('curriculum')}>
+                            Curriculum
+                        </Menu.Item>
+                        <Menu.Item key="instructor" onClick={() => scrollToSection('instructor')}>
+                            Instructor
+                        </Menu.Item>
+                        <Menu.Item key="reviews" onClick={() => scrollToSection('reviews')}>
+                            Reviews
+                        </Menu.Item>
+                    </Menu>
+                </Affix>
+
                 <div className="container mx-auto px-4 py-12 relative">
                     <Row gutter={24}>
                         <Col xs={24} lg={16}>
-                            <Card title="OVERVIEW" className="mb-8 shadow-none border">
+                            <Card id="overview" title="OVERVIEW" className="mb-8 shadow-none border">
                                 <Title level={4}>Course Description</Title>
                                 <Paragraph>{courseData.description}</Paragraph>
                                 <Title level={4}>Certification</Title>
@@ -137,11 +115,11 @@ const CoursePage: React.FC = () => {
                                 </ul>
                             </Card>
 
-                            <Card title="CURRICULUM" className="mb-8 shadow-none border">
+                            <Card id="curriculum" title="CURRICULUM" className="mb-8 shadow-none border">
                                 <Paragraph>The curriculum is empty</Paragraph>
                             </Card>
 
-                            <Card title="INSTRUCTOR" className="mb-8 shadow-none border">
+                            <Card id="instructor" title="INSTRUCTOR" className="mb-8 shadow-none border">
                                 <div className="flex items-start">
                                     <Avatar size={64} src={courseData.instructor.avatar} icon={<UserOutlined />} />
                                     <div className="ml-4">
@@ -157,7 +135,7 @@ const CoursePage: React.FC = () => {
                                 </div>
                             </Card>
 
-                            <Card title="REVIEWS" className="mb-8 shadow-none border">
+                            <Card id="reviews" title="REVIEWS" className="mb-8 shadow-none border">
                                 <Row gutter={24}>
                                     <Col span={8}>
                                         <div className="text-center">
@@ -182,75 +160,98 @@ const CoursePage: React.FC = () => {
                             </Card>
                         </Col>
 
-                        <Col xs={24} lg={8}>
-                            <Affix offsetTop={20}>
-                                <Card className="mb-8 shadow-none border">
+                        <Col xs={24} lg={8} className="relative" style={{ marginTop: '-120px' }}>
+                            <Affix offsetTop={80}>
+                                <Card className="shadow-md border-0" style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}>
                                     <div className="-mx-6 -mt-6 mb-6">
                                         <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover" />
                                     </div>
-                                    <Text className="block text-2xl font-bold mt-4">{courseData.price}</Text>
-                                    <Button type="primary" block size="large" className="mt-4 bg-purple-600 hover:bg-purple-700 border-none">
+                                    <Text className="block text-3xl font-bold mt-4">{courseData.price}</Text>
+                                    <Button
+                                        type="primary"
+                                        block
+                                        size="large"
+                                        className="mt-6 bg-purple-600 hover:bg-purple-700 border-none h-12 text-lg"
+                                    >
                                         START NOW
                                     </Button>
-                                    <Title level={4} className="mt-6">
+                                    <Title level={4} className="mt-8 mb-4">
                                         Course Features
                                     </Title>
-                                    <ul className="space-y-2">
-                                        <li>
-                                            <BookOutlined className="mr-2" /> Lectures: {courseData.features.lectures}
+                                    <ul className="space-y-3">
+                                        <li className="flex items-center">
+                                            <BookOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Lectures</span>
+                                            <span className="font-semibold">{courseData.features.lectures}</span>
                                         </li>
-                                        <li>
-                                            <FileTextOutlined className="mr-2" /> Quizzes: {courseData.features.quizzes}
+                                        <li className="flex items-center">
+                                            <FileTextOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Quizzes</span>
+                                            <span className="font-semibold">{courseData.features.quizzes}</span>
                                         </li>
-                                        <li>
-                                            <ClockCircleOutlined className="mr-2" /> Duration: {courseData.features.duration}
+                                        <li className="flex items-center">
+                                            <ClockCircleOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Duration</span>
+                                            <span className="font-semibold">{courseData.features.duration}</span>
                                         </li>
-                                        <li>
-                                            <UserOutlined className="mr-2" /> Skill level: {courseData.features.skillLevel}
+                                        <li className="flex items-center">
+                                            <UserOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Skill level</span>
+                                            <span className="font-semibold">{courseData.features.skillLevel}</span>
                                         </li>
-                                        <li>
-                                            <GlobalOutlined className="mr-2" /> Language: {courseData.features.language}
+                                        <li className="flex items-center">
+                                            <GlobalOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Language</span>
+                                            <span className="font-semibold">{courseData.features.language}</span>
                                         </li>
-                                        <li>
-                                            <TeamOutlined className="mr-2" /> Students: {courseData.features.students}
+                                        <li className="flex items-center">
+                                            <TeamOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Students</span>
+                                            <span className="font-semibold">{courseData.features.students}</span>
                                         </li>
-                                        <li>
-                                            <FileTextOutlined className="mr-2" /> Assessments: {courseData.features.assessments}
+                                        <li className="flex items-center">
+                                            <FileTextOutlined className="mr-3 text-gray-500" />
+                                            <span className="flex-grow">Assessments</span>
+                                            <span className="font-semibold">{courseData.features.assessments}</span>
                                         </li>
                                     </ul>
                                 </Card>
                             </Affix>
                         </Col>
                     </Row>
+                </div>
 
-                    <Title level={3} className="mt-12 mb-6">
-                        YOU MAY LIKE
-                    </Title>
-                    <Row gutter={[24, 24]}>
-                        {courseData.relatedCourses.map((course, index) => (
-                            <Col xs={24} sm={12} md={8} key={index}>
-                                <Card
-                                    cover={<img alt={course.title} src={course.image} className="h-48 object-cover" />}
-                                    actions={[
-                                        <span>
-                                            <BookOutlined /> {course.lessons}
-                                        </span>,
-                                        <span>
-                                            <TeamOutlined /> {course.students}
-                                        </span>,
-                                        <span className={course.price === 'Free' ? 'text-green-500' : 'text-red-500'}>{course.price}</span>,
-                                    ]}
-                                    className="shadow-none border"
-                                >
-                                    <Card.Meta
-                                        avatar={<Avatar src={course.instructor.avatar} />}
-                                        title={course.title}
-                                        description={<Text>{course.instructor.name}</Text>}
-                                    />
-                                </Card>
-                            </Col>
-                        ))}
-                    </Row>
+                <div className="bg-gray-100 py-12">
+                    <div className="container mx-auto px-4">
+                        <Title level={3} className="mb-6">
+                            YOU MAY LIKE
+                        </Title>
+                        <Row gutter={[24, 24]}>
+                            {courseData.relatedCourses.map((course, index) => (
+                                <Col xs={24} sm={12} md={8} key={index}>
+                                    <Card
+                                        cover={<img alt={course.title} src={course.image} className="h-48 object-cover" />}
+                                        actions={[
+                                            <span>
+                                                <BookOutlined /> {course.lessons}
+                                            </span>,
+                                            <span>
+                                                <TeamOutlined /> {course.students}
+                                            </span>,
+                                            <span className={course.price === 'Free' ? 'text-green-500' : 'text-blue-500'}>{course.price}</span>,
+                                        ]}
+                                        className="shadow-sm hover:shadow-md transition-shadow duration-300"
+                                    >
+                                        <Card.Meta
+                                            avatar={<Avatar src={course.instructor.avatar} />}
+                                            title={course.title}
+                                            description={<Text>{course.instructor.name}</Text>}
+                                        />
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                    </div>
                 </div>
             </div>
         </PublicLayout>
