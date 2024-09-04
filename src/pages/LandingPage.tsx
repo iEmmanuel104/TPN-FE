@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { Typography, Button, Card, Rate, Row, Col, Avatar, List, Carousel } from 'antd';
+import { Typography, Button, Card, Row, Col, Avatar, List, Carousel } from 'antd';
 import { motion } from 'framer-motion';
-import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined, StarFilled } from '@ant-design/icons';
+import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { CarouselRef } from 'antd/lib/carousel';
 
@@ -11,9 +11,9 @@ import Faq from '../components/Faq';
 
 import backgroundImage from '../assets/schoolwork.jpg';
 import parenting from '../assets/parenting.jpeg';
-import angermanage from '../assets/angermanage.jpg';
-import domestic from '../assets/domesticviolence.jpeg';
 import umbrella from '../assets/umbrella.jpeg';
+import Instructor from '../assets/man.jpg'
+import CourseCard from '../components/CourseCard';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -126,22 +126,45 @@ const PopularCoursesSection: React.FC<{ navigate: (path: string) => void }> = ({
         return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
-    const courseCards = [parenting, angermanage, domestic, domestic].map((image, index) => (
+    const courses = [
+        {
+            title: 'Introduction LearnPress – LMS Plugin',
+            instructor: { name: 'Keny White', avatar: Instructor },
+            lessons: 6,
+            students: 412,
+            image: parenting,
+            price: 'Free',
+        },
+        {
+            title: 'Introduction LearnPress – LMS Plugin',
+            instructor: { name: 'Keny White', avatar: Instructor },
+            lessons: 6,
+            students: 412,
+            image: parenting,
+            price: 'Free',
+        },
+        {
+            title: 'Introduction LearnPress – LMS Plugin',
+            instructor: { name: 'Keny White', avatar: Instructor },
+            lessons: 6,
+            students: 412,
+            image: parenting,
+            price: 'Free',
+        },
+        {
+            title: 'Introduction LearnPress – LMS Plugin',
+            instructor: { name: 'Keny White', avatar: Instructor },
+            lessons: 6,
+            students: 412,
+            image: parenting,
+            price: 'Free',
+        },
+        // Add more course objects here...
+    ];
+
+    const courseCards = courses.map((course, index) => (
         <div key={index} className="px-2">
-            <Card hoverable cover={<img alt="course" src={image} className="h-48 object-cover" />} onClick={() => navigate('/coursedetails')}>
-                <Card.Meta
-                    title="Course Title"
-                    description={
-                        <>
-                            <p className="text-sm text-gray-600">by Andrew Iwe</p>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-sm text-blue-600">8 lectures</span>
-                                <Rate disabled defaultValue={4} character={<StarFilled />} />
-                            </div>
-                        </>
-                    }
-                />
-            </Card>
+            <CourseCard {...course} onClick={() => navigate('/coursedetails')} />
         </div>
     ));
 
