@@ -108,7 +108,7 @@ export const courseApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Course'],
         }),
-        getAllCourses: builder.query<ApiResponse<{ courses: CourseDto[] }>, GetAllCoursesParams>({
+        getAllCourses: builder.query<ApiResponse<{ courses: CourseDto[], count: number, totalPages: number }>, GetAllCoursesParams>({
             query: (params) => {
                 const queryParams = new URLSearchParams();
                 if (params.q) queryParams.append('q', params.q);

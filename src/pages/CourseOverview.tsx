@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Row, Col, Breadcrumb, Select, Input, Drawer, Button, Pagination } from 'antd';
+import { Typography, Row, Col, Breadcrumb, Select, Input, Drawer, Button, Pagination, Radio, RadioChangeEvent } from 'antd';
 import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined, FilterOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import CourseCard from '../components/CourseCard';
@@ -18,13 +18,14 @@ const CourseOverview: React.FC = () => {
     const [selectedLevel, setSelectedLevel] = useState<CourseLevel | undefined>(undefined);
     const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
     const [minRating, setMinRating] = useState<number | undefined>(undefined);
-    const pageSize = 9; // Number of courses per page
+    const pageSize = 12;
 
     const {
         data: coursesData,
         isLoading,
         isError,
         error,
+        refetch,
     } = useGetAllCoursesQuery({
         q: searchQuery,
         level: selectedLevel,
@@ -37,7 +38,6 @@ const CourseOverview: React.FC = () => {
 
     const handleCourseClick = (courseId: string) => {
         console.log(`Clicked on course: ${courseId}`);
-        // Navigate to course detail page
     };
 
     const handlePageChange = (page: number) => {
@@ -48,20 +48,58 @@ const CourseOverview: React.FC = () => {
         setSearchQuery(e.target.value);
     };
 
-    const handleLevelChange = (value: CourseLevel) => {
-        setSelectedLevel(value);
+    const handleLevelChange = (e: RadioChangeEvent) => {
+        const value = e.target.value;
+        setSelectedLevel(value as CourseLevel);
     };
 
     const handleCategoryChange = (checkedValues: string[]) => {
         setSelectedCategory(checkedValues);
     };
 
-    const handleMinRatingChange = (value: number) => {
+    const handleMinRatingChange = (e: RadioChangeEvent) => {
+        const value = parseInt(e.target.value, 10);
         setMinRating(value);
+    };
+
+    const applyFilters = () => {
+        setIsFilterDrawerVisible(false);
+        setCurrentPage(1);
+        refetch();
+    };
+
+    const resetFilters = () => {
+        setSelectedLevel(undefined);
+        setSelectedCategory([]);
+        setMinRating(undefined);
+        setSearchQuery('');
+        setCurrentPage(1);
+        refetch();
     };
 
     const FilterContent = () => (
         <div>
+            <Title level={3} className="mb-4">
+                Level
+            </Title>
+            <Radio.Group onChange={handleLevelChange} value={selectedLevel} className="mb-6">
+                <Radio.Button value={CourseLevel.Beginner}>Beginner</Radio.Button>
+                <Radio.Button value={CourseLevel.Intermediate}>Intermediate</Radio.Button>
+                <Radio.Button value={CourseLevel.Advanced}>Advanced</Radio.Button>
+                <Radio.Button value={CourseLevel.AllLevels}>All Levels</Radio.Button>
+            </Radio.Group>
+
+            <Title level={3} className="mb-4">
+                Minimum Rating
+            </Title>
+            <Radio.Group onChange={handleMinRatingChange} value={minRating} className="mb-6">
+                <Radio.Button value={1}>1★</Radio.Button>
+                <Radio.Button value={2}>2★</Radio.Button>
+                <Radio.Button value={3}>3★</Radio.Button>
+                <Radio.Button value={4}>4★</Radio.Button>
+                <Radio.Button value={5}>5★</Radio.Button>
+            </Radio.Group>
+
             <Title level={3} className="mb-4">
                 Categories
             </Title>
@@ -81,42 +119,22 @@ const CourseOverview: React.FC = () => {
                 </div>
             ))}
 
-            <Title level={3} className="mt-8 mb-4">
-                Level
-            </Title>
-            <Select style={{ width: '60%' }} onChange={handleLevelChange} value={selectedLevel}>
-                <Option value={CourseLevel.Beginner}>Beginner</Option>
-                <Option value={CourseLevel.Intermediate}>Intermediate</Option>
-                <Option value={CourseLevel.Advanced}>Advanced</Option>
-                <Option value={CourseLevel.AllLevels}>All Levels</Option>
-            </Select>
-
-            <Title level={3} className="mt-8 mb-4">
-                Minimum Rating
-            </Title>
-            <Select style={{ width: '60%' }} onChange={handleMinRatingChange} value={minRating}>
-                <Option value={1}>1 star</Option>
-                <Option value={2}>2 stars</Option>
-                <Option value={3}>3 stars</Option>
-                <Option value={4}>4 stars</Option>
-                <Option value={5}>5 stars</Option>
-            </Select>
-
-            <button className="bg-purple-600 text-white px-4 py-2 rounded mt-4" onClick={() => setIsFilterDrawerVisible(false)}>
-                APPLY FILTERS
-            </button>
+            <div className="flex flex-col mt-8 space-y-2">
+                <Button className="bg-purple-600 text-white hover:bg-purple-700 w-full md:w-2/3 lg:w-1/2" onClick={applyFilters}>
+                    APPLY FILTERS
+                </Button>
+                <Button className="border-purple-600 text-purple-600 hover:bg-purple-100 w-full md:w-2/3 lg:w-1/2" onClick={resetFilters}>
+                    RESET FILTERS
+                </Button>
+            </div>
         </div>
     );
 
-    if (isLoading) {
-        return <div>Loading courses...</div>;
-    }
-
-    if (isError) {
-        return <div>Error loading courses: {error.toString()}</div>;
-    }
+    if (isLoading) return <div>Loading courses...</div>;
+    if (isError) return <div>Error loading courses: {error.toString()}</div>;
 
     const courses = coursesData?.data?.courses || [];
+    const count = coursesData?.data?.count || 0;
 
     return (
         <PublicLayout>
@@ -138,7 +156,7 @@ const CourseOverview: React.FC = () => {
                     <Col xs={24} md={18}>
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
                             <div className="flex items-center">
-                                <Button icon={<FilterOutlined />} onClick={() => setIsFilterDrawerVisible(true)} className="mr-2 sm:hidden">
+                                <Button icon={<FilterOutlined />} onClick={() => setIsFilterDrawerVisible(true)} className="mr-2 md:hidden">
                                     Filter
                                 </Button>
                                 <Button
@@ -152,10 +170,7 @@ const CourseOverview: React.FC = () => {
                                     onClick={() => setIsListView(true)}
                                     type={isListView ? 'primary' : 'default'}
                                 />
-                                <Text className="ml-4 hidden sm:inline">
-                                    Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize)}
-                                    results
-                                </Text>
+                                <Text className="ml-4 hidden sm:inline">Showing {count} courses result</Text>
                             </div>
                             <div className="flex items-center w-full sm:w-auto">
                                 <Select defaultValue="newest" style={{ width: 150 }} className="mr-4 w-full sm:w-auto">
@@ -177,21 +192,23 @@ const CourseOverview: React.FC = () => {
                         {isListView ? (
                             <div>
                                 {courses.map((course) => (
-                                    <CourseCard key={course.id} {...course} onClick={handleCourseClick} isList={isListView} />
+                                    <CourseCard key={course.id} {...course} onClick={() => handleCourseClick(course.id)} isList={true} />
                                 ))}
                             </div>
                         ) : (
                             <Row gutter={[16, 16]}>
                                 {courses.map((course) => (
-                                    <CourseCard key={course.id} {...course} onClick={handleCourseClick} isList={isListView} />
+                                    <Col xs={24} sm={12} md={8} lg={6} key={course.id}>
+                                        <CourseCard {...course} onClick={() => handleCourseClick(course.id)} />
+                                    </Col>
                                 ))}
                             </Row>
                         )}
 
-                        {/* Pagination */}
                         <div className="mt-8 flex justify-center">
                             <Pagination
                                 current={currentPage}
+                                total={count}
                                 pageSize={pageSize}
                                 onChange={handlePageChange}
                                 showSizeChanger={false}
@@ -208,6 +225,7 @@ const CourseOverview: React.FC = () => {
                 closable={true}
                 onClose={() => setIsFilterDrawerVisible(false)}
                 visible={isFilterDrawerVisible}
+                width={300}
             >
                 <FilterContent />
             </Drawer>
