@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer } from 'antd';
+import { useParams } from 'react-router-dom';
+import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List, Progress } from 'antd';
 import {
     UserOutlined,
     BookOutlined,
@@ -9,14 +10,21 @@ import {
     FileTextOutlined,
     TwitterOutlined,
     LinkedinOutlined,
+    PlayCircleOutlined,
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
-import { courseData } from '../constants/courseData';
 import CourseFrame from '../components/CourseFrame';
+import { useGetSingleCourseInfoQuery } from '../api/courseApi';
+import VideoPlayer from '../components/VideoPlayer';
+import { formatVideoLength } from '../utils/formatVideoLength';
+const { Panel } = Collapse;
 
 const { Title, Text, Paragraph } = Typography;
 
 const CoursePage: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const { data: courseData, isLoading, isError } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
+
     const [activeSection, setActiveSection] = useState('overview');
     const [showBottomNav, setShowBottomNav] = useState(false);
     const [affixBottom, setAffixBottom] = useState<number | undefined>(undefined);
@@ -69,57 +77,86 @@ const CoursePage: React.FC = () => {
 
     const SectionTitle = ({ title }: { title: string }) => <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200">{title}</h2>;
 
-    const CourseInfo = () => (
-        <Card className="border w-full max-w-sm mx-auto lg:mx-0">
-            <div className="-mx-6 -mt-6 mb-6 border-0">
-                <img src={courseData.image} alt={courseData.title} className="w-full h-48 object-cover" />
-            </div>
-            <Text className="block text-3xl font-bold mt-4">{courseData.price}</Text>
-            <Button type="primary" block size="large" className="mt-6 bg-purple-600 hover:bg-purple-700 border-none h-12 text-lg">
-                START NOW
-            </Button>
-            <Title level={4} className="mt-8 mb-4">
-                Course Features
-            </Title>
-            <ul className="space-y-3">
-                <li className="flex items-center">
-                    <BookOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Lectures</span>
-                    <span className="font-semibold">{courseData.features.lectures}</span>
-                </li>
-                <li className="flex items-center">
-                    <FileTextOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Quizzes</span>
-                    <span className="font-semibold">{courseData.features.quizzes}</span>
-                </li>
-                <li className="flex items-center">
-                    <ClockCircleOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Duration</span>
-                    <span className="font-semibold">{courseData.features.duration}</span>
-                </li>
-                <li className="flex items-center">
-                    <UserOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Skill level</span>
-                    <span className="font-semibold">{courseData.features.skillLevel}</span>
-                </li>
-                <li className="flex items-center">
-                    <GlobalOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Language</span>
-                    <span className="font-semibold">{courseData.features.language}</span>
-                </li>
-                <li className="flex items-center">
-                    <TeamOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Students</span>
-                    <span className="font-semibold">{courseData.features.students}</span>
-                </li>
-                <li className="flex items-center">
-                    <FileTextOutlined className="mr-3 text-gray-500" />
-                    <span className="flex-grow">Assessments</span>
-                    <span className="font-semibold">{courseData.features.assessments}</span>
-                </li>
-            </ul>
-        </Card>
-    );
+    const CourseInfo = () => {
+        if (!courseData) return null;
+        const course = courseData?.data;
+
+        return (
+            <Card className="border w-full max-w-sm mx-auto lg:mx-0">
+                <div className="-mx-6 -mt-6 mb-6 border-0">
+                    <img src={course?.media.videoThumbnail} alt={course?.title} className="w-full h-48 object-cover" />
+                </div>
+                <Text className="block text-3xl font-bold mt-4">{`${course?.currency.symbol}${course?.price}`}</Text>
+                <Button type="primary" block size="large" className="mt-6 bg-purple-600 hover:bg-purple-700 border-none h-12 text-lg">
+                    START NOW
+                </Button>
+                <Title level={4} className="mt-8 mb-4">
+                    Course Features
+                </Title>
+                <ul className="space-y-3">
+                    <li className="flex items-center">
+                        <BookOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Lectures</span>
+                        <span className="font-semibold">{course?.modules.length}</span>
+                    </li>
+                    <li className="flex items-center">
+                        <FileTextOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Assessment</span>
+                        <span className="font-semibold">{course?.assessment?.hasAssessment ? 'Yes' : 'No'}</span>
+                    </li>
+                    <li className="flex items-center">
+                        <ClockCircleOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Duration</span>
+                        <span className="font-semibold">{/* Calculate total duration */}</span>
+                    </li>
+                    <li className="flex items-center">
+                        <UserOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Skill level</span>
+                        <span className="font-semibold">{course?.level}</span>
+                    </li>
+                    <li className="flex items-center">
+                        <GlobalOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Language</span>
+                        <span className="font-semibold">{/* Add language to CourseDto if needed */}</span>
+                    </li>
+                    <li className="flex items-center">
+                        <TeamOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Students</span>
+                        <span className="font-semibold">{course?.stats.numberOfPaidStudents}</span>
+                    </li>
+                    <li className="flex items-center">
+                        <FileTextOutlined className="mr-3 text-gray-500" />
+                        <span className="flex-grow">Assessments</span>
+                        <span className="font-semibold">{course?.assessment.hasAssessment ? 'Yes' : 'No'}</span>
+                    </li>
+                </ul>
+            </Card>
+        );
+    };
+
+    if (isLoading) {
+        return (
+            <PublicLayout>
+                <div className="flex justify-center items-center h-screen">
+                    <Spin size="large" />
+                </div>
+            </PublicLayout>
+        );
+    }
+
+    if (isError || !courseData) {
+        return (
+            <PublicLayout>
+                <div className="flex justify-center items-center h-screen">
+                    <Text>Error loading course data. Please try again later.</Text>
+                </div>
+            </PublicLayout>
+        );
+    }
+    
+    const course = courseData?.data;
+
+    const totalDuration = course?.modules.reduce((acc, module) => acc + (module.videoInfo?.length || 0), 0);
 
     return (
         <PublicLayout>
@@ -127,7 +164,7 @@ const CoursePage: React.FC = () => {
                 <Breadcrumb className="container mx-auto px-4 py-4">
                     <Breadcrumb.Item>Home</Breadcrumb.Item>
                     <Breadcrumb.Item>Courses</Breadcrumb.Item>
-                    <Breadcrumb.Item>Language</Breadcrumb.Item>
+                    <Breadcrumb.Item>{course?.category[0] ?? ''}</Breadcrumb.Item>
                 </Breadcrumb>
 
                 <div className="bg-[#333333] text-white w-full py-12 lg:py-24">
@@ -135,28 +172,28 @@ const CoursePage: React.FC = () => {
                         <Row gutter={24} align="middle">
                             <Col xs={24} lg={16}>
                                 <Title level={2} className="text-white mb-6 lg:mb-12" style={{ color: 'white' }}>
-                                    {courseData.title}
+                                    {course?.title}
                                 </Title>
-                                <Paragraph className="text-gray-300 mb-8">{courseData.description}</Paragraph>
+                                <Paragraph className="text-gray-300 mb-8">{course?.description}</Paragraph>
                                 <div className="flex flex-wrap items-center mt-8">
                                     <div className="flex items-center mr-8 mb-4">
-                                        <Avatar size={48} src={courseData.instructor.avatar} icon={<UserOutlined />} />
+                                        <Avatar size={48} src={course?.instructor.info.profilePictureUrl} icon={<UserOutlined />} />
                                         <div className="ml-4">
                                             <Text className="text-gray-400">Teacher</Text>
-                                            <Text className="text-white block">{courseData.instructor.name}</Text>
+                                            <Text className="text-white block">{course?.instructor.name}</Text>
                                         </div>
                                     </div>
                                     <Divider type="vertical" className="h-12 bg-gray-600 mx-4 hidden lg:block" />
                                     <div className="flex flex-col mr-8 mb-4">
                                         <Text className="text-gray-400">Categories</Text>
-                                        <Text className="text-white">{courseData.categories.join(', ')}</Text>
+                                        <Text className="text-white">{course?.category.join(', ')}</Text>
                                     </div>
                                     <Divider type="vertical" className="h-12 bg-gray-600 mx-4 hidden lg:block" />
                                     <div className="flex flex-col mb-4">
                                         <Text className="text-gray-400">Review</Text>
                                         <Rate
                                             disabled
-                                            defaultValue={courseData.rating}
+                                            defaultValue={course?.stats.overallRating}
                                             className="text-2xl"
                                             character={() => <span className="text-yellow-400">&#9734;</span>}
                                         />
@@ -185,41 +222,110 @@ const CoursePage: React.FC = () => {
                                 <Card id="overview" className="mb-8">
                                     <SectionTitle title="OVERVIEW" />
                                     <h3 className="text-lg font-semibold mb-2">Course Description</h3>
-                                    <Paragraph>{courseData.description}</Paragraph>
-                                    <h3 className="text-lg font-semibold mb-2">Certification</h3>
-                                    <Paragraph>{courseData.description}</Paragraph>
+                                    <Paragraph>{course?.description}</Paragraph>
                                     <h3 className="text-lg font-semibold mb-2">Learning Outcomes</h3>
                                     <ul className="list-disc pl-5 text-gray-600">
-                                        {courseData.outcomes.map((outcome, index) => (
-                                            <li key={index}>{outcome}</li>
-                                        ))}
+                                        {course?.learningOutcome.map((outcome, index) => <li key={index}>{outcome}</li>)}
                                     </ul>
                                 </Card>
                             </div>
 
                             <Card id="curriculum" className="mb-8">
                                 <SectionTitle title="CURRICULUM" />
-                                <Paragraph>The curriculum is empty</Paragraph>
+                                <Row gutter={16}>
+                                    <Col span={16}>
+                                        <Card>
+                                            <Collapse accordion className="mb-4">
+                                                {course?.modules
+                                                    .slice()
+                                                    .sort((a, b) => a.episodeNumber - b.episodeNumber)
+                                                    .map((module) => (
+                                                        <Panel
+                                                            header={
+                                                                <div className="flex justify-between items-center">
+                                                                    <Text strong>{`Module ${module.episodeNumber}: ${module.title}`}</Text>
+                                                                    <Text className="text-gray-500">
+                                                                        {formatVideoLength(module.videoInfo?.length || 0)}
+                                                                    </Text>
+                                                                </div>
+                                                            }
+                                                            key={module.id}
+                                                        >
+                                                            <Paragraph className="text-sm mb-2">{module.description}</Paragraph>
+                                                            <VideoPlayer
+                                                                url={module.url}
+                                                                videoId={module.id}
+                                                                frames={module.frames}
+                                                                className="mb-4"
+                                                            />
+                                                            <List
+                                                                size="small"
+                                                                dataSource={[
+                                                                    {
+                                                                        icon: <PlayCircleOutlined />,
+                                                                        text: 'Video Lecture',
+                                                                        duration: formatVideoLength(module.videoInfo?.length || 0),
+                                                                    },
+                                                                    {
+                                                                        icon: <FileTextOutlined />,
+                                                                        text: 'Reading Material',
+                                                                        duration: '10 mins',
+                                                                    },
+                                                                ]}
+                                                                renderItem={(item) => (
+                                                                    <List.Item>
+                                                                        <List.Item.Meta
+                                                                            avatar={item.icon}
+                                                                            title={item.text}
+                                                                            description={item.duration}
+                                                                        />
+                                                                    </List.Item>
+                                                                )}
+                                                            />
+                                                        </Panel>
+                                                    ))}
+                                            </Collapse>
+                                        </Card>
+                                    </Col>
+                                    <Col span={8}>
+                                        <Card>
+                                            <Title level={5}>Course Overview</Title>
+                                            <Progress percent={30} status="active" />
+                                            <Text className="block mt-1 text-xs">
+                                                {course?.modules.length} modules • {formatVideoLength(totalDuration ?? 0)}
+                                            </Text>
+                                            <Divider />
+                                            <Title level={5}>Learning Outcomes</Title>
+                                            <ul className="list-disc list-inside">
+                                                {course?.learningOutcome.map((outcome, index) => (
+                                                    <li key={index} className="text-xs mb-1">
+                                                        {outcome}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </Card>
+                                    </Col>
+                                </Row>
                             </Card>
 
                             <Card id="instructor" className="mb-8">
                                 <SectionTitle title="INSTRUCTOR" />
                                 <div className="flex flex-col md:flex-row items-start">
                                     <img
-                                        src={courseData.instructor.avatar}
-                                        alt={courseData.instructor.name}
+                                        src={course?.instructor.info.profilePictureUrl}
+                                        alt={course?.instructor.name}
                                         className="w-16 h-16 rounded-full object-cover mr-4 mb-4 md:mb-0"
                                     />
                                     <div>
                                         <Title level={4} className="mb-0">
-                                            {courseData.instructor.name}
+                                            {course?.instructor.name}
                                         </Title>
-                                        <Text type="secondary">{courseData.instructor.role}</Text>
+                                        {/* <Text type="secondary">{course?.instructor.info.title}</Text> */}
                                         <div className="mt-2 mb-2">
                                             <TwitterOutlined className="mr-2 text-blue-400" />
                                             <LinkedinOutlined className="text-blue-800" />
                                         </div>
-                                        <Paragraph className="text-gray-600">{courseData.instructor.bio}</Paragraph>
+                                        <Paragraph className="text-gray-600">{course?.instructor.bio}</Paragraph>
                                     </div>
                                 </div>
                             </Card>
@@ -242,16 +348,16 @@ const CoursePage: React.FC = () => {
                                     <Col xs={24} md={8}>
                                         <div className="border p-4 h-full flex flex-col justify-center items-center">
                                             <Title level={1} className="mb-0 text-6xl">
-                                                0
+                                                {course?.stats.overallRating.toFixed(1)}
                                             </Title>
                                             <Rate
                                                 disabled
-                                                defaultValue={0}
+                                                defaultValue={course?.stats.overallRating}
                                                 className="text-2xl my-2"
                                                 character={() => <span className="text-yellow-400">&#9734;</span>}
                                             />
                                             <Text type="secondary" className="block mt-2">
-                                                0 rating
+                                                {course?.stats.ratingCount} ratings
                                             </Text>
                                         </div>
                                     </Col>
@@ -261,9 +367,21 @@ const CoursePage: React.FC = () => {
                                                 <div key={star} className="flex items-center mb-4">
                                                     <Text className="mr-2 w-4">{star}</Text>
                                                     <div className="w-full bg-gray-200 h-6 flex-grow">
-                                                        <div className="bg-yellow-400 h-6 w-0"></div>
+                                                        <div
+                                                            className="bg-yellow-400 h-6"
+                                                            style={{
+                                                                width: `${((course?.reviews?.filter((review) => Math.round(review.rating) === star).length ?? 0) / (course?.stats?.ratingCount ?? 1)) * 100}%`,
+                                                            }}
+                                                        ></div>
                                                     </div>
-                                                    <Text className="ml-2 w-8 text-right">0%</Text>
+                                                    <Text className="ml-2 w-8 text-right">
+                                                        {(
+                                                            ((course?.reviews?.filter((review) => Math.round(review.rating) === star).length ?? 0) /
+                                                                (course?.stats?.ratingCount ?? 1)) *
+                                                            100
+                                                        ).toFixed(0)}
+                                                        %
+                                                    </Text>
                                                 </div>
                                             ))}
                                         </div>
@@ -288,7 +406,7 @@ const CoursePage: React.FC = () => {
                             <Title level={3} className="mb-6">
                                 Similar Courses
                             </Title>
-                            <CourseFrame courses={courseData.relatedCourses} columns={3} />
+                            <CourseFrame courses={[]} columns={3} />
                         </Col>
                     </Row>
                 </div>

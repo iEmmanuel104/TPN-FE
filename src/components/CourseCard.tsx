@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Card, Typography, Avatar, Rate, Divider } from 'antd';
 import { UserOutlined, StarOutlined, FileTextOutlined } from '@ant-design/icons';
 import { CourseDto } from '../api/courseApi';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
 interface CourseCardProps extends CourseDto {
-    onClick: (id: string) => void;
     isList?: boolean;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, price, currency, instructor, stats, onClick, isList = false }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, price, currency, instructor, stats, isList = false }) => {
     const [truncateLength, setTruncateLength] = useState(45);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleResize = () => {
@@ -38,10 +39,14 @@ const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, 
         return desc.length > maxLength ? `${desc.substring(0, maxLength)}...` : desc;
     };
 
+    const handleClick = () => {
+        navigate(`/course/${id}`);
+    };
+
     if (isList) {
         return (
             <div
-                onClick={() => onClick(id)}
+                onClick={handleClick}
                 className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 hover:bg-gray-50 cursor-pointer border-b w-full"
             >
                 <div className="w-full sm:w-64 h-40 flex-shrink-0">
@@ -93,7 +98,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, 
                     <img alt={title} src={media.videoThumbnail} className="h-40 w-full object-cover" />
                 </div>
             }
-            onClick={() => onClick(id)}
+            onClick={handleClick}
             bodyStyle={{ padding: '12px', display: 'flex', flexDirection: 'column', height: 'calc(100% - 160px)' }}
         >
             <div className="flex-grow flex flex-col">

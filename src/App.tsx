@@ -43,7 +43,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/courses" element={<CourseOverView />} />
-                        <Route path="/course" element={<CoursePage />} />
+                        <Route path="/course/:id" element={<CoursePage />} />
                         <Route path="/events" element={<EventsPage />} />
 
                         {/* Admin Routes */}

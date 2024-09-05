@@ -1,36 +1,21 @@
 import React, { useRef, useState } from 'react';
 import { Carousel } from 'antd';
 import { CarouselRef } from 'antd/lib/carousel';
-import { useNavigate } from 'react-router-dom';
 import CourseCard from './CourseCard';
-
-interface Course {
-    title: string;
-    instructor: { name: string; avatar: string };
-    lessons: number;
-    students: number;
-    image: string;
-    price: string;
-}
+import { CourseDto } from '../api/courseApi';
 
 interface CourseFrameProps {
-    courses: Course[];
+    courses: CourseDto[];
     columns?: 3 | 4;
 }
 
 const CourseFrame: React.FC<CourseFrameProps> = ({ courses, columns = 4 }) => {
     const carouselRef = useRef<CarouselRef>(null);
-    const navigate = useNavigate();
     const [currentSlide, setCurrentSlide] = useState(0);
 
-    const handleCourseClick = (courseId: string) => {
-        console.log(courseId);
-        navigate(`/coursedetails/${courseId}`);
-    };
-
     const courseCards = courses.map((course) => (
-        <div key={course.title} className="px-2">
-            <CourseCard {...course} onClick={() => handleCourseClick(course.title)} />
+        <div key={course.id} className="px-2">
+            <CourseCard {...course} />
         </div>
     ));
 
