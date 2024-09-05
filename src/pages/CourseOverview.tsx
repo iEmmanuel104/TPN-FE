@@ -3,84 +3,120 @@ import { Typography, Row, Col, Breadcrumb, Select, Input, Drawer, Button, Pagina
 import { SearchOutlined, AppstoreOutlined, UnorderedListOutlined, FilterOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import CourseCard from '../components/CourseCard';
+import { useGetAllCoursesQuery } from '../api/courseApi';
+import { CourseLevel, CourseStatus } from '../api/courseApi';
+import categories from '../constants/categories.json';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-
-import CourseImage from '../assets/hero2.jpg';
-import Instructor from '../assets/man.jpg';
 
 const CourseOverview: React.FC = () => {
     const [isListView, setIsListView] = useState(false);
     const [isFilterDrawerVisible, setIsFilterDrawerVisible] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedLevel, setSelectedLevel] = useState<CourseLevel | undefined>(undefined);
+    const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+    const [minRating, setMinRating] = useState<number | undefined>(undefined);
     const pageSize = 9; // Number of courses per page
 
-    const singleCourse = {
-        title: 'Introduction LearnPress – LMS Plugin',
-        instructor: { name: 'Keny White', avatar: Instructor },
-        lessons: 6,
-        students: 412,
-        image: CourseImage,
-        description:
-            'This tutorial will introduce you to PHP, a server-side scripting language you can use to make dynamic websites and web applications.',
-        price: 'Free',
-    };
+    const {
+        data: coursesData,
+        isLoading,
+        isError,
+        error,
+    } = useGetAllCoursesQuery({
+        q: searchQuery,
+        level: selectedLevel,
+        category: selectedCategory,
+        minRating: minRating,
+        status: CourseStatus.Published,
+        page: currentPage,
+        size: pageSize,
+    });
 
-    // Create an array of 18 courses (2 pages worth)
-    const allCourses = Array(18).fill(singleCourse);
-
-    const handleCourseClick = (courseTitle: string) => {
-        console.log(`Clicked on course: ${courseTitle}`);
+    const handleCourseClick = (courseId: string) => {
+        console.log(`Clicked on course: ${courseId}`);
+        // Navigate to course detail page
     };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
-    // Get current courses
-    const indexOfLastCourse = currentPage * pageSize;
-    const indexOfFirstCourse = indexOfLastCourse - pageSize;
-    const currentCourses = allCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const handleLevelChange = (value: CourseLevel) => {
+        setSelectedLevel(value);
+    };
+
+    const handleCategoryChange = (checkedValues: string[]) => {
+        setSelectedCategory(checkedValues);
+    };
+
+    const handleMinRatingChange = (value: number) => {
+        setMinRating(value);
+    };
 
     const FilterContent = () => (
         <div>
             <Title level={3} className="mb-4">
                 Categories
             </Title>
-            {['Photography & Video', 'Business', 'Design', 'Language', 'Health & Fitness', 'Marketing', 'Lifestyle', 'IT & Software'].map(
-                (category, index) => (
-                    <div key={index} className="flex items-center mb-2">
-                        <input type="checkbox" id={`category-${index}`} className="mr-2" />
-                        <label htmlFor={`category-${index}`}>{category}</label>
-                    </div>
-                ),
-            )}
+            {categories.slice(0, 10).map((category, index) => (
+                <div key={index} className="flex items-center mb-2">
+                    <input
+                        type="checkbox"
+                        id={`category-${index}`}
+                        className="mr-2"
+                        value={category}
+                        checked={selectedCategory.includes(category)}
+                        onChange={(e) =>
+                            handleCategoryChange(e.target.checked ? [...selectedCategory, category] : selectedCategory.filter((c) => c !== category))
+                        }
+                    />
+                    <label htmlFor={`category-${index}`}>{category}</label>
+                </div>
+            ))}
 
             <Title level={3} className="mt-8 mb-4">
-                Author
+                Level
             </Title>
-            <div className="flex items-center mb-2">
-                <input type="checkbox" id="author-keny" className="mr-2" />
-                <label htmlFor="author-keny">Keny White (18)</label>
-            </div>
+            <Select style={{ width: '60%' }} onChange={handleLevelChange} value={selectedLevel}>
+                <Option value={CourseLevel.Beginner}>Beginner</Option>
+                <Option value={CourseLevel.Intermediate}>Intermediate</Option>
+                <Option value={CourseLevel.Advanced}>Advanced</Option>
+                <Option value={CourseLevel.AllLevels}>All Levels</Option>
+            </Select>
 
             <Title level={3} className="mt-8 mb-4">
-                Price
+                Minimum Rating
             </Title>
-            <div className="flex items-center mb-2">
-                <input type="checkbox" id="price-free" className="mr-2" />
-                <label htmlFor="price-free">Free (6)</label>
-            </div>
-            <div className="flex items-center mb-2">
-                <input type="checkbox" id="price-paid" className="mr-2" />
-                <label htmlFor="price-paid">Paid (12)</label>
-            </div>
+            <Select style={{ width: '60%' }} onChange={handleMinRatingChange} value={minRating}>
+                <Option value={1}>1 star</Option>
+                <Option value={2}>2 stars</Option>
+                <Option value={3}>3 stars</Option>
+                <Option value={4}>4 stars</Option>
+                <Option value={5}>5 stars</Option>
+            </Select>
 
-            <button className="bg-purple-600 text-white px-4 py-2 rounded mt-4 w-full">FILTER</button>
-            <button className="border border-purple-600 text-purple-600 px-4 py-2 rounded mt-2 w-full">RESET</button>
+            <button className="bg-purple-600 text-white px-4 py-2 rounded mt-4" onClick={() => setIsFilterDrawerVisible(false)}>
+                APPLY FILTERS
+            </button>
         </div>
     );
+
+    if (isLoading) {
+        return <div>Loading courses...</div>;
+    }
+
+    if (isError) {
+        return <div>Error loading courses: {error.toString()}</div>;
+    }
+
+    const courses = coursesData?.data?.courses || [];
 
     return (
         <PublicLayout>
@@ -116,7 +152,10 @@ const CourseOverview: React.FC = () => {
                                     onClick={() => setIsListView(true)}
                                     type={isListView ? 'primary' : 'default'}
                                 />
-                                <Text className="ml-4 hidden sm:inline">Showing 1-9 of 18 results</Text>
+                                <Text className="ml-4 hidden sm:inline">
+                                    Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize)}
+                                    results
+                                </Text>
                             </div>
                             <div className="flex items-center w-full sm:w-auto">
                                 <Select defaultValue="newest" style={{ width: 150 }} className="mr-4 w-full sm:w-auto">
@@ -125,22 +164,26 @@ const CourseOverview: React.FC = () => {
                                     <Option value="price-low">Price: Low to High</Option>
                                     <Option value="price-high">Price: High to Low</Option>
                                 </Select>
-                                <Input placeholder="Search our courses" prefix={<SearchOutlined />} className="w-full sm:w-auto" />
+                                <Input
+                                    placeholder="Search our courses"
+                                    prefix={<SearchOutlined />}
+                                    className="w-full sm:w-auto"
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
+                                />
                             </div>
                         </div>
 
                         {isListView ? (
                             <div>
-                                {currentCourses.map((course, index) => (
-                                    <CourseCard key={index} onClick={() => handleCourseClick(course.title)} {...course} isList={true} />
+                                {courses.map((course) => (
+                                    <CourseCard key={course.id} {...course} onClick={handleCourseClick} isList={isListView} />
                                 ))}
                             </div>
                         ) : (
                             <Row gutter={[16, 16]}>
-                                {currentCourses.map((course, index) => (
-                                    <Col xs={24} sm={12} lg={8} key={index}>
-                                        <CourseCard onClick={() => handleCourseClick(course.title)} {...course} />
-                                    </Col>
+                                {courses.map((course) => (
+                                    <CourseCard key={course.id} {...course} onClick={handleCourseClick} isList={isListView} />
                                 ))}
                             </Row>
                         )}
@@ -149,7 +192,6 @@ const CourseOverview: React.FC = () => {
                         <div className="mt-8 flex justify-center">
                             <Pagination
                                 current={currentPage}
-                                total={allCourses.length}
                                 pageSize={pageSize}
                                 onChange={handlePageChange}
                                 showSizeChanger={false}
