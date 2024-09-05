@@ -43,6 +43,19 @@ const CoursePage: React.FC = () => {
         setIsDrawerVisible(false);
     };
 
+    
+    const course = courseData?.data;
+    
+     const reviews = course?.reviews || [];
+     const overallRating = course?.stats?.overallRating || 0;
+     const ratingCount = course?.stats?.ratingCount || 0;
+
+     const calculateRatingPercentage = (star: number) => {
+         if (ratingCount === 0) return 0;
+         const count = reviews.filter((review) => Math.round(review.rating) === star).length;
+         return (count / ratingCount) * 100;
+     };
+
     useEffect(() => {
         const handleScroll = () => {
             const sections = ['overview', 'curriculum', 'instructor', 'reviews'];
@@ -78,6 +91,15 @@ const CoursePage: React.FC = () => {
     }, []);
 
     const SectionTitle = ({ title }: { title: string }) => <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200">{title}</h2>;
+
+    const StarRating = ({ rating }: { rating: number }) => (
+        <Rate
+            disabled
+            defaultValue={rating}
+            className="text-sm"
+            character={({ index }) => <span style={{ color: index < Math.floor(rating) ? '#fadb14' : '#e8e8e8' }}>&#9733;</span>}
+        />
+    );
 
     const CourseInfo = () => {
         if (!courseData) return null;
@@ -155,8 +177,6 @@ const CoursePage: React.FC = () => {
         );
     }
 
-    const course = courseData?.data;
-
     return (
         <PublicLayout>
             <div className="bg-white min-h-screen">
@@ -166,15 +186,15 @@ const CoursePage: React.FC = () => {
                     <Breadcrumb.Item>{course?.category[0] ?? ''}</Breadcrumb.Item>
                 </Breadcrumb>
 
-                <div className="bg-[#333333] text-white w-full py-12 lg:py-24">
+                <div className="bg-[#333333] text-white w-full py-8 lg:py-16">
                     <div className="container mx-auto px-4 lg:px-12">
                         <Row gutter={24} align="middle">
                             <Col xs={24} lg={16}>
-                                <Title level={2} className="text-white mb-6 lg:mb-12" style={{ color: 'white' }}>
+                                <Title level={2} className="text-white mb-4 lg:mb-8" style={{ color: 'white' }}>
                                     {course?.title}
                                 </Title>
-                                <Paragraph className="text-gray-300 mb-8">{course?.description}</Paragraph>
-                                <div className="flex flex-wrap items-center mt-8">
+                                <Paragraph className="text-gray-300 mb-6">{course?.description}</Paragraph>
+                                <div className="flex flex-wrap items-center mt-6">
                                     <div className="flex items-center mr-8 mb-4">
                                         <Avatar size={48} src={course?.instructor.info.profilePictureUrl} icon={<UserOutlined />} />
                                         <div className="ml-4">
@@ -190,12 +210,7 @@ const CoursePage: React.FC = () => {
                                     <Divider type="vertical" className="h-12 bg-gray-600 mx-4 hidden lg:block" />
                                     <div className="flex flex-col mb-4">
                                         <Text className="text-gray-400">Review</Text>
-                                        <Rate
-                                            disabled
-                                            defaultValue={course?.stats.overallRating}
-                                            className="text-2xl"
-                                            character={() => <span className="text-yellow-400">&#9734;</span>}
-                                        />
+                                        <StarRating rating={overallRating} />
                                     </div>
                                 </div>
                             </Col>
@@ -303,12 +318,12 @@ const CoursePage: React.FC = () => {
                                     </div>
                                 </div>
                             </Card>
-                            
+
                             <Card id="reviews" className="mb-8">
-                                <Title level={3} className="mb-4 pb-2 border-b border-gray-200">
+                                <Title level={4} className="mb-4 pb-2 border-b border-gray-200">
                                     REVIEWS
                                 </Title>
-                                <Row gutter={[24, 24]} className="items-stretch">
+                                <Row gutter={[16, 16]} className="items-stretch">
                                     <Col span={24}>
                                         <Row gutter={24}>
                                             <Col span={8}>
@@ -320,42 +335,30 @@ const CoursePage: React.FC = () => {
                                         </Row>
                                     </Col>
                                     <Col xs={24} md={8}>
-                                        <div className="border p-4 h-full flex flex-col justify-center items-center">
-                                            <Title level={1} className="mb-0 text-6xl">
-                                                {course?.stats.overallRating.toFixed(1)}
+                                        <div className="border p-3 h-full flex flex-col justify-center items-center">
+                                            <Title level={2} className="mb-0">
+                                                {overallRating.toFixed(1)}
                                             </Title>
-                                            <Rate
-                                                disabled
-                                                defaultValue={course?.stats.overallRating}
-                                                className="text-2xl my-2"
-                                                character={() => <span className="text-yellow-400">&#9734;</span>}
-                                            />
-                                            <Text type="secondary" className="block mt-2">
-                                                {course?.stats.ratingCount} ratings
+                                            <StarRating rating={overallRating} />
+                                            <Text type="secondary" className="block mt-1 text-xs">
+                                                {ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'}
                                             </Text>
                                         </div>
                                     </Col>
                                     <Col xs={24} md={16}>
-                                        <div className="border p-4 h-full">
+                                        <div className="border p-3 h-full">
                                             {[5, 4, 3, 2, 1].map((star) => (
-                                                <div key={star} className="flex items-center mb-4">
-                                                    <Text className="mr-2 w-4">{star}</Text>
-                                                    <div className="w-full bg-gray-200 h-6 flex-grow">
+                                                <div key={star} className="flex items-center mb-1">
+                                                    <Text className="mr-2 w-3 text-xs">{star}</Text>
+                                                    <div className="w-full bg-gray-200 h-2 flex-grow">
                                                         <div
-                                                            className="bg-yellow-400 h-6"
+                                                            className="bg-yellow-400 h-2"
                                                             style={{
-                                                                width: `${((course?.reviews?.filter((review) => Math.round(review.rating) === star).length ?? 0) / (course?.stats?.ratingCount ?? 1)) * 100}%`,
+                                                                width: `${calculateRatingPercentage(star)}%`,
                                                             }}
                                                         ></div>
                                                     </div>
-                                                    <Text className="ml-2 w-8 text-right">
-                                                        {(
-                                                            ((course?.reviews?.filter((review) => Math.round(review.rating) === star).length ?? 0) /
-                                                                (course?.stats?.ratingCount ?? 1)) *
-                                                            100
-                                                        ).toFixed(0)}
-                                                        %
-                                                    </Text>
+                                                    <Text className="ml-2 w-8 text-right text-xs">{calculateRatingPercentage(star).toFixed(0)}%</Text>
                                                 </div>
                                             ))}
                                         </div>
