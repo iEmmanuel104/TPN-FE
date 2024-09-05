@@ -1,12 +1,23 @@
 import React, { useState, CSSProperties } from 'react';
-import { Layout, Menu, Input, Button, Drawer, Dropdown, Avatar } from 'antd';
-import { SearchOutlined, MenuOutlined, DownOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
+import { Layout, Menu, Input, Button, Drawer, Dropdown, Avatar, AutoComplete } from 'antd';
+import {
+    MenuOutlined,
+    DownOutlined,
+    CloseOutlined,
+    UserOutlined,
+    SettingOutlined,
+    LogoutOutlined,
+    StarOutlined,
+    FileTextOutlined,
+} from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import AuthModal from './AuthModal';
 import { AuthModalType } from '../constants';
 import { RootState } from '../state/store';
 import { logOut } from '../state/slices/authSlice';
+import { useGetAllCoursesQuery } from '../api/courseApi';
+import { CourseDto } from '../api/courseApi';
 
 const { Header } = Layout;
 const { Search } = Input;
@@ -18,30 +29,68 @@ interface NavbarProps {
     onCloseAuthModal: () => void;
 }
 
+const CourseSearchResult: React.FC<{ course: CourseDto }> = ({ course }) => {
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/course/${course.id}`);
+    };
+
+    return (
+        <div onClick={handleClick} className="flex items-center p-2 hover:bg-gray-100 cursor-pointer">
+            <img src={course.media.videoThumbnail || '/placeholder-image.jpg'} alt={course.title} className="w-16 h-16 object-cover rounded mr-4" />
+            <div className="flex-grow">
+                <h4 className="text-sm font-semibold mb-1">{course.title}</h4>
+                <p className="text-xs text-gray-500 mb-1">{course.instructor.name}</p>
+                <div className="flex items-center text-xs text-gray-500">
+                    <span className="flex items-center mr-2">
+                        <StarOutlined className="mr-1" />
+                        {course.stats.overallRating.toFixed(1)} ({course.stats.ratingCount})
+                    </span>
+                    <span className="flex items-center mr-2">
+                        <FileTextOutlined className="mr-1" />
+                        {course.stats.numberOfModules} modules
+                    </span>
+                    <span className="flex items-center">
+                        <UserOutlined className="mr-1" />
+                        {course.stats.numberOfPaidStudents} students
+                    </span>
+                </div>
+            </div>
+            <div className="text-sm font-semibold" style={{ color: course.price === 0 ? '#52c41a' : '#f5222d' }}>
+                {course.price === 0 ? 'Free' : `${course.currency.symbol}${course.price.toFixed(2)}`}
+            </div>
+        </div>
+    );
+};
+
 const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authModalType, onCloseAuthModal }) => {
     const [drawerVisible, setDrawerVisible] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
 
+    const { data: coursesData } = useGetAllCoursesQuery({ q: searchValue, page: 1, size: 5 });
+
     const handleSearch = (value: string) => {
-        console.log(value);
-        // Implement search functionality here
+        navigate(`/courses?search=${encodeURIComponent(value)}`);
     };
 
     const handleLogout = () => {
         dispatch(logOut());
+        setDrawerVisible(false);
     };
 
     const userMenu = (
         <Menu>
-            <Menu.Item key="profile">
+            <Menu.Item key="profile" icon={<UserOutlined />}>
                 <Link to="/profile">Profile</Link>
             </Menu.Item>
-            <Menu.Item key="settings">
+            <Menu.Item key="settings" icon={<SettingOutlined />}>
                 <Link to="/settings">Settings</Link>
             </Menu.Item>
-            <Menu.Item key="logout" onClick={handleLogout}>
+            <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
                 Logout
             </Menu.Item>
         </Menu>
@@ -101,7 +150,24 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                         </a>
                     </Dropdown>
 
-                    <Search placeholder="Search..." allowClear onSearch={handleSearch} className="w-[32rem] max-w-[40%]" />
+                    <AutoComplete
+                        popupClassName="certain-category-search-dropdown"
+                        popupMatchSelectWidth={500}
+                        style={{ width: 500 }}
+                        options={coursesData?.data?.courses.map((course) => ({
+                            value: course.id,
+                            label: <CourseSearchResult course={course} />,
+                        }))}
+                        onSelect={(value) => navigate(`/course/${value}`)}
+                    >
+                        <Search
+                            placeholder="Search for courses..."
+                            allowClear
+                            onSearch={handleSearch}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            className="w-full"
+                        />
+                    </AutoComplete>
 
                     <Dropdown overlay={pagesMenu} trigger={['hover']}>
                         <a className="ant-dropdown-link flex items-center cursor-pointer">
@@ -141,14 +207,10 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
 
                 {/* Mobile buttons */}
                 <div className="flex lg:hidden items-center space-x-4">
-                    {isLoggedIn ? (
+                    {isLoggedIn && (
                         <Dropdown overlay={userMenu} trigger={['click']}>
                             <Avatar src={user?.displayImage} icon={<UserOutlined />} />
                         </Dropdown>
-                    ) : (
-                        <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700" onClick={() => onOpenAuthModal(AuthModalType.LOGIN)}>
-                            LOGIN
-                        </Button>
                     )}
                     <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
                 </div>
@@ -172,14 +234,30 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                         </Link>
                         <Button icon={<CloseOutlined />} onClick={() => setDrawerVisible(false)} />
                     </div>
-                    <Search
-                        placeholder="Search..."
-                        allowClear
-                        enterButton={<SearchOutlined />}
-                        size="large"
-                        onSearch={handleSearch}
-                        className="w-full mb-4"
-                    />
+                    <AutoComplete
+                        popupClassName="certain-category-search-dropdown"
+                        popupMatchSelectWidth={300}
+                        style={{ width: '100%' }}
+                        options={coursesData?.data?.courses.map((course) => ({
+                            value: course.id,
+                            label: <CourseSearchResult course={course} />,
+                        }))}
+                        onSelect={(value) => {
+                            navigate(`/course/${value}`);
+                            setDrawerVisible(false);
+                        }}
+                    >
+                        <Search
+                            placeholder="Search for courses..."
+                            allowClear
+                            onSearch={(value) => {
+                                handleSearch(value);
+                                setDrawerVisible(false);
+                            }}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            className="w-full mb-4"
+                        />
+                    </AutoComplete>
                     <Menu mode="inline" className="w-full border-r-0">
                         <Menu.SubMenu key="categories" title="Categories" icon={<MenuOutlined />}>
                             {categoryMenu.props.children}
@@ -188,17 +266,55 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                             {pagesMenu.props.children}
                         </Menu.SubMenu>
                         <Menu.Item key="events">
-                            <Link to="/events">Events</Link>
+                            <Link to="/events" onClick={() => setDrawerVisible(false)}>
+                                Events
+                            </Link>
                         </Menu.Item>
                     </Menu>
-                    <div className="mt-4 flex space-x-4">
-                        <Button type="primary" className="flex-1 bg-indigo-600 hover:bg-indigo-700">
-                            LOGIN
-                        </Button>
-                        <Button type="primary" className="flex-1 bg-gray-600 hover:bg-indigo-700">
-                            SIGNUP
-                        </Button>
-                    </div>
+                    {isLoggedIn ? (
+                        <div className="mt-auto">
+                            <Menu mode="inline" className="w-full border-r-0">
+                                <Menu.Item key="profile" icon={<UserOutlined />}>
+                                    <Link to="/profile" onClick={() => setDrawerVisible(false)}>
+                                        Profile
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Item key="settings" icon={<SettingOutlined />}>
+                                    <Link to="/settings" onClick={() => setDrawerVisible(false)}>
+                                        Settings
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+                                    Logout
+                                </Menu.Item>
+                            </Menu>
+                        </div>
+                    ) : (
+                        <div className="mt-auto">
+                            <Button
+                                type="primary"
+                                block
+                                className="mb-2 bg-indigo-600 hover:bg-indigo-700"
+                                onClick={() => {
+                                    onOpenAuthModal(AuthModalType.LOGIN);
+                                    setDrawerVisible(false);
+                                }}
+                            >
+                                LOGIN
+                            </Button>
+                            <Button
+                                type="primary"
+                                block
+                                className="bg-gray-600 hover:bg-indigo-700"
+                                onClick={() => {
+                                    onOpenAuthModal(AuthModalType.SIGNUP);
+                                    setDrawerVisible(false);
+                                }}
+                            >
+                                SIGNUP
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </Drawer>
 
