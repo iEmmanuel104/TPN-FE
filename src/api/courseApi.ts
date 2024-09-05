@@ -61,6 +61,7 @@ export interface CourseDto {
         ratingCount: number;
         numberOfModules: number;
     };
+    userCourses: UserCourseDto[];
 }
 
 export interface UserCourseDto {
@@ -96,6 +97,10 @@ export interface GetAllCoursesParams {
     userId?: string;
     page?: number;
     size?: number;
+}
+
+export interface EnrollUserResponse {
+    url: string;
 }
 
 export const courseApiSlice = apiSlice.injectEndpoints({
@@ -149,7 +154,7 @@ export const courseApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Course'],
         }),
-        enrollForCourse: builder.mutation<ApiResponse<UserCourseDto>, { courseId: string }>({
+        enrollForCourse: builder.mutation<ApiResponse<EnrollUserResponse | null>, { courseId: string }>({
             query: ({ courseId }) => ({
                 url: '/course/enroll',
                 method: 'POST',

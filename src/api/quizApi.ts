@@ -16,7 +16,7 @@ export interface IAnswer {
 }
 
 export interface IGradeQuizResponse {
-    userCourse: UserCourseDto; // Replace 'any' with your UserCourse interface
+    userCourse: UserCourseDto;
     grade: number;
     passed: boolean;
 }
@@ -51,7 +51,7 @@ export const quizApiSlice = apiSlice.injectEndpoints({
             query: (courseId) => `/quiz?courseId=${courseId}`,
             providesTags: ['Quiz'],
         }),
-        getCourseQuiz: builder.query < ApiResponse<IQuiz[]>, string>({
+        getCourseQuiz: builder.query<ApiResponse<IQuiz[]>, string>({
             query: (courseId) => `/quiz/info?courseId=${courseId}`,
             providesTags: ['Quiz'],
         }),
@@ -70,6 +70,7 @@ export const {
     useUpdateQuizMutation,
     useGradeQuizMutation,
     useRequestQuizQuery,
+    useLazyRequestQuizQuery,  // Add this line
     useGetCourseQuizQuery,
     useDeleteQuizMutation,
 } = quizApiSlice;

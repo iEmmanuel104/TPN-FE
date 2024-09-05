@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List, Progress } from 'antd';
+import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List } from 'antd';
 import {
     UserOutlined,
     BookOutlined,
@@ -17,6 +17,8 @@ import CourseFrame from '../components/CourseFrame';
 import { useGetSingleCourseInfoQuery } from '../api/courseApi';
 import VideoPlayer from '../components/VideoPlayer';
 import { formatVideoLength } from '../utils/formatVideoLength';
+import CourseEnrollmentProgress from '../components/CourseEnrollmentProgress';
+
 const { Panel } = Collapse;
 
 const { Title, Text, Paragraph } = Typography;
@@ -80,6 +82,7 @@ const CoursePage: React.FC = () => {
     const CourseInfo = () => {
         if (!courseData) return null;
         const course = courseData?.data;
+        const userCourse = course?.userCourses[0];
 
         return (
             <Card className="border w-full max-w-sm mx-auto lg:mx-0">
@@ -87,9 +90,7 @@ const CoursePage: React.FC = () => {
                     <img src={course?.media.videoThumbnail} alt={course?.title} className="w-full h-48 object-cover" />
                 </div>
                 <Text className="block text-3xl font-bold mt-4">{`${course?.currency.symbol}${course?.price}`}</Text>
-                <Button type="primary" block size="large" className="mt-6 bg-purple-600 hover:bg-purple-700 border-none h-12 text-lg">
-                    START NOW
-                </Button>
+                {course && <CourseEnrollmentProgress course={course} userCourse={userCourse} />}
                 <Title level={4} className="mt-8 mb-4">
                     Course Features
                 </Title>
@@ -153,10 +154,8 @@ const CoursePage: React.FC = () => {
             </PublicLayout>
         );
     }
-    
-    const course = courseData?.data;
 
-    const totalDuration = course?.modules.reduce((acc, module) => acc + (module.videoInfo?.length || 0), 0);
+    const course = courseData?.data;
 
     return (
         <PublicLayout>
@@ -221,10 +220,14 @@ const CoursePage: React.FC = () => {
                             <div ref={overviewRef}>
                                 <Card id="overview" className="mb-8">
                                     <SectionTitle title="OVERVIEW" />
-                                    <h3 className="text-lg font-semibold mb-2">Course Description</h3>
+                                    <h3 className="text-sm font-semibold mb-2">Course Description</h3>
                                     <Paragraph>{course?.description}</Paragraph>
-                                    <h3 className="text-lg font-semibold mb-2">Learning Outcomes</h3>
-                                    <ul className="list-disc pl-5 text-gray-600">
+                                    <h3 className="text-sm font-semibold pt-2 mb-2">Course Requirements</h3>
+                                    <ul className="list-disc pl-5 py-2 text-gray-400">
+                                        {course?.requirements.map((requirement, index) => <li key={index}>{requirement}</li>)}
+                                    </ul>
+                                    <h3 className="text-sm font-semibold pt-2 mb-2">Learning Outcomes</h3>
+                                    <ul className="list-disc pl-5 text-gray-400">
                                         {course?.learningOutcome.map((outcome, index) => <li key={index}>{outcome}</li>)}
                                     </ul>
                                 </Card>
@@ -232,80 +235,51 @@ const CoursePage: React.FC = () => {
 
                             <Card id="curriculum" className="mb-8">
                                 <SectionTitle title="CURRICULUM" />
-                                <Row gutter={16}>
-                                    <Col span={16}>
-                                        <Card>
-                                            <Collapse accordion className="mb-4">
-                                                {course?.modules
-                                                    .slice()
-                                                    .sort((a, b) => a.episodeNumber - b.episodeNumber)
-                                                    .map((module) => (
-                                                        <Panel
-                                                            header={
-                                                                <div className="flex justify-between items-center">
-                                                                    <Text strong>{`Module ${module.episodeNumber}: ${module.title}`}</Text>
-                                                                    <Text className="text-gray-500">
-                                                                        {formatVideoLength(module.videoInfo?.length || 0)}
-                                                                    </Text>
-                                                                </div>
-                                                            }
-                                                            key={module.id}
-                                                        >
-                                                            <Paragraph className="text-sm mb-2">{module.description}</Paragraph>
-                                                            <VideoPlayer
-                                                                url={module.url}
-                                                                videoId={module.id}
-                                                                frames={module.frames}
-                                                                className="mb-4"
-                                                            />
-                                                            <List
-                                                                size="small"
-                                                                dataSource={[
-                                                                    {
-                                                                        icon: <PlayCircleOutlined />,
-                                                                        text: 'Video Lecture',
-                                                                        duration: formatVideoLength(module.videoInfo?.length || 0),
-                                                                    },
-                                                                    {
-                                                                        icon: <FileTextOutlined />,
-                                                                        text: 'Reading Material',
-                                                                        duration: '10 mins',
-                                                                    },
-                                                                ]}
-                                                                renderItem={(item) => (
-                                                                    <List.Item>
-                                                                        <List.Item.Meta
-                                                                            avatar={item.icon}
-                                                                            title={item.text}
-                                                                            description={item.duration}
-                                                                        />
-                                                                    </List.Item>
-                                                                )}
-                                                            />
-                                                        </Panel>
-                                                    ))}
-                                            </Collapse>
-                                        </Card>
-                                    </Col>
-                                    <Col span={8}>
-                                        <Card>
-                                            <Title level={5}>Course Overview</Title>
-                                            <Progress percent={30} status="active" />
-                                            <Text className="block mt-1 text-xs">
-                                                {course?.modules.length} modules • {formatVideoLength(totalDuration ?? 0)}
-                                            </Text>
-                                            <Divider />
-                                            <Title level={5}>Learning Outcomes</Title>
-                                            <ul className="list-disc list-inside">
-                                                {course?.learningOutcome.map((outcome, index) => (
-                                                    <li key={index} className="text-xs mb-1">
-                                                        {outcome}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </Card>
-                                    </Col>
-                                </Row>
+                                <Collapse accordion className="mb-4">
+                                    {course?.modules
+                                        .slice()
+                                        .sort((a, b) => a.episodeNumber - b.episodeNumber)
+                                        .map((module) => {
+                                            const userCourse = course.userCourses[0];
+                                            const isEnrolledAndPaid = userCourse && userCourse.paid;
+                                            return (
+                                                <Panel
+                                                    header={
+                                                        <div className="flex justify-between items-center">
+                                                            <Text strong>{`Module ${module.episodeNumber}: ${module.title}`}</Text>
+                                                            <Text className="text-gray-500">{formatVideoLength(module.videoInfo?.length || 0)}</Text>
+                                                        </div>
+                                                    }
+                                                    key={module.id}
+                                                >
+                                                    <Paragraph className="text-sm mb-2">{module.description}</Paragraph>
+                                                    {isEnrolledAndPaid && (
+                                                        <VideoPlayer url={module.url} videoId={module.id} frames={module.frames} className="mb-4" />
+                                                    )}
+                                                    <List
+                                                        size="small"
+                                                        dataSource={[
+                                                            {
+                                                                icon: <PlayCircleOutlined />,
+                                                                text: 'Video Lecture',
+                                                                duration: formatVideoLength(module.videoInfo?.length || 0),
+                                                            },
+                                                            {
+                                                                icon: <FileTextOutlined />,
+                                                                text: 'Reading Material',
+                                                                duration: '10 mins',
+                                                            },
+                                                        ]}
+                                                        renderItem={(item) => (
+                                                            <List.Item>
+                                                                <List.Item.Meta avatar={item.icon} title={item.text} description={item.duration} />
+                                                            </List.Item>
+                                                        )}
+                                                    />
+                                                </Panel>
+                                            );
+                                        })}
+                                </Collapse>
                             </Card>
 
                             <Card id="instructor" className="mb-8">
@@ -329,7 +303,7 @@ const CoursePage: React.FC = () => {
                                     </div>
                                 </div>
                             </Card>
-
+                            
                             <Card id="reviews" className="mb-8">
                                 <Title level={3} className="mb-4 pb-2 border-b border-gray-200">
                                     REVIEWS
