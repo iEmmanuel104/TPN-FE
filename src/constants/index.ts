@@ -3,3 +3,10 @@ console.log('SERVER_URL:', SERVER_URL);
 
 export const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
 console.log('CLOUDINARY_CLOUD_NAME:', CLOUDINARY_CLOUD_NAME);
+
+export enum AuthModalType {
+    LOGIN = 'login',
+    SIGNUP = 'signup',
+    VERIFY_EMAIL = 'verifyEmail',
+    FORGOT_PASSWORD = 'forgotPassword'
+}

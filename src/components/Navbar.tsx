@@ -1,19 +1,51 @@
 import React, { useState, CSSProperties } from 'react';
-import { Layout, Menu, Input, Button, Drawer, Dropdown } from 'antd';
-import { SearchOutlined, MenuOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons';
+import { Layout, Menu, Input, Button, Drawer, Dropdown, Avatar } from 'antd';
+import { SearchOutlined, MenuOutlined, DownOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import AuthModal from './AuthModal';
+import { AuthModalType } from '../constants';
+import { RootState } from '../state/store';
+import { logOut } from '../state/slices/authSlice';
 
 const { Header } = Layout;
 const { Search } = Input;
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+    onOpenAuthModal: (type: AuthModalType) => void;
+    isAuthModalOpen: boolean;
+    authModalType: AuthModalType;
+    onCloseAuthModal: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authModalType, onCloseAuthModal }) => {
     const [drawerVisible, setDrawerVisible] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
 
     const handleSearch = (value: string) => {
         console.log(value);
         // Implement search functionality here
     };
+
+    const handleLogout = () => {
+        dispatch(logOut());
+    };
+
+    const userMenu = (
+        <Menu>
+            <Menu.Item key="profile">
+                <Link to="/profile">Profile</Link>
+            </Menu.Item>
+            <Menu.Item key="settings">
+                <Link to="/settings">Settings</Link>
+            </Menu.Item>
+            <Menu.Item key="logout" onClick={handleLogout}>
+                Logout
+            </Menu.Item>
+        </Menu>
+    );
 
     const categoryMenu = (
         <Menu>
@@ -85,19 +117,39 @@ const Navbar: React.FC = () => {
 
                 {/* Login and Signup buttons */}
                 <div className="hidden lg:flex items-center space-x-4">
-                    <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700">
-                        LOGIN
-                    </Button>
-                    <Button type="primary" className="bg-gray-600 hover:bg-indigo-700">
-                        SIGNUP
-                    </Button>
+                    {isLoggedIn ? (
+                        <Dropdown overlay={userMenu} trigger={['click']}>
+                            <a className="ant-dropdown-link flex items-center cursor-pointer">
+                                <Avatar src={user?.displayImage} icon={<UserOutlined />} />
+                                <span className="ml-2">
+                                    {user?.firstName} {user?.lastName}
+                                </span>
+                                <DownOutlined className="ml-2" />
+                            </a>
+                        </Dropdown>
+                    ) : (
+                        <>
+                            <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700" onClick={() => onOpenAuthModal(AuthModalType.LOGIN)}>
+                                LOGIN
+                            </Button>
+                            <Button type="primary" className="bg-gray-600 hover:bg-indigo-700" onClick={() => onOpenAuthModal(AuthModalType.SIGNUP)}>
+                                SIGNUP
+                            </Button>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile buttons */}
                 <div className="flex lg:hidden items-center space-x-4">
-                    <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700">
-                        LOGIN
-                    </Button>
+                    {isLoggedIn ? (
+                        <Dropdown overlay={userMenu} trigger={['click']}>
+                            <Avatar src={user?.displayImage} icon={<UserOutlined />} />
+                        </Dropdown>
+                    ) : (
+                        <Button type="primary" className="bg-indigo-600 hover:bg-indigo-700" onClick={() => onOpenAuthModal(AuthModalType.LOGIN)}>
+                            LOGIN
+                        </Button>
+                    )}
                     <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
                 </div>
             </div>
@@ -149,6 +201,8 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             </Drawer>
+
+            <AuthModal visible={isAuthModalOpen} onClose={onCloseAuthModal} type={authModalType} onSwitchType={(type) => onOpenAuthModal(type)} />
         </Header>
     );
 };

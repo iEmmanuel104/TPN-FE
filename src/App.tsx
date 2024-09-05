@@ -24,6 +24,7 @@ import BlogManagement from './pages/Admin/BlogManagement';
 import LandingPage from './pages/LandingPage';
 import CourseOverView from './pages/CourseOverview';
 import CoursePage from './pages/CoursePage';
+import EventsPage from './pages/EventsPage';
 
 // Ant Design theme configuration
 const theme: ThemeConfig = {
@@ -43,6 +44,7 @@ function App() {
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/courses" element={<CourseOverView />} />
                         <Route path="/course" element={<CoursePage />} />
+                        <Route path="/events" element={<EventsPage />} />
 
                         {/* Admin Routes */}
                         <Route path="/iadmin/login" element={<AdminLogin />} />
