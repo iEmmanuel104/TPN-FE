@@ -23,6 +23,10 @@ const { Panel } = Collapse;
 
 const { Title, Text, Paragraph } = Typography;
 
+interface StarRatingProps {
+    rating: number;
+}
+
 const CoursePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { data: courseData, isLoading, isError } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
@@ -43,18 +47,17 @@ const CoursePage: React.FC = () => {
         setIsDrawerVisible(false);
     };
 
-    
     const course = courseData?.data;
-    
-     const reviews = course?.reviews || [];
-     const overallRating = course?.stats?.overallRating || 0;
-     const ratingCount = course?.stats?.ratingCount || 0;
 
-     const calculateRatingPercentage = (star: number) => {
-         if (ratingCount === 0) return 0;
-         const count = reviews.filter((review) => Math.round(review.rating) === star).length;
-         return (count / ratingCount) * 100;
-     };
+    const reviews = course?.reviews || [];
+    const overallRating = course?.stats?.overallRating || 0;
+    const ratingCount = course?.stats?.ratingCount || 0;
+
+    const calculateRatingPercentage = (star: number) => {
+        if (ratingCount === 0) return 0;
+        const count = reviews.filter((review) => Math.round(review.rating) === star).length;
+        return (count / ratingCount) * 100;
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -92,12 +95,15 @@ const CoursePage: React.FC = () => {
 
     const SectionTitle = ({ title }: { title: string }) => <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200">{title}</h2>;
 
-    const StarRating = ({ rating }: { rating: number }) => (
+    const StarRating: React.FC<StarRatingProps> = ({ rating }) => (
         <Rate
             disabled
             defaultValue={rating}
             className="text-sm"
-            character={({ index }) => <span style={{ color: index < Math.floor(rating) ? '#fadb14' : '#e8e8e8' }}>&#9733;</span>}
+            character={(props) => {
+                const index = props.index ?? 0;
+                return <span style={{ color: index < Math.floor(rating) ? '#fadb14' : '#e8e8e8' }}>&#9733;</span>;
+            }}
         />
     );
 
