@@ -36,10 +36,6 @@ const CourseOverview: React.FC = () => {
         size: pageSize,
     });
 
-    const handleCourseClick = (courseId: string) => {
-        console.log(`Clicked on course: ${courseId}`);
-    };
-
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
@@ -192,14 +188,14 @@ const CourseOverview: React.FC = () => {
                         {isListView ? (
                             <div>
                                 {courses.map((course) => (
-                                    <CourseCard key={course.id} {...course} onClick={() => handleCourseClick(course.id)} isList={true} />
+                                    <CourseCard key={course.id} {...course} isList={true} />
                                 ))}
                             </div>
                         ) : (
                             <Row gutter={[16, 16]}>
                                 {courses.map((course) => (
                                     <Col xs={24} sm={12} md={8} lg={6} key={course.id}>
-                                        <CourseCard {...course} onClick={() => handleCourseClick(course.id)} />
+                                        <CourseCard {...course} />
                                     </Col>
                                 ))}
                             </Row>
@@ -224,7 +220,7 @@ const CourseOverview: React.FC = () => {
                 placement="right"
                 closable={true}
                 onClose={() => setIsFilterDrawerVisible(false)}
-                visible={isFilterDrawerVisible}
+                open={isFilterDrawerVisible}
                 width={300}
             >
                 <FilterContent />
