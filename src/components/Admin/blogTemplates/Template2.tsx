@@ -1,8 +1,10 @@
 import React from 'react';
-import { Typography, Image, Avatar, Space, Button, Tag, Carousel } from 'antd';
-import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, BookOutlined } from '@ant-design/icons';
+import { Typography, Image, Avatar, Space, Button, Tag, Carousel, Divider } from 'antd';
+import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, BookOutlined, CommentOutlined } from '@ant-design/icons';
 import QuillContent from '../QuillContent';
 import { BlogDto } from '../../../api/blogApi';
+import { RootState } from '@reduxjs/toolkit/query';
+import { useSelector } from 'react-redux';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -11,7 +13,11 @@ interface BlogTemplate2Props {
 }
 
 const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
+        const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
+
     if (!blog) return null;
+
+    console.log('BlogTemplate2Props:', blog);
 
     const headerImage = blog.media?.images?.[0];
     const contentImages = blog.media?.images?.slice(1) || [];
@@ -28,30 +34,32 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
                     <Title level={1} className="text-4xl font-bold leading-tight mb-4">
                         {blog.title}
                     </Title>
-                    <Space size="large" className="items-center">
+                    <Space split={<Divider type="vertical" />} wrap className="items-center mb-4">
                         <Space>
-                            <Avatar src={blog.author?.image} icon={<UserOutlined />} size={40} />
-                            <div>
-                                <Text strong className="text-lg">
-                                    {blog.author?.name}
-                                </Text>
-                                <Text type="secondary" className="block text-sm">
-                                    {blog.author?.bio}
-                                </Text>
-                            </div>
+                            <Avatar src={blog.author?.image} icon={<UserOutlined />} size="small" />
+                            <Text>{blog.author?.name}</Text>
                         </Space>
-                        <Text type="secondary" className="text-sm">
-                            <CalendarOutlined className="mr-1" />
-                            {blog.createdAt && new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </Text>
+                        <Space>
+                            <CalendarOutlined />
+                            <Text>
+                                {blog.createdAt &&
+                                    new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </Text>
+                        </Space>
+                        <Space>
+                            <CommentOutlined />
+                            <Text>
+                                {blog.activities?.length || 0} Comment{blog.activities?.length !== 1 ? 's' : ''}
+                            </Text>
+                        </Space>
                     </Space>
-                    <Space wrap className="my-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         {blog.tags?.map((tag) => (
-                            <Tag key={tag} className="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded-full">
+                            <Tag key={tag} className="m-0 text-xs bg-gray-100 text-gray-600 px-2 py-1 border">
                                 {tag}
                             </Tag>
                         ))}
-                    </Space>
+                    </div>
                 </div>
             </div>
 
