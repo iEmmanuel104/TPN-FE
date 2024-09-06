@@ -3,20 +3,26 @@ import { Typography, Button, Card, Row, Col, Avatar, List, Carousel } from 'antd
 import { motion } from 'framer-motion';
 import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
+import { useGetAllBlogsQuery, BlogStatus, BlogDto } from '../api/blogApi';
 import type { CarouselRef } from 'antd/lib/carousel';
+import { Link } from 'react-router-dom';
 
 import PublicLayout from '../components/PublicLayout';
 import NextStep from '../components/NextStep';
 import Faq from '../components/Faq';
 
 import backgroundImage from '../assets/schoolwork.jpg';
-import umbrella from '../assets/umbrella.jpeg';
 import CourseFrame from '../components/CourseFrame';
 
 const { Title, Paragraph, Text } = Typography;
 
 const Home: React.FC = () => {
-    const blogs = [{ id: 1 }, { id: 2 }, { id: 3 }];
+    const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
+    const { data: blogsData } = useGetAllBlogsQuery({
+        status: BlogStatus.Published,
+        page: 1,
+        size: 3,
+    });
 
     const events = [
         { date: { day: 15, month: 'Oct' }, title: 'Eduma Autumn 2022', time: '8:00 am - 5:00 pm', location: 'Venice, Italy' },
@@ -28,8 +34,6 @@ const Home: React.FC = () => {
         { icon: <ReadOutlined />, text: 'Expert Instruction' },
         { icon: <SafetyCertificateOutlined />, text: 'Unlimited Lifetime Access' },
     ];
-
-const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
 
     return (
         <PublicLayout>
@@ -65,7 +69,7 @@ const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
                         {popularCoursesData?.data && <CourseFrame courses={popularCoursesData.data} />}
                     </section>
                     <EventsAndTestimonialsSection events={events} />
-                    <BlogSection blogs={blogs} />
+                    <BlogSection blogs={blogsData?.data?.blogs || []} />
                     <section className="py-8 sm:py-12">
                         <Faq />
                     </section>
@@ -229,7 +233,7 @@ const EventsAndTestimonialsSection: React.FC<{
     );
 };
 
-const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
+const BlogSection: React.FC<{ blogs: BlogDto[] }> = ({ blogs }) => {
     const carouselRef = useRef<CarouselRef>(null);
 
     useEffect(() => {
@@ -245,29 +249,25 @@ const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
 
     const blogCards = blogs.map((blog) => (
         <div key={blog.id} className="px-2">
-            <Card
-                hoverable
-                cover={<img alt="blog" src={umbrella} className="h-48 object-cover" />}
-                onClick={() => (window.location.href = '/blogdetails')}
-            >
-                <Card.Meta
-                    title={
-                        <Typography.Title level={4} className="!mb-0">
-                            The Unseen of spending three years at Pixelgrade
-                        </Typography.Title>
-                    }
-                    description={
-                        <>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                            </p>
-                            <div className="flex items-center justify-between">
-                                <Text strong>Continue Reading</Text>
-                                <ArrowRightOutlined />
-                            </div>
-                        </>
-                    }
-                />
+            <Card hoverable cover={<img alt="blog" src={blog.media?.images?.[0] || '/placeholder-image.jpg'} className="h-48 object-cover" />}>
+                <Link to={`/blog/${blog.id}`}>
+                    <Card.Meta
+                        title={
+                            <Typography.Title level={4} className="!mb-0">
+                                {blog.title}
+                            </Typography.Title>
+                        }
+                        description={
+                            <>
+                                <p className="text-sm text-gray-600 mb-4">{blog.content.substring(0, 100)}...</p>
+                                <div className="flex items-center justify-between">
+                                    <Text strong>Continue Reading</Text>
+                                    <ArrowRightOutlined />
+                                </div>
+                            </>
+                        }
+                    />
+                </Link>
             </Card>
         </div>
     ));
@@ -278,15 +278,20 @@ const BlogSection: React.FC<{ blogs: { id: number }[] }> = ({ blogs }) => {
                 <Title level={2} className="text-2xl sm:text-3xl font-bold">
                     Read Latest Articles
                 </Title>
-                <Paragraph className="max-w-[320px] mx-auto">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                </Paragraph>
+                <Paragraph className="max-w-[320px] mx-auto">Stay updated with our latest insights and expert advice</Paragraph>
             </div>
             <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 gap-6">{blogCards}</div>
             <div className="sm:hidden">
                 <Carousel autoplay ref={carouselRef}>
                     {blogCards}
                 </Carousel>
+            </div>
+            <div className="text-center mt-6">
+                <Link to="/blogs">
+                    <Button type="primary" size="large">
+                        View All Articles
+                    </Button>
+                </Link>
             </div>
         </section>
     );
