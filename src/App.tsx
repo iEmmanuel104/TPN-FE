@@ -27,6 +27,7 @@ import EventsPage from './pages/EventsPage';
 import BlogOverview from './pages/BlogOverview';
 import BlogPage from './pages/BlogPage';
 import PaymentResult from './pages/PaymentResult';
+import ContactPage from './pages/ContatcUsPage';
 
 // user pages
 import UserProfilePage from './pages/UserProfilePage';
@@ -55,6 +56,7 @@ function App() {
                         <Route path="/events" element={<EventsPage />} />
                         <Route path="/blogs" element={<BlogOverview />} />
                         <Route path="/blog/:id" element={<BlogPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
 
                         {/* Admin Routes */}
                         <Route path="/iadmin/login" element={<AdminLogin />} />

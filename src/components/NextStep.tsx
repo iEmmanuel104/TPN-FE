@@ -22,16 +22,16 @@ const AnimatedNumber = ({
     delay: number;
 }) => (
     <motion.div
-        className="bg-white p-6 rounded-lg shadow-md relative overflow-hidden"
+        className="bg-white p-4 sm:p-6 rounded-lg shadow-md relative overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay }}
         whileHover={{ y: -5 }}
     >
-        <div className={`text-${color}-500 text-5xl mb-4`}>{icon}</div>
+        <div className={`text-${color}-500 text-4xl sm:text-5xl mb-2 sm:mb-4`}>{icon}</div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 2, delay: delay + 0.5 }}>
-            <span className={`text-4xl font-bold text-${color}-500 block`}>{value}</span>
-            <span className="text-gray-600 text-lg">{label}</span>
+            <span className={`text-2xl sm:text-4xl font-bold text-${color}-500 block`}>{value}</span>
+            <span className="text-gray-600 text-base sm:text-lg">{label}</span>
         </motion.div>
         <motion.div
             className={`absolute bottom-0 left-0 right-0 h-1 bg-${color}-500`}
@@ -44,13 +44,18 @@ const AnimatedNumber = ({
 
 const NextStep: React.FC = () => {
     return (
-        <div className="container mx-auto px-4">
-            <div className="bg-white px-0 sm:px-12 mb-12">
-                <Row gutter={[32, 32]} className="flex flex-wrap">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white mb-12">
+                <Row gutter={[16, 16]} className="flex flex-wrap">
                     <Col xs={24} lg={16} className="flex flex-col">
                         <Row gutter={[16, 16]} className="h-full">
                             <Col xs={24} sm={12} className="flex flex-col">
-                                <img src={image2} alt="Experience" className="w-full flex-grow object-cover" style={{ minHeight: '200px' }} />
+                                <img
+                                    src={image2}
+                                    alt="Experience"
+                                    className="w-full flex-grow object-cover"
+                                    style={{ minHeight: '200px' }}
+                                />
                                 <Card className="mt-3 bg-green-500 text-white text-center">
                                     <Paragraph strong className="mb-0">
                                         7 years of
@@ -69,10 +74,10 @@ const NextStep: React.FC = () => {
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={24} lg={8} className="flex flex-col justify-between">
+                    <Col xs={24} lg={8} className="flex flex-col justify-between mt-6 lg:mt-0">
                         <div>
                             <Paragraph className="text-sm text-purple-600 font-semibold mb-2">WHAT'S OUR MAIN GOAL</Paragraph>
-                            <Title level={2} className="text-purple-400 mb-4">
+                            <Title level={2} className="text-purple-400 mb-4 text-2xl sm:text-3xl">
                                 Take The Next Step Toward Your Personal Life With TPN
                             </Title>
                             <Paragraph className="text-gray-600 mb-6">
@@ -83,15 +88,15 @@ const NextStep: React.FC = () => {
                         <div>
                             <Card className="bg-blue-50 border-0 mb-4">
                                 <Card.Meta
-                                    avatar={<BookOutlined className="text-2xl text-blue-600" />}
-                                    title={<span className="text-lg font-semibold">Learn From the Professional</span>}
+                                    avatar={<BookOutlined className="text-xl sm:text-2xl text-blue-600" />}
+                                    title={<span className="text-base sm:text-lg font-semibold">Learn From the Professional</span>}
                                     description="Lorem ipsum dolor sit amet, consectetur adipiscing elit"
                                 />
                             </Card>
                             <Card className="bg-blue-50 border-0">
                                 <Card.Meta
-                                    avatar={<VideoCameraOutlined className="text-2xl text-blue-600" />}
-                                    title={<span className="text-lg font-semibold">Video Tutorial</span>}
+                                    avatar={<VideoCameraOutlined className="text-xl sm:text-2xl text-blue-600" />}
+                                    title={<span className="text-base sm:text-lg font-semibold">Video Tutorial</span>}
                                     description="Lorem ipsum dolor sit amet, consectetur adipiscing elit"
                                 />
                             </Card>
@@ -99,16 +104,16 @@ const NextStep: React.FC = () => {
                     </Col>
                 </Row>
             </div>
-            <div className="py-16">
-                <Title level={1} className="text-center mb-4 text-4xl font-bold">
+            <div className="py-12 sm:py-16">
+                <Title level={1} className="text-center mb-4 text-xl sm:text-2xl font-bold">
                     Learn With Passion To Live With Purpose.
                 </Title>
-                <Paragraph className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+                <Paragraph className="text-center text-gray-600 mb-12 sm:mb-16 max-w-2xl mx-auto px-4">
                     Neque convallis a cras semper auctor. Libero id faucibus nisl tincidunt egetnvallis a cras semper auctonvallis a cras semper
                     aucto.
                 </Paragraph>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                     <div className="sm:mt-12">
                         <AnimatedNumber value={94532} label="Foreign Followers" icon={<GlobalOutlined />} color="green" delay={0} />
                     </div>
