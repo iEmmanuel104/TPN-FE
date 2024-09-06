@@ -75,7 +75,7 @@ export const blogApiSlice = apiSlice.injectEndpoints({
         }),
         getBlog: builder.query<ApiResponse<BlogDto>, string>({
             query: (id) => ({
-                url: `/blog/?id=${id}`,
+                url: `/blog/info?id=${id}`,
             }),
             providesTags: ['Blog'],
         }),
