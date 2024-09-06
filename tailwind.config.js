@@ -14,7 +14,7 @@ export default {
                 primary: '#EB1D25',
             },
             fontSize: {
-                'xxs': '0.625rem', // 10px
+                'xxs': '0.625rem',
             },
         },
     },
