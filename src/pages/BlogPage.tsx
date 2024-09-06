@@ -42,6 +42,7 @@ const BlogPage: React.FC = () => {
                     <Breadcrumb.Item>Home</Breadcrumb.Item>
                     <Breadcrumb.Item>Courses</Breadcrumb.Item>
                 </Breadcrumb>
+                
                 <div className="container mx-auto px-4 py-4">
                     <Title level={2}>Blog</Title>
                     <Row gutter={24}>
@@ -124,7 +125,7 @@ const BlogPage: React.FC = () => {
                                     )}
                                 />
                             </div>
-                            {/* 
+                            
                         <div className="mb-6">
                             <Title level={5} className="mb-2 text-sm font-semibold">
                                 Latest Posts
@@ -146,7 +147,7 @@ const BlogPage: React.FC = () => {
                                     </List.Item>
                                 )}
                             />
-                        </div> */}
+                        </div>
                         </Col>
                     </Row>
                 </div>
