@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Typography, Input, Card, Row, Col, List, Avatar, Tag, Pagination, Breadcrumb } from 'antd';
+import { Typography, Input, Row, Col, List, Avatar, Tag, Pagination, Breadcrumb } from 'antd';
 import { BlogStatus, useGetAllBlogsQuery } from '../api/blogApi';
+import { useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/PublicLayout';
 import QuillContent from '../components/Admin/QuillContent';
@@ -12,6 +13,7 @@ const BlogPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
+    const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
 
     const {
         data: blogData,
@@ -42,7 +44,7 @@ const BlogPage: React.FC = () => {
                 </Breadcrumb>
                 <Title level={2}>Blog</Title>
                 <Row gutter={24}>
-                    <Col xs={24} md={16}>
+                    <Col xs={24} md={18}>
                         {isLoading && <div>Loading...</div>}
                         {isError && <div>Error loading blog posts</div>}
                         {blogData && (
@@ -58,7 +60,7 @@ const BlogPage: React.FC = () => {
                                                 blog.media?.images &&
                                                 blog.media.images.length > 0 && <img width={272} alt="blog image" src={blog.media.images[0]} />
                                             }
-                                            className="border"
+                                            className="border mb-4 p-4"
                                         >
                                             <List.Item.Meta
                                                 avatar={<Avatar src={blog.author.image} />}
@@ -82,30 +84,31 @@ const BlogPage: React.FC = () => {
                             </>
                         )}
                     </Col>
-                    <Col xs={24} md={8}>
-                        <Card className="mb-4">
+                    <Col xs={24} md={6}>
+                        <div className="mb-8">
                             <Title level={4}>Search</Title>
-
                             <Search allowClear placeholder="Search blogs" onSearch={handleSearch} className="w-full mb-4" />
+                        </div>
 
+                        <div className="mb-8">
                             <Title level={4}>Popular Courses</Title>
                             <List
-                                dataSource={[
-                                    { title: 'Introduction LearnPress – LMS plugin', price: 'Free' },
-                                    { title: 'Master of Business Administration', price: 'Free' },
-                                    { title: 'Prenatal Yoga', price: 'Free' },
-                                ]}
-                                renderItem={(item) => (
+                                dataSource={popularCoursesData?.data || []}
+                                renderItem={(course) => (
                                     <List.Item>
                                         <List.Item.Meta
-                                            avatar={<Avatar src="/placeholder-image.jpg" />}
-                                            title={<Link to="/">{item.title}</Link>}
-                                            description={<Text type="success">{item.price}</Text>}
+                                            avatar={<Avatar src={course.media?.videoThumbnail || '/placeholder-image.jpg'} />}
+                                            title={<Link to={`/course/${course.id}`}>{course.title}</Link>}
+                                            description={
+                                                <Text type="success">{course.price === 0 ? 'Free' : `${course.currency.symbol}${course.price}`}</Text>
+                                            }
                                         />
                                     </List.Item>
                                 )}
                             />
+                        </div>
 
+                        <div>
                             <Title level={4}>Latest Posts</Title>
                             <List
                                 dataSource={blogData?.data?.blogs.slice(0, 3) || []}
@@ -119,7 +122,7 @@ const BlogPage: React.FC = () => {
                                     </List.Item>
                                 )}
                             />
-                        </Card>
+                        </div>
                     </Col>
                 </Row>
             </div>
