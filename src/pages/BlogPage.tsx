@@ -12,7 +12,7 @@ const { Search } = Input;
 const BlogPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5;
+    const pageSize = 3;
     const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
 
     const {
