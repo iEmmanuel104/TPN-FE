@@ -1,26 +1,59 @@
-import React from 'react';
-import { Typography, Image, Avatar, Space, Button, Tag, Carousel, Divider } from 'antd';
-import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, BookOutlined, CommentOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Typography, Image, Avatar, Space, Button, Tag, Carousel, Divider, Input, message } from 'antd';
+import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, TwitterOutlined, LinkedinOutlined, CommentOutlined } from '@ant-design/icons';
 import QuillContent from '../QuillContent';
-import { BlogDto } from '../../../api/blogApi';
-import { RootState } from '@reduxjs/toolkit/query';
+import { BlogDto, useEngageWithBlogMutation } from '../../../api/blogApi';
 import { useSelector } from 'react-redux';
+import { RootState } from '../../../state/store';
 
 const { Title, Paragraph, Text } = Typography;
+const { TextArea } = Input;
 
 interface BlogTemplate2Props {
     blog: Partial<BlogDto>;
-}
+} 
+
 
 const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
-        const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+    const [engageWithBlog] = useEngageWithBlogMutation();
+    const [comment, setComment] = useState('');
 
     if (!blog) return null;
 
-    console.log('BlogTemplate2Props:', blog);
-
     const headerImage = blog.media?.images?.[0];
     const contentImages = blog.media?.images?.slice(1) || [];
+
+    const handleLike = async () => {
+        if (!isLoggedIn) {
+            message.warning('Please log in to like this blog post.');
+            return;
+        }
+        try {
+            await engageWithBlog({ id: blog.id!, action: 'like' }).unwrap();
+            message.success('Blog post liked successfully!');
+        } catch (error) {
+            message.error('Failed to like the blog post. Please try again.');
+        }
+    };
+
+    const handleComment = async () => {
+        if (!isLoggedIn) {
+            message.warning('Please log in to comment on this blog post.');
+            return;
+        }
+        if (!comment.trim()) {
+            message.warning('Please enter a comment.');
+            return;
+        }
+        try {
+            await engageWithBlog({ id: blog.id!, action: 'comment', comment }).unwrap();
+            message.success('Comment added successfully!');
+            setComment('');
+        } catch (error) {
+            message.error('Failed to add comment. Please try again.');
+        }
+    };
 
     return (
         <div className="max-w-full mx-auto bg-white font-sans">
@@ -49,7 +82,7 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
                         <Space>
                             <CommentOutlined />
                             <Text>
-                                {blog.activities?.length || 0} Comment{blog.activities?.length !== 1 ? 's' : ''}
+                                {Number(blog.commentsCount) || 0} Comment{Number(blog.commentsCount) !== 1 ? 's' : ''}
                             </Text>
                         </Space>
                     </Space>
@@ -82,33 +115,59 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
 
                 <div className="border-t border-b py-4 my-8">
                     <Space size="large">
-                        <Button type="text" icon={<HeartOutlined />} className="text-gray-600 hover:text-red-500">
+                        <Button
+                            type="text"
+                            icon={<HeartOutlined />}
+                            className="text-gray-600 hover:text-red-500"
+                            onClick={handleLike}
+                            disabled={!isLoggedIn}
+                        >
                             Like
                         </Button>
-                        <Button type="text" icon={<MessageOutlined />} className="text-gray-600">
+                        <Button
+                            type="text"
+                            icon={<MessageOutlined />}
+                            className="text-gray-600"
+                            onClick={() => document.getElementById('commentSection')?.scrollIntoView({ behavior: 'smooth' })}
+                            disabled={!isLoggedIn}
+                        >
                             Comment
                         </Button>
-                        <Button type="text" icon={<BookOutlined />} className="text-gray-600">
-                            Save
-                        </Button>
                     </Space>
                 </div>
 
-                <div className="my-8">
-                    <Title level={4}>About the Author</Title>
-                    <Space align="start">
-                        <Avatar src={blog.author?.image} icon={<UserOutlined />} size={64} />
+                <div className="my-8 border p-6 rounded-lg">
+                    <div className="flex items-center mb-4">
+                        <Avatar src={blog.author?.image} icon={<UserOutlined />} size={64} className="mr-4" />
                         <div>
-                            <Text strong className="text-lg">
+                            <Title level={4} className="mb-0">
                                 {blog.author?.name}
-                            </Text>
-                            <Paragraph className="text-gray-600">{blog.author?.bio}</Paragraph>
+                            </Title>
+                            <Text type="secondary">Professor</Text>
                         </div>
+                    </div>
+                    <Paragraph className="text-gray-600 mb-4">{blog.author?.bio}</Paragraph>
+                    <Space>
+                        <Button icon={<TwitterOutlined />} shape="circle" />
+                        <Button icon={<LinkedinOutlined />} shape="circle" />
                     </Space>
                 </div>
 
-                <div className="my-8">
+                <div id="commentSection" className="my-8">
                     <Title level={4}>Comments</Title>
+                    {isLoggedIn && (
+                        <div className="mb-4">
+                            <TextArea
+                                rows={4}
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                placeholder="Write your comment here..."
+                            />
+                            <Button type="primary" onClick={handleComment} className="mt-2">
+                                Post Comment
+                            </Button>
+                        </div>
+                    )}
                     {blog.activities?.map((activity) => (
                         <div key={activity.userId} className="mb-6">
                             <Space align="start">
