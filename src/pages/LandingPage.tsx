@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Typography, Button, Card, Row, Col, Avatar, List, Carousel } from 'antd';
 import { motion } from 'framer-motion';
 import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
 import type { CarouselRef } from 'antd/lib/carousel';
 
 import PublicLayout from '../components/PublicLayout';
@@ -11,7 +12,6 @@ import Faq from '../components/Faq';
 import backgroundImage from '../assets/schoolwork.jpg';
 import umbrella from '../assets/umbrella.jpeg';
 import CourseFrame from '../components/CourseFrame';
-import { courses } from '../constants/courseData';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -28,6 +28,8 @@ const Home: React.FC = () => {
         { icon: <ReadOutlined />, text: 'Expert Instruction' },
         { icon: <SafetyCertificateOutlined />, text: 'Unlimited Lifetime Access' },
     ];
+
+const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
 
     return (
         <PublicLayout>
@@ -60,7 +62,7 @@ const Home: React.FC = () => {
                                 </Row>
                             </Col>
                         </Row>
-                        <CourseFrame courses={courses} />
+                        {popularCoursesData?.data && <CourseFrame courses={popularCoursesData.data} />}
                     </section>
                     <EventsAndTestimonialsSection events={events} />
                     <BlogSection blogs={blogs} />
