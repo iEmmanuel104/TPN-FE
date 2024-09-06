@@ -5,7 +5,7 @@ import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlin
 import { useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
 import { useGetAllBlogsQuery, BlogStatus, BlogDto } from '../api/blogApi';
 import type { CarouselRef } from 'antd/lib/carousel';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import PublicLayout from '../components/PublicLayout';
 import NextStep from '../components/NextStep';
@@ -18,6 +18,7 @@ import QuillContent from '../components/Admin/QuillContent';
 const { Title, Paragraph, Text } = Typography;
 
 const Home: React.FC = () => {
+    const location = useLocation();
     const { data: popularCoursesData } = useGetAllSimilarOrPopularCoursesQuery({});
     const { data: blogsData } = useGetAllBlogsQuery({
         status: BlogStatus.Published,
@@ -35,6 +36,17 @@ const Home: React.FC = () => {
         { icon: <ReadOutlined />, text: 'Expert Instruction' },
         { icon: <SafetyCertificateOutlined />, text: 'Unlimited Lifetime Access' },
     ];
+
+        useEffect(() => {
+            if (location.hash) {
+                setTimeout(() => {
+                    const element = document.querySelector(location.hash);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
+            }
+        }, [location]);
 
     return (
         <PublicLayout>

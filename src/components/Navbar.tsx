@@ -93,7 +93,13 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                 }
             } else {
                 // If we're on a different page, navigate to home and then scroll
-                navigate('/' + path);
+                navigate('/');
+                setTimeout(() => {
+                    const element = document.querySelector(path);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
             }
         } else {
             navigate(path);
