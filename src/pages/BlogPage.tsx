@@ -48,40 +48,38 @@ const BlogPage: React.FC = () => {
                         {isLoading && <div>Loading...</div>}
                         {isError && <div>Error loading blog posts</div>}
                         {blogData && (
-                            <>
-                                <List
-                                    itemLayout="vertical"
-                                    size="large"
-                                    dataSource={blogData?.data?.blogs}
-                                    renderItem={(blog) => (
-                                        <List.Item
-                                            key={blog.id}
-                                            extra={
-                                                blog.media?.images &&
-                                                blog.media.images.length > 0 && <img width={272} alt="blog image" src={blog.media.images[0]} />
-                                            }
-                                            className="border mb-4 p-4"
-                                        >
-                                            <List.Item.Meta
-                                                avatar={<Avatar src={blog.author.image} />}
-                                                title={<Link to={`/blog/${blog.id}`}>{blog.title}</Link>}
-                                                description={`${blog.author.name} | ${new Date(blog.createdAt).toLocaleDateString()}`}
-                                            />
-                                            <Paragraph ellipsis={{ rows: 3 }}>
-                                                <QuillContent content={blog.content || ''} />
-                                            </Paragraph>
-                                            {blog.tags && blog.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
-                                        </List.Item>
-                                    )}
-                                />
-                                <Pagination
-                                    current={currentPage}
-                                    total={blogData?.data?.count}
-                                    pageSize={pageSize}
-                                    onChange={handlePageChange}
-                                    className="mt-4"
-                                />
-                            </>
+                            <div className="flex flex-col h-full">
+                                <div className="flex-grow">
+                                    <List
+                                        itemLayout="vertical"
+                                        size="large"
+                                        dataSource={blogData?.data?.blogs}
+                                        renderItem={(blog) => (
+                                            <List.Item
+                                                key={blog.id}
+                                                extra={
+                                                    blog.media?.images &&
+                                                    blog.media.images.length > 0 && <img width={272} alt="blog image" src={blog.media.images[0]} />
+                                                }
+                                                className="border mb-4 p-4"
+                                            >
+                                                <List.Item.Meta
+                                                    avatar={<Avatar src={blog.author.image} />}
+                                                    title={<Link to={`/blog/${blog.id}`}>{blog.title}</Link>}
+                                                    description={`${blog.author.name} | ${new Date(blog.createdAt).toLocaleDateString()}`}
+                                                />
+                                                <Paragraph ellipsis={{ rows: 3 }}>
+                                                    <QuillContent content={blog.content || ''} />
+                                                </Paragraph>
+                                                {blog.tags && blog.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+                                            </List.Item>
+                                        )}
+                                    />
+                                </div>
+                                <div className="flex justify-end mt-4">
+                                    <Pagination current={currentPage} total={blogData?.data?.count} pageSize={pageSize} onChange={handlePageChange} />
+                                </div>
+                            </div>
                         )}
                     </Col>
                     <Col xs={24} md={6}>
@@ -108,7 +106,7 @@ const BlogPage: React.FC = () => {
                             />
                         </div>
 
-                        <div>
+                        <div className="mb-8">
                             <Title level={4}>Latest Posts</Title>
                             <List
                                 dataSource={blogData?.data?.blogs.slice(0, 3) || []}
