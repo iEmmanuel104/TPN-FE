@@ -44,7 +44,7 @@ const Home: React.FC = () => {
                     <UnderHeroSection items={items} />
                 </div>
                 <div className="px-4 sm:px-6 lg:px-24 xl:px-32">
-                    <section className="py-8 sm:py-12 lg:py-24">
+                    <section id='about-us' className="py-8 sm:py-12 lg:py-24">
                         <NextStep />
                     </section>
                     <section className="py-8 sm:py-12">
@@ -71,7 +71,7 @@ const Home: React.FC = () => {
                     </section>
                     <EventsAndTestimonialsSection events={events} />
                     <BlogSection blogs={blogsData?.data?.blogs || []} />
-                    <section className="py-8 sm:py-12">
+                    <section id='faq' className="py-8 sm:py-12">
                         <Faq />
                     </section>
                 </div>
