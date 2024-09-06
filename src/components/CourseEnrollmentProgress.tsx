@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Progress, Typography, Badge, Modal, message } from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
+import { Button, Progress, Typography, Badge, Modal, message, Checkbox, List, Space } from 'antd';
+import { FileTextOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { CourseDto, UserCourseDto, UserCourseStatus } from '../api/courseApi';
 import { useEnrollForCourseMutation, useGenerateCourseCertificateMutation } from '../api/courseApi';
 import { useLazyRequestQuizQuery } from '../api/quizApi';
 
-const { Text } = Typography;
-
+const { Text, Paragraph, Title } = Typography;
 interface CourseEnrollmentProgressProps {
     course: CourseDto;
     userCourse?: UserCourseDto;
@@ -21,8 +20,14 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
     const [isEnrolling, setIsEnrolling] = useState(false);
     const [isGeneratingCertificate, setIsGeneratingCertificate] = useState(false);
     const [showEnrollConfirmation, setShowEnrollConfirmation] = useState(false);
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     const handleEnroll = async () => {
+        if (!termsAccepted) {
+            message.error('Please accept the terms and conditions to enroll.');
+            return;
+        }
+
         setIsEnrolling(true);
         try {
             const response = await enrollForCourse({ courseId: course.id }).unwrap();
@@ -90,13 +95,60 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                     {course.price > 0 ? `Enroll Now - ${course.currency.symbol}${course.price}` : 'Enroll for Free'}
                 </Button>
                 <Modal
-                    title="Confirm Enrollment"
-                    visible={showEnrollConfirmation}
+                    title={<Title level={4}>Confirm Enrollment: {course.title}</Title>}
+                    open={showEnrollConfirmation}
                     onOk={handleEnroll}
                     onCancel={() => setShowEnrollConfirmation(false)}
                     confirmLoading={isEnrolling}
+                    okText="Enroll Now"
+                    okButtonProps={{ disabled: !termsAccepted }}
+                    width={600}
                 >
-                    <p>Are you sure you want to enroll in this course?</p>
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <Paragraph>
+                            You are about to enroll in <strong>{course.title}</strong>. Please review the following information before proceeding:
+                        </Paragraph>
+
+                        <List
+                            header={<Title level={5}>Course Details</Title>}
+                            bordered
+                            dataSource={[
+                                `Duration: ${course.modules.length} modules`,
+                                `Level: ${course.level}`,
+                                `Price: ${course.currency.symbol}${course.price}`,
+                                `Instructor: ${course.instructor.name}`,
+                            ]}
+                            renderItem={(item) => <List.Item>{item}</List.Item>}
+                        />
+
+                        <Paragraph>
+                            <InfoCircleOutlined /> By enrolling, you agree to:
+                        </Paragraph>
+                        <List
+                            dataSource={[
+                                'Complete all required coursework',
+                                'Participate in course discussions respectfully',
+                                'Not share course materials outside the platform',
+                                'Adhere to the academic integrity policy',
+                            ]}
+                            renderItem={(item) => (
+                                <List.Item>
+                                    <Text>{item}</Text>
+                                </List.Item>
+                            )}
+                        />
+
+                        <Checkbox checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)}>
+                            I have read and agree to the{' '}
+                            <a href="/terms" target="_blank">
+                                Terms and Conditions
+                            </a>{' '}
+                            and{' '}
+                            <a href="/privacy" target="_blank">
+                                Privacy Policy
+                            </a>
+                        </Checkbox>
+                    </Space>
                 </Modal>
             </>
         );
