@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import CourseFrame from '../components/CourseFrame';
-import { useGetSingleCourseInfoQuery } from '../api/courseApi';
+import { useGetSingleCourseInfoQuery, useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
 import VideoPlayer from '../components/VideoPlayer';
 import { formatVideoLength } from '../utils/formatVideoLength';
 import CourseEnrollmentProgress from '../components/CourseEnrollmentProgress';
@@ -30,6 +30,7 @@ interface StarRatingProps {
 const CoursePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { data: courseData, isLoading, isError } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
+const { data: similarCoursesData } = useGetAllSimilarOrPopularCoursesQuery({ id });
 
     const [activeSection, setActiveSection] = useState('overview');
     const [showBottomNav, setShowBottomNav] = useState(false);
@@ -389,7 +390,7 @@ const CoursePage: React.FC = () => {
                             <Title level={3} className="mb-6">
                                 Similar Courses
                             </Title>
-                            <CourseFrame courses={[]} columns={3} />
+                            {similarCoursesData?.data && <CourseFrame courses={similarCoursesData.data} columns={3} />}
                         </Col>
                     </Row>
                 </div>
