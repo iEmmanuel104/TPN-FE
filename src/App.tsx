@@ -1,4 +1,3 @@
-// src/App.tsx
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -27,13 +26,14 @@ import CoursePage from './pages/CoursePage';
 import EventsPage from './pages/EventsPage';
 import BlogOverview from './pages/BlogOverview';
 import BlogPage from './pages/BlogPage';
+import PaymentResult from './pages/PaymentResult';
 
 // Ant Design theme configuration
 const theme: ThemeConfig = {
-  token: {
-    fontFamily: '"Roboto Slab", serif',
-    borderRadius: 0
-  },
+    token: {
+        fontFamily: '"Roboto Slab", serif',
+        borderRadius: 0,
+    },
 };
 
 function App() {
@@ -43,9 +43,12 @@ function App() {
                 <BrowserRouter>
                     <ToastContainer position="top-center" limit={2} />
                     <Routes>
+                        {/* Public Routes */}
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/courses" element={<CourseOverView />} />
                         <Route path="/course/:id" element={<CoursePage />} />
+                        <Route path="course-payment/success/:id" element={<PaymentResult isSuccess={true} />} />
+                        <Route path="course-payment/cancel/:id" element={<PaymentResult isSuccess={false} />} />
                         <Route path="/events" element={<EventsPage />} />
                         <Route path="/blogs" element={<BlogOverview />} />
                         <Route path="/blog/:id" element={<BlogPage />} />
@@ -70,7 +73,6 @@ function App() {
                         </Route>
 
                         {/* Add protected user routes here */}
-
                         <Route path="/user" element={<ProtectedUserRoute />}>
                             {/* Add your user routes here */}
                         </Route>
