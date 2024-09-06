@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Typography, Form, Input, Button, message, Tabs, Avatar, Spin, Card, Row, Col, Select, Modal, Alert, Divider } from 'antd';
 import { UserOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -7,7 +7,7 @@ import { useUpdateUserMutation } from '../api/userApi';
 import PublicLayout from '../components/PublicLayout';
 import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
 import { updateUser, logOut } from '../state/slices/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -28,6 +28,8 @@ const formatDate = (dateString: string) => {
 const UserProfilePage: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState('1');
     const { data: userData, isLoading, isError } = useGetLoggedUserQuery();
     const [updateUserMutation] = useUpdateUserMutation();
     const [changePassword] = useChangePasswordMutation();
@@ -39,6 +41,14 @@ const UserProfilePage: React.FC = () => {
     const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
     const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(false);
     const [isDeactivationModalVisible, setIsDeactivationModalVisible] = useState(false);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tab = params.get('tab');
+        if (tab === 'settings') {
+            setActiveTab('2');
+        }
+    }, [location]);
 
     const { openWidget: openProfilePictureWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
@@ -144,7 +154,6 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
-
     return (
         <PublicLayout>
             <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -152,7 +161,7 @@ const UserProfilePage: React.FC = () => {
                     User Profile
                 </Title>
                 <Card>
-                    <Tabs defaultActiveKey="1">
+                    <Tabs activeKey={activeTab} defaultActiveKey="1">
                         <TabPane tab="Personal Information" key="1">
                             <div className="flex items-center mb-8">
                                 <div className="relative">
@@ -263,8 +272,8 @@ const UserProfilePage: React.FC = () => {
                                     Account Deactivation
                                 </Title>
                                 <Paragraph>
-                                    Deactivating your account will temporarily disable it. You can reactivate it by contacting support within 90 days. After
-                                    90 days, your account will be permanently deleted.
+                                    Deactivating your account will temporarily disable it. You can reactivate it by contacting support within 90 days.
+                                    After 90 days, your account will be permanently deleted.
                                 </Paragraph>
                                 <Button danger onClick={showDeactivationModal}>
                                     Deactivate Account

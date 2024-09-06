@@ -88,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                 <Link to="/dashboard/profile">Profile</Link>
             </Menu.Item>
             <Menu.Item key="settings" icon={<SettingOutlined />}>
-                <Link to="/settings">Settings</Link>
+                <Link to="/dashboard/profile?tab=settings">Settings</Link>
             </Menu.Item>
             <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
                 Logout
@@ -280,7 +280,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="settings" icon={<SettingOutlined />}>
-                                    <Link to="/settings" onClick={() => setDrawerVisible(false)}>
+                                    <Link to="/dashboard/profile?tab=settings" onClick={() => setDrawerVisible(false)}>
                                         Settings
                                     </Link>
                                 </Menu.Item>
