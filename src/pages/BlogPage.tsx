@@ -45,6 +45,9 @@ const BlogPage: React.FC = () => {
 
                 <div className="container mx-auto px-4 py-4">
                     <Title level={2}>Blog</Title>
+                    <div className="mb-6">
+                        <Search allowClear placeholder="Search blogs" onSearch={handleSearch} className="w-full md:w-1/2 lg:w-1/3" size="large" />
+                    </div>
                     <Row gutter={[24, 24]}>
                         <Col xs={24} lg={18}>
                             {isLoading && <div>Loading...</div>}
@@ -63,13 +66,13 @@ const BlogPage: React.FC = () => {
                                                         blog.media?.images &&
                                                         blog.media.images.length > 0 && (
                                                             <img
-                                                                className="w-full md:w-48 h-32 object-cover"
+                                                                className="w-full md:w-48 h-32 object-cover rounded"
                                                                 alt="blog image"
                                                                 src={blog.media.images[0]}
                                                             />
                                                         )
                                                     }
-                                                    className="border mb-4 p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                                                    className="border rounded-lg mb-4 p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
                                                 >
                                                     <List.Item.Meta
                                                         avatar={<Avatar src={blog.author.image} size={48} />}
@@ -110,15 +113,8 @@ const BlogPage: React.FC = () => {
                                 </div>
                             )}
                         </Col>
-                        <Col xs={24} lg={6}>
+                        <Col xs={0} lg={6}>
                             <div className="sticky top-24">
-                                <div className="mb-6">
-                                    <Title level={5} className="mb-2 text-base font-semibold">
-                                        Search
-                                    </Title>
-                                    <Search allowClear placeholder="Search blogs" onSearch={handleSearch} className="w-full" />
-                                </div>
-
                                 <div className="mb-6">
                                     <Title level={5} className="mb-2 text-base font-semibold">
                                         Popular Courses
