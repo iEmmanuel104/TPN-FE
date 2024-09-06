@@ -45,8 +45,8 @@ const BlogPage: React.FC = () => {
 
                 <div className="container mx-auto px-4 py-4">
                     <Title level={2}>Blog</Title>
-                    <Row gutter={24}>
-                        <Col xs={24} md={18}>
+                    <Row gutter={[24, 24]}>
+                        <Col xs={24} lg={18}>
                             {isLoading && <div>Loading...</div>}
                             {isError && <div>Error loading blog posts</div>}
                             {blogData && (
@@ -62,25 +62,44 @@ const BlogPage: React.FC = () => {
                                                     extra={
                                                         blog.media?.images &&
                                                         blog.media.images.length > 0 && (
-                                                            <img width={272} alt="blog image" src={blog.media.images[0]} />
+                                                            <img
+                                                                className="w-full md:w-48 h-32 object-cover"
+                                                                alt="blog image"
+                                                                src={blog.media.images[0]}
+                                                            />
                                                         )
                                                     }
-                                                    className="border mb-4 p-4"
+                                                    className="border mb-4 p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
                                                 >
                                                     <List.Item.Meta
-                                                        avatar={<Avatar src={blog.author.image} />}
-                                                        title={<Link to={`/blog/${blog.id}`}>{blog.title}</Link>}
-                                                        description={`${blog.author.name} | ${new Date(blog.createdAt).toLocaleDateString()}`}
+                                                        avatar={<Avatar src={blog.author.image} size={48} />}
+                                                        title={
+                                                            <Link to={`/blog/${blog.id}`} className="text-lg font-semibold hover:text-blue-600">
+                                                                {blog.title}
+                                                            </Link>
+                                                        }
+                                                        description={
+                                                            <Text className="text-sm text-gray-500">
+                                                                {blog.author.name} | {new Date(blog.createdAt).toLocaleDateString()}
+                                                            </Text>
+                                                        }
                                                     />
-                                                    <Paragraph ellipsis={{ rows: 3 }}>
+                                                    <Paragraph ellipsis={{ rows: 2 }} className="text-sm mt-2">
                                                         <QuillContent content={blog.content || ''} />
                                                     </Paragraph>
-                                                    {blog.tags && blog.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}
+                                                    <div className="mt-2">
+                                                        {blog.tags &&
+                                                            blog.tags.map((tag) => (
+                                                                <Tag key={tag} className="mr-1 mb-1">
+                                                                    {tag}
+                                                                </Tag>
+                                                            ))}
+                                                    </div>
                                                 </List.Item>
                                             )}
                                         />
                                     </div>
-                                    <div className="flex justify-end mt-2">
+                                    <div className="flex justify-end mt-4">
                                         <Pagination
                                             current={currentPage}
                                             total={blogData?.data?.count}
@@ -91,63 +110,65 @@ const BlogPage: React.FC = () => {
                                 </div>
                             )}
                         </Col>
-                        <Col xs={24} md={6}>
-                            <div className="mb-6">
-                                <Title level={5} className="mb-2 text-sm font-semibold">
-                                    Search
-                                </Title>
-                                <Search allowClear placeholder="Search blogs" onSearch={handleSearch} className="w-full" size="small" />
-                            </div>
+                        <Col xs={24} lg={6}>
+                            <div className="sticky top-24">
+                                <div className="mb-6">
+                                    <Title level={5} className="mb-2 text-base font-semibold">
+                                        Search
+                                    </Title>
+                                    <Search allowClear placeholder="Search blogs" onSearch={handleSearch} className="w-full" />
+                                </div>
 
-                            <div className="mb-6">
-                                <Title level={5} className="mb-2 text-sm font-semibold">
-                                    Popular Courses
-                                </Title>
-                                <List
-                                    size="small"
-                                    dataSource={popularCoursesData?.data || []}
-                                    renderItem={(course) => (
-                                        <List.Item>
-                                            <List.Item.Meta
-                                                avatar={<Avatar src={course.media?.videoThumbnail || '/placeholder-image.jpg'} size="small" />}
-                                                title={
-                                                    <Link to={`/course/${course.id}`} className="text-xs">
-                                                        {course.title}
-                                                    </Link>
-                                                }
-                                                description={
-                                                    <Text type="success" className="text-xs">
-                                                        {course.price === 0 ? 'Free' : `${course.currency.symbol}${course.price}`}
-                                                    </Text>
-                                                }
-                                            />
-                                        </List.Item>
-                                    )}
-                                />
+                                <div className="mb-6">
+                                    <Title level={5} className="mb-2 text-base font-semibold">
+                                        Popular Courses
+                                    </Title>
+                                    <List
+                                        itemLayout="horizontal"
+                                        dataSource={popularCoursesData?.data || []}
+                                        renderItem={(course) => (
+                                            <List.Item>
+                                                <List.Item.Meta
+                                                    avatar={<Avatar src={course.media?.videoThumbnail || '/placeholder-image.jpg'} size="large" />}
+                                                    title={
+                                                        <Link to={`/course/${course.id}`} className="text-sm hover:text-blue-600">
+                                                            {course.title}
+                                                        </Link>
+                                                    }
+                                                    description={
+                                                        <Text type="success" className="text-xs">
+                                                            {course.price === 0 ? 'Free' : `${course.currency.symbol}${course.price}`}
+                                                        </Text>
+                                                    }
+                                                />
+                                            </List.Item>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="mb-6">
+                                    <Title level={5} className="mb-2 text-base font-semibold">
+                                        Latest Posts
+                                    </Title>
+                                    <List
+                                        itemLayout="horizontal"
+                                        dataSource={blogData?.data?.blogs.slice(0, 3) || []}
+                                        renderItem={(blog) => (
+                                            <List.Item>
+                                                <List.Item.Meta
+                                                    avatar={<Avatar src={blog.media?.images?.[0] || '/placeholder-image.jpg'} size="large" />}
+                                                    title={
+                                                        <Link to={`/blog/${blog.id}`} className="text-sm hover:text-blue-600">
+                                                            {blog.title}
+                                                        </Link>
+                                                    }
+                                                    description={<Text className="text-xs">{new Date(blog.createdAt).toLocaleDateString()}</Text>}
+                                                />
+                                            </List.Item>
+                                        )}
+                                    />
+                                </div>
                             </div>
-                            
-                        <div className="mb-6">
-                            <Title level={5} className="mb-2 text-sm font-semibold">
-                                Latest Posts
-                            </Title>
-                            <List
-                                size="small"
-                                dataSource={blogData?.data?.blogs.slice(0, 3) || []}
-                                renderItem={(blog) => (
-                                    <List.Item>
-                                        <List.Item.Meta
-                                            avatar={<Avatar src={blog.media?.images?.[0] || '/placeholder-image.jpg'} size="small" />}
-                                            title={
-                                                <Link to={`/blog/${blog.id}`} className="text-xs">
-                                                    {blog.title}
-                                                </Link>
-                                            }
-                                            description={<Text className="text-xs">{new Date(blog.createdAt).toLocaleDateString()}</Text>}
-                                        />
-                                    </List.Item>
-                                )}
-                            />
-                        </div>
                         </Col>
                     </Row>
                 </div>
