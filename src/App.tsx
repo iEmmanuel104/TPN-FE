@@ -28,6 +28,9 @@ import BlogOverview from './pages/BlogOverview';
 import BlogPage from './pages/BlogPage';
 import PaymentResult from './pages/PaymentResult';
 
+// user pages
+import UserProfilePage from './pages/UserProfilePage';
+
 // Ant Design theme configuration
 const theme: ThemeConfig = {
     token: {
@@ -73,8 +76,9 @@ function App() {
                         </Route>
 
                         {/* Add protected user routes here */}
-                        <Route path="/user" element={<ProtectedUserRoute />}>
-                            {/* Add your user routes here */}
+                        <Route path="/dashboard" element={<ProtectedUserRoute />}>
+                            <Route index element={<UserProfilePage />} />
+                            <Route path="profile" element={<UserProfilePage />} />  
                         </Route>
 
                         <Route path="*" element={<NotFound />} />
