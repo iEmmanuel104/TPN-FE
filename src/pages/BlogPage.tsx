@@ -40,9 +40,9 @@ const BlogPage: React.FC = () => {
             <div className="bg-white min-h-screen">
                 <Breadcrumb className="container mx-auto px-4 py-4">
                     <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>Courses</Breadcrumb.Item>
+                    <Breadcrumb.Item>Blogs</Breadcrumb.Item>
                 </Breadcrumb>
-                
+
                 <div className="container mx-auto px-4 py-4">
                     <Title level={2}>Blog</Title>
                     <Row gutter={24}>
