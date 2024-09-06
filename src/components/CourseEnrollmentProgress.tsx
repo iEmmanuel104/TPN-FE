@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Progress, Typography, Badge } from 'antd';
+import { Button, Progress, Typography, Badge, Modal, message } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { CourseDto, UserCourseDto, UserCourseStatus } from '../api/courseApi';
 import { useEnrollForCourseMutation, useGenerateCourseCertificateMutation } from '../api/courseApi';
@@ -18,25 +18,38 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
     const [requestQuiz, { data: quizData, isLoading: isQuizLoading }] = useLazyRequestQuizQuery();
     const [isQuizRequested, setIsQuizRequested] = useState(false);
 
+    const [isEnrolling, setIsEnrolling] = useState(false);
+    const [isGeneratingCertificate, setIsGeneratingCertificate] = useState(false);
+    const [showEnrollConfirmation, setShowEnrollConfirmation] = useState(false);
+
     const handleEnroll = async () => {
+        setIsEnrolling(true);
         try {
             const response = await enrollForCourse({ courseId: course.id }).unwrap();
             if (response.data?.url) {
                 window.location.href = response.data.url;
             } else {
-                console.log('Enrolled in free course');
+                message.success('Successfully enrolled in the course');
+                setShowEnrollConfirmation(false);
             }
         } catch (error) {
             console.error('Failed to enroll:', error);
+            message.error('Failed to enroll. Please try again.');
+        } finally {
+            setIsEnrolling(false);
         }
     };
 
     const handleRequestCertificate = async () => {
+        setIsGeneratingCertificate(true);
         try {
             await generateCertificate({ courseId: course.id }).unwrap();
-            // Handle success (e.g., show a success message or update UI)
+            message.success('Certificate generated successfully!');
         } catch (error) {
             console.error('Failed to generate certificate:', error);
+            message.error('Failed to generate certificate. Please try again.');
+        } finally {
+            setIsGeneratingCertificate(false);
         }
     };
 
@@ -49,7 +62,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         console.log('Taking quiz', quizData);
     };
 
-    const calculateProgress = () => {
+    const calculateProgress = (): number => {
         if (!userCourse || !userCourse.progress) return 0;
 
         const totalDuration = course.modules.reduce((acc, module) => acc + (module.videoInfo?.length || 0), 0);
@@ -72,9 +85,20 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
 
     if (!userCourse) {
         return (
-            <Button type="primary" onClick={handleEnroll} className="w-full">
-                {course.price > 0 ? `Enroll Now - ${course.currency.symbol}${course.price}` : 'Enroll for Free'}
-            </Button>
+            <>
+                <Button type="primary" onClick={() => setShowEnrollConfirmation(true)} className="w-full" loading={isEnrolling}>
+                    {course.price > 0 ? `Enroll Now - ${course.currency.symbol}${course.price}` : 'Enroll for Free'}
+                </Button>
+                <Modal
+                    title="Confirm Enrollment"
+                    visible={showEnrollConfirmation}
+                    onOk={handleEnroll}
+                    onCancel={() => setShowEnrollConfirmation(false)}
+                    confirmLoading={isEnrolling}
+                >
+                    <p>Are you sure you want to enroll in this course?</p>
+                </Modal>
+            </>
         );
     }
 
@@ -104,7 +128,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                 return (
                     <>
                         <Text>Course completed - Quiz available</Text>
-                        <Button icon={<FileTextOutlined />} onClick={handleTakeQuiz} loading={isQuizLoading} disabled={isQuizLoading}>
+                        <Button icon={<FileTextOutlined />} onClick={handleTakeQuiz} loading={isQuizLoading}>
                             {isQuizRequested ? 'Continue Quiz' : 'Take Quiz'}
                         </Button>
                     </>
@@ -114,7 +138,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                     <>
                         <Badge status="success" text="Course Completed" />
                         {course.assessment.hasAssessment && (
-                            <Button icon={<FileTextOutlined />} onClick={handleRequestCertificate}>
+                            <Button icon={<FileTextOutlined />} onClick={handleRequestCertificate} loading={isGeneratingCertificate}>
                                 Request Certificate
                             </Button>
                         )}
