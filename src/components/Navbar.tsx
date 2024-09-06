@@ -111,7 +111,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
             <Menu.Item key="1" onClick={() => navigate('/courses')}>
                 Courses
             </Menu.Item>
-            <Menu.Item key="2" onClick={() => navigate('/blog')}>
+            <Menu.Item key="2" onClick={() => navigate('/blogs')}>
                 Blog
             </Menu.Item>
             <Menu.Item key="3" onClick={() => navigate('/about')}>
