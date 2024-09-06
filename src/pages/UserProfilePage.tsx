@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Typography, Form, Input, Button, message, Tabs, Avatar, Spin, Card, Row, Col, Select } from 'antd';
-import { UserOutlined, EditOutlined } from '@ant-design/icons';
+import { Typography, Form, Input, Button, message, Tabs, Avatar, Spin, Card, Row, Col, Select, Modal, Alert, Divider } from 'antd';
+import { UserOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useGetLoggedUserQuery, useChangePasswordMutation, UserInfoFromApi } from '../api/authApi';
 import { useUpdateUserMutation } from '../api/userApi';
 import PublicLayout from '../components/PublicLayout';
 import { useCloudinaryWidget } from '../hooks/useCloudinaryWidget';
-import { updateUser } from '../state/slices/authSlice';
+import { updateUser, logOut } from '../state/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 const { Option } = Select;
+const { confirm } = Modal;
 
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -25,6 +27,7 @@ const formatDate = (dateString: string) => {
 
 const UserProfilePage: React.FC = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { data: userData, isLoading, isError } = useGetLoggedUserQuery();
     const [updateUserMutation] = useUpdateUserMutation();
     const [changePassword] = useChangePasswordMutation();
@@ -35,6 +38,7 @@ const UserProfilePage: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
     const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(false);
+    const [isDeactivationModalVisible, setIsDeactivationModalVisible] = useState(false);
 
     const { openWidget: openProfilePictureWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
@@ -86,7 +90,7 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
-    const handlePasswordChange = async (values: { oldPassword: string, newPassword: string, confirmPassword: string }) => {
+    const handlePasswordChange = async (values: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
         try {
             await changePassword(values).unwrap();
             message.success('Password changed successfully');
@@ -105,6 +109,41 @@ const UserProfilePage: React.FC = () => {
         setIsEditing(false);
         form.resetFields();
     };
+
+    const showDeactivationModal = () => {
+        setIsDeactivationModalVisible(true);
+    };
+
+    const handleDeactivationCancel = () => {
+        setIsDeactivationModalVisible(false);
+    };
+
+    const handleDeactivationConfirm = () => {
+        confirm({
+            title: 'Are you sure you want to deactivate your account?',
+            icon: <ExclamationCircleOutlined />,
+            content:
+                'This action will deactivate your account. You can reactivate it by logging in within 90 days. After 90 days, your account will be permanently deleted.',
+            okText: 'Yes, deactivate my account',
+            okType: 'danger',
+            cancelText: 'No, keep my account active',
+            onOk() {
+                deactivateAccount();
+            },
+        });
+    };
+
+    const deactivateAccount = async () => {
+        try {
+            await updateUserMutation({ isDeactivated: true }).unwrap();
+            message.success('Your account has been deactivated. You will be logged out now.');
+            dispatch(logOut());
+            navigate('/');
+        } catch (error) {
+            message.error('Failed to deactivate account. Please try again.');
+        }
+    };
+
 
     return (
         <PublicLayout>
@@ -219,6 +258,17 @@ const UserProfilePage: React.FC = () => {
                                         <Text className="ml-2">{userData.data.user.status.emailVerified ? 'Yes' : 'No'}</Text>
                                     </Col>
                                 </Row>
+                                <Divider />
+                                <Title level={4} className="mb-4">
+                                    Account Deactivation
+                                </Title>
+                                <Paragraph>
+                                    Deactivating your account will temporarily disable it. You can reactivate it by contacting support within 90 days. After
+                                    90 days, your account will be permanently deleted.
+                                </Paragraph>
+                                <Button danger onClick={showDeactivationModal}>
+                                    Deactivate Account
+                                </Button>
                             </Card>
                         </TabPane>
                         <TabPane tab="Change Password" key="3">
@@ -276,6 +326,34 @@ const UserProfilePage: React.FC = () => {
                     </Tabs>
                 </Card>
             </div>
+            <Modal
+                title="Account Deactivation"
+                visible={isDeactivationModalVisible}
+                onCancel={handleDeactivationCancel}
+                footer={[
+                    <Button key="back" onClick={handleDeactivationCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" type="primary" danger onClick={handleDeactivationConfirm}>
+                        Deactivate Account
+                    </Button>,
+                ]}
+            >
+                <Alert
+                    message="Warning"
+                    description="Deactivating your account will temporarily disable it. You can reactivate it by contacting support within 90 days. After 90 days, your account will be permanently deleted."
+                    type="warning"
+                    showIcon
+                    className="mb-4"
+                />
+                <Paragraph>Are you sure you want to deactivate your account? This action will:</Paragraph>
+                <ul className="list-disc list-inside mb-4">
+                    <li>Disable your access to the platform</li>
+                    <li>Hide your profile from other users</li>
+                    <li>Pause all your ongoing courses and activities</li>
+                </ul>
+                <Paragraph strong>To proceed with account deactivation, click the "Deactivate Account" button below.</Paragraph>
+            </Modal>
         </PublicLayout>
     );
 };

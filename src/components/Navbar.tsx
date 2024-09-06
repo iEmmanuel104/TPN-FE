@@ -85,7 +85,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
     const userMenu = (
         <Menu>
             <Menu.Item key="profile" icon={<UserOutlined />}>
-                <Link to="/profile">Profile</Link>
+                <Link to="/dashboard/profile">Profile</Link>
             </Menu.Item>
             <Menu.Item key="settings" icon={<SettingOutlined />}>
                 <Link to="/settings">Settings</Link>
@@ -275,7 +275,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                         <div className="mt-auto">
                             <Menu mode="inline" className="w-full border-r-0">
                                 <Menu.Item key="profile" icon={<UserOutlined />}>
-                                    <Link to="/profile" onClick={() => setDrawerVisible(false)}>
+                                    <Link to="/dashboard/profile" onClick={() => setDrawerVisible(false)}>
                                         Profile
                                     </Link>
                                 </Menu.Item>

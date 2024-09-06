@@ -17,6 +17,7 @@ export interface UserInfoFromApi {
     };
     settings: Usersettings;
     enrolledCoursesCount: number;
+    isDeactivated: boolean;
 }
 
 export interface Usersettings {
