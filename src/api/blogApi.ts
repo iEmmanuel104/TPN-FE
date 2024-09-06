@@ -30,6 +30,8 @@ export interface BlogDto {
     createdAt: string;
     updatedAt: string;
     activities: BlogActivityDto[];
+    commentsCount: string;
+    likesCount: string;
 }
 
 export interface BlogActivityDto {
