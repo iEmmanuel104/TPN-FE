@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { Typography, Image, Avatar, Space, Button, Tag, Carousel, Divider, Input, message } from 'antd';
-import { CalendarOutlined, UserOutlined, HeartOutlined, MessageOutlined, TwitterOutlined, LinkedinOutlined, CommentOutlined } from '@ant-design/icons';
+import {
+    CalendarOutlined,
+    UserOutlined,
+    HeartOutlined,
+    MessageOutlined,
+    TwitterOutlined,
+    LinkedinOutlined,
+    CommentOutlined,
+} from '@ant-design/icons';
 import QuillContent from '../QuillContent';
 import { BlogDto, useEngageWithBlogMutation } from '../../../api/blogApi';
 import { useSelector } from 'react-redux';
@@ -11,13 +19,13 @@ const { TextArea } = Input;
 
 interface BlogTemplate2Props {
     blog: Partial<BlogDto>;
-} 
-
+}
 
 const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
-    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+    const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
     const [engageWithBlog] = useEngageWithBlogMutation();
     const [comment, setComment] = useState('');
+    const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
 
     if (!blog) return null;
 
@@ -53,6 +61,10 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
         } catch (error) {
             message.error('Failed to add comment. Please try again.');
         }
+    };
+
+    const toggleCommentSection = () => {
+        setIsCommentSectionVisible(!isCommentSectionVisible);
     };
 
     return (
@@ -103,7 +115,7 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
 
                 {contentImages.length > 0 && (
                     <div className="my-8">
-                        <Carousel autoplay effect="fade" className="rounded-lg overflow-hidden">
+                        <Carousel autoplay effect="fade" className="overflow-hidden">
                             {contentImages.map((image, index) => (
                                 <div key={index} className="h-64 md:h-96">
                                     <Image src={image} alt={`Content ${index + 1}`} className="w-full h-full object-cover" preview={false} />
@@ -122,21 +134,38 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
                             onClick={handleLike}
                             disabled={!isLoggedIn}
                         >
-                            Like
+                            Like ({blog.likesCount || 0})
                         </Button>
-                        <Button
-                            type="text"
-                            icon={<MessageOutlined />}
-                            className="text-gray-600"
-                            onClick={() => document.getElementById('commentSection')?.scrollIntoView({ behavior: 'smooth' })}
-                            disabled={!isLoggedIn}
-                        >
-                            Comment
+                        <Button type="text" icon={<MessageOutlined />} className="text-gray-600" onClick={toggleCommentSection}>
+                            Comment ({blog.commentsCount || 0})
                         </Button>
                     </Space>
                 </div>
+                {/* Slide-down Comment Section */}
+                <div
+                    className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                        isCommentSectionVisible ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                >
+                    <div className="bg-gray-50 p-4 shadow-inner mb-8">
+                        {isLoggedIn && (
+                            <div className="mb-4">
+                                <TextArea
+                                    rows={4}
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                    placeholder="Write your comment here..."
+                                    className="mb-2"
+                                />
+                                <Button type="primary" onClick={handleComment}>
+                                    Post Comment
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
-                <div className="my-8 border p-6 rounded-lg">
+                <div className="my-8 border p-6">
                     <div className="flex items-center mb-4">
                         <Avatar src={blog.author?.image} icon={<UserOutlined />} size={64} className="mr-4" />
                         <div>
@@ -154,27 +183,16 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
                 </div>
 
                 <div id="commentSection" className="my-8">
-                    <Title level={4}>Comments</Title>
-                    {isLoggedIn && (
-                        <div className="mb-4">
-                            <TextArea
-                                rows={4}
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                placeholder="Write your comment here..."
-                            />
-                            <Button type="primary" onClick={handleComment} className="mt-2">
-                                Post Comment
-                            </Button>
-                        </div>
-                    )}
+                    <Title level={5} className="mb-4">
+                        Post Activity
+                    </Title>
                     {blog.activities?.map((activity) => (
-                        <div key={activity.userId} className="mb-6">
-                            <Space align="start">
+                        <div key={activity.userId} className="mb-4 bg-white p-3 border shadow-sm">
+                            <Space align="start" className="w-full">
                                 <Avatar src={activity.user.displayImage} icon={<UserOutlined />} />
-                                <div>
-                                    <Text strong>{`${activity.user.firstName} ${activity.user.lastName}`}</Text>
-                                    <Paragraph className="text-gray-600">{activity.comment}</Paragraph>
+                                <div className="flex-grow">
+                                    <Text strong className="text-blue-600">{`${activity.user.firstName} ${activity.user.lastName}`}</Text>
+                                    <Paragraph className="text-gray-700 mt-1 mb-0">{activity.comment}</Paragraph>
                                 </div>
                             </Space>
                         </div>

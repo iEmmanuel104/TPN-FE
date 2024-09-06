@@ -32,6 +32,7 @@ export interface BlogDto {
     activities: BlogActivityDto[];
     commentsCount: string;
     likesCount: string;
+    userHasCommented?: boolean
 }
 
 export interface BlogActivityDto {
@@ -75,9 +76,9 @@ export const blogApiSlice = apiSlice.injectEndpoints({
             },
             providesTags: ['Blog'],
         }),
-        getBlog: builder.query<ApiResponse<BlogDto>, string>({
-            query: (id) => ({
-                url: `/blog/info?id=${id}`,
+        getBlog: builder.query<ApiResponse<BlogDto>, { id: string; userId?: string }>({
+            query: ({ id, userId }) => ({
+                url: `/blog/info?id=${id}${userId ? `&userId=${userId}` : ''}`,
             }),
             providesTags: ['Blog'],
         }),
