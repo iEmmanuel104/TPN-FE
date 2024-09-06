@@ -49,6 +49,7 @@ export interface GetAllBlogsParams {
     status?: BlogStatus;
     q?: string;
     tag?: string;
+    userId?: string;
 }
 
 export const blogApiSlice = apiSlice.injectEndpoints({
@@ -69,6 +70,7 @@ export const blogApiSlice = apiSlice.injectEndpoints({
                 if (params.tag) queryParams.append('tag', params.tag);
                 if (params.page) queryParams.append('page', params.page.toString());
                 if (params.size) queryParams.append('size', params.size.toString());
+                if (params.userId) queryParams.append('userId', params.userId);
 
                 return {
                     url: `/blog/?${queryParams.toString()}`,

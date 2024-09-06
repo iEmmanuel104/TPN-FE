@@ -4,10 +4,17 @@ import { useGetBlogQuery } from '../api/blogApi';
 import BlogTemplate2 from '../components/Admin/blogTemplates/Template2';
 import PublicLayout from '../components/PublicLayout';
 import { Spin } from 'antd';
+import { RootState } from '../state/store';
+import { useSelector } from 'react-redux';
 
 const BlogPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { data: blogResponse, isLoading, isError } = useGetBlogQuery((id as string) || '');
+        const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
+
+    const { data: blogResponse, isLoading, isError } = useGetBlogQuery({
+         id: (id as string) || '',
+         ...(isLoggedIn && user ? { userId: user.id } : {}),
+        });
 
     if (isLoading) {
         return (

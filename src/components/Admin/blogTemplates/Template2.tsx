@@ -18,11 +18,11 @@ const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
 interface BlogTemplate2Props {
-    blog: Partial<BlogDto>;
+    blog: Partial<BlogDto> & { userHasCommented?: boolean };
 }
 
 const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
-    const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
     const [engageWithBlog] = useEngageWithBlogMutation();
     const [comment, setComment] = useState('');
     const [isCommentSectionVisible, setIsCommentSectionVisible] = useState(false);
@@ -50,6 +50,10 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
             message.warning('Please log in to comment on this blog post.');
             return;
         }
+        if (blog.userHasCommented) {
+            message.warning('You have already commented on this blog post.');
+            return;
+        }
         if (!comment.trim()) {
             message.warning('Please enter a comment.');
             return;
@@ -58,6 +62,8 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
             await engageWithBlog({ id: blog.id!, action: 'comment', comment }).unwrap();
             message.success('Comment added successfully!');
             setComment('');
+            // Update the local state to reflect that the user has commented
+            blog.userHasCommented = true;
         } catch (error) {
             message.error('Failed to add comment. Please try again.');
         }
@@ -148,7 +154,7 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
                     }`}
                 >
                     <div className="bg-gray-50 p-4 shadow-inner mb-8">
-                        {isLoggedIn && (
+                        {isLoggedIn && !blog.userHasCommented && (
                             <div className="mb-4">
                                 <TextArea
                                     rows={4}
@@ -162,6 +168,8 @@ const BlogTemplate2: React.FC<BlogTemplate2Props> = ({ blog }) => {
                                 </Button>
                             </div>
                         )}
+                        {isLoggedIn && blog.userHasCommented && <Text type="secondary">You have already commented on this blog post.</Text>}
+                        {!isLoggedIn && <Text type="secondary">Please log in to comment on this blog post.</Text>}
                     </div>
                 </div>
 
