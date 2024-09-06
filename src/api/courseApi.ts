@@ -185,6 +185,13 @@ export const courseApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['UserCourse'],
         }),
+        getAllSimilarOrPopularCourses: builder.query<ApiResponse<CourseDto[]>, { id?: string }>({
+            query: ({ id }) => ({
+                url: `/course/similar-popular?id=${id}`,
+                method: 'GET',
+            }),
+            providesTags: ['Course'],
+        }),
     }),
 });
 
@@ -198,4 +205,5 @@ export const {
     useGenerateCourseCertificateMutation,
     useGetUserCoursesQuery,
     useUpdateUserCourseProgressMutation,
+    useGetAllSimilarOrPopularCoursesQuery,
 } = courseApiSlice;
