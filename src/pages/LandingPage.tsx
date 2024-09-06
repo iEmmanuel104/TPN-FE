@@ -13,6 +13,7 @@ import Faq from '../components/Faq';
 
 import backgroundImage from '../assets/schoolwork.jpg';
 import CourseFrame from '../components/CourseFrame';
+import QuillContent from '../components/Admin/QuillContent';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -247,6 +248,12 @@ const BlogSection: React.FC<{ blogs: BlogDto[] }> = ({ blogs }) => {
         return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
+    const truncateContent = (content: string, maxLength: number) => {
+        const strippedContent = content.replace(/<[^>]+>/g, '');
+        if (strippedContent.length <= maxLength) return content;
+        return strippedContent.slice(0, maxLength) + '...';
+    };
+
     const blogCards = blogs.map((blog) => (
         <div key={blog.id} className="px-2">
             <Card hoverable cover={<img alt="blog" src={blog.media?.images?.[0] || '/placeholder-image.jpg'} className="h-48 object-cover" />}>
@@ -259,7 +266,9 @@ const BlogSection: React.FC<{ blogs: BlogDto[] }> = ({ blogs }) => {
                         }
                         description={
                             <>
-                                <p className="text-sm text-gray-600 mb-4">{blog.content.substring(0, 100)}...</p>
+                                <div className="text-sm text-gray-600 mb-4 h-16 overflow-hidden">
+                                    <QuillContent content={truncateContent(blog.content, 100)} />
+                                </div>
                                 <div className="flex items-center justify-between">
                                     <Text strong>Continue Reading</Text>
                                     <ArrowRightOutlined />
