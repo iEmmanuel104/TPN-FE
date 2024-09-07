@@ -49,6 +49,19 @@ export const moduleApiSlice = apiSlice.injectEndpoints({
             query: ({ courseId }) => `/module/course-modules/?courseId=${courseId}`,
             providesTags: ['Module'],
         }),
+        updateModuleWatchProgress: builder.mutation<ApiResponse<ModuleDto>, { id: string; currentTime: number, episodeNumber: number, completed?: boolean }>({
+            query: ({ id, currentTime, episodeNumber, completed }) => ({
+                url: '/module/watch-progress/',
+                method: 'PATCH',
+                body: {
+                    moduleId: id,
+                    currentTime,
+                    episodeNumber,
+                    completed,
+                },
+            }),
+            invalidatesTags: ['Module'],
+        }),
     }),
 });
 
@@ -58,4 +71,5 @@ export const {
     useDeleteModuleMutation,
     useGetModuleQuery,
     useGetModulesByCourseQuery,
+    useUpdateModuleWatchProgressMutation
 } = moduleApiSlice;
