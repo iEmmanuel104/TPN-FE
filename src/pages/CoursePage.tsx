@@ -285,7 +285,7 @@ const CoursePage: React.FC = () => {
                                                             frames={module.frames}
                                                             className="mb-4"
                                                             initialProgress={
-                                                                userCourse.progress.moduleId === module.id
+                                                                userCourse?.progress && userCourse.progress.moduleId === module.id
                                                                     ? {
                                                                           currentTime: userCourse.progress.currentTime,
                                                                           episodeNumber: userCourse.progress.episodeNumber,
@@ -296,6 +296,7 @@ const CoursePage: React.FC = () => {
                                                                 // Handle video watched event if needed
                                                                 console.log(`Video ${videoId} has been watched`);
                                                             }}
+                                                            watchedEps={userCourse?.progress.watchedEps}
                                                         />
                                                     )}
                                                     <List
