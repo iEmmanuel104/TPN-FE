@@ -23,6 +23,7 @@ import { useUpdateModuleWatchProgressMutation } from '../api/moduleApi';
 import { useDispatch, useSelector } from 'react-redux'; // Add this import
 import { updateUserCourseProgress, markModuleAsCompleted } from '../state/slices/courseSlice'; // Add this import
 import { RootState } from '../state/store'; // Add this import
+import React from 'react';
 
 interface Frame {
     title: string;
@@ -60,13 +61,13 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         const [isLightOn, setIsLightOn] = useState(true);
         const playerRef = useRef<ReactPlayer>(null);
         const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-        const [hasBeenCounted, setHasBeenCounted] = useState(false);
         const [isFullscreen, setIsFullscreen] = useState(false);
         const containerRef = useRef<HTMLDivElement>(null);
         const episodeNumberRef = useRef(initialProgress?.episodeNumber || currentEpisodeNumber || 1);
 
         const [duration, setDuration] = useState(0);
         const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+        const completionMarkedRef = useRef(false);
 
         useEffect(() => {
             if (initialProgress && playerRef.current) {
@@ -204,10 +205,11 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         }, [isPlaying, updateProgress]);
 
         useEffect(() => {
-            if (currentTime / duration >= 0.85 && !hasBeenCounted) {
-                setHasBeenCounted(true);
-                onVideoWatched && onVideoWatched(videoId);
-                if (isModule && courseId && episodeNumberRef.current) {
+            const shouldMarkComplete = currentTime / duration >= 0.85 && !completionMarkedRef.current;
+            if (shouldMarkComplete && isModule && courseId && episodeNumberRef.current) {
+                if (!watchedEps || !watchedEps.includes(episodeNumberRef.current)) {
+                    completionMarkedRef.current = true;
+                    onVideoWatched && onVideoWatched(videoId);
                     dispatch(
                         markModuleAsCompleted({
                             courseId,
@@ -223,7 +225,7 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
                     });
                 }
             }
-        }, [currentTime, duration, hasBeenCounted, videoId, isModule, courseId, dispatch, updateModuleWatchProgress, onVideoWatched]);
+        }, [currentTime, duration, videoId, isModule, courseId, dispatch, updateModuleWatchProgress, onVideoWatched, watchedEps]);
 
         const handleDuration = (duration: number) => {
             setDuration(duration);
@@ -402,4 +404,5 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
 );
 
 VideoPlayer.displayName = 'VideoPlayer';
-export default VideoPlayer;
+const MemoizedVideoPlayer = React.memo(VideoPlayer);
+export default MemoizedVideoPlayer;
