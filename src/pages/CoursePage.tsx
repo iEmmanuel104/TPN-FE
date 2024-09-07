@@ -30,7 +30,7 @@ interface StarRatingProps {
 const CoursePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { data: courseData, isLoading, isError } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
-const { data: similarCoursesData } = useGetAllSimilarOrPopularCoursesQuery({ id });
+    const { data: similarCoursesData } = useGetAllSimilarOrPopularCoursesQuery({ id });
 
     const [activeSection, setActiveSection] = useState('overview');
     const [showBottomNav, setShowBottomNav] = useState(false);
@@ -276,7 +276,25 @@ const { data: similarCoursesData } = useGetAllSimilarOrPopularCoursesQuery({ id 
                                                 >
                                                     <Paragraph className="text-sm mb-2">{module.description}</Paragraph>
                                                     {isEnrolledAndPaid && (
-                                                        <VideoPlayer url={module.url} videoId={module.id} frames={module.frames} className="mb-4" />
+                                                        <VideoPlayer
+                                                            url={module.url}
+                                                            videoId={module.id}
+                                                            moduleId={isEnrolledAndPaid ? module.id : undefined}
+                                                            frames={module.frames}
+                                                            className="mb-4"
+                                                            initialProgress={
+                                                                userCourse.progress.moduleId === module.id
+                                                                    ? {
+                                                                          currentTime: userCourse.progress.currentTime,
+                                                                          episodeNumber: userCourse.progress.episodeNumber,
+                                                                      }
+                                                                    : undefined
+                                                            }
+                                                            onVideoWatched={(videoId) => {
+                                                                // Handle video watched event if needed
+                                                                console.log(`Video ${videoId} has been watched`);
+                                                            }}
+                                                        />
                                                     )}
                                                     <List
                                                         size="small"
