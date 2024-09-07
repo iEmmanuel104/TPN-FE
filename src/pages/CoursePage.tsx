@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List } from 'antd';
@@ -42,6 +42,7 @@ const CoursePage: React.FC = () => {
     const [showBottomNav, setShowBottomNav] = useState(false);
     const [affixBottom, setAffixBottom] = useState<number | undefined>(undefined);
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+    const [activeKeys, setActiveKeys] = useState<string[]>([]);
     const SimilarCoursesRef = useRef<HTMLDivElement>(null);
     const overviewRef = useRef<HTMLDivElement>(null);
     const courseInfoRef = useRef<HTMLDivElement>(null);
@@ -72,14 +73,18 @@ const CoursePage: React.FC = () => {
         return (count / ratingCount) * 100;
     };
 
-    const handlePanelClick = (key: string | string[]) => {
-        if (typeof key === 'string') {
-            const module = selectedCourse?.modules.find((m) => m.id === key);
-            if (module) {
-                dispatch(setCurrentModule({ moduleId: module.id, episodeNumber: module.episodeNumber }));
+    const handlePanelChange = useCallback(
+        (key: string | string[]) => {
+            setActiveKeys(Array.isArray(key) ? key : [key]);
+            if (typeof key === 'string' && selectedCourse) {
+                const module = selectedCourse.modules.find((m) => m.id === key);
+                if (module) {
+                    dispatch(setCurrentModule({ moduleId: module.id, episodeNumber: module.episodeNumber }));
+                }
             }
-        }
-    };
+        },
+        [selectedCourse, dispatch],
+    );
 
     useEffect(() => {
         const handleScroll = () => {
@@ -280,14 +285,14 @@ const CoursePage: React.FC = () => {
 
                             <Card id="curriculum" className="mb-8">
                                 <SectionTitle title="CURRICULUM" />
-                                <Collapse accordion className="mb-4" onChange={handlePanelClick}>
+                                <Collapse accordion className="mb-4" activeKey={activeKeys} onChange={handlePanelChange} destroyInactivePanel={false}>
                                     {selectedCourse.modules
                                         .slice()
                                         .sort((a, b) => a.episodeNumber - b.episodeNumber)
                                         .map((module) => {
                                             const userCourse = userCourses.find((uc) => uc.courseId === selectedCourse.id);
                                             const isEnrolledAndPaid = userCourse && userCourse.paid;
-                                            console.log({isEnrolledAndPaid, userCourse})
+                                            console.log({ isEnrolledAndPaid, userCourse });
                                             return (
                                                 <Panel
                                                     header={
@@ -303,7 +308,6 @@ const CoursePage: React.FC = () => {
                                                         <VideoPlayer
                                                             url={module.url}
                                                             videoId={module.id}
-                                                            id={module.id}
                                                             courseId={selectedCourse.id}
                                                             isModule={true}
                                                             frames={module.frames}
