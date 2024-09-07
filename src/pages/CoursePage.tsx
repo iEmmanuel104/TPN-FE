@@ -112,6 +112,7 @@ const CoursePage: React.FC = () => {
         if (!courseData) return null;
         const course = courseData?.data;
         const userCourse = course?.userCourses[0];
+        const totalDuration = course?.modules.reduce((acc, module) => acc + (module.videoInfo?.length || 0), 0) || 0;
 
         return (
             <Card className="border w-full max-w-sm mx-auto lg:mx-0">
@@ -132,12 +133,18 @@ const CoursePage: React.FC = () => {
                     <li className="flex items-center">
                         <FileTextOutlined className="mr-3 text-gray-500" />
                         <span className="flex-grow">Assessment</span>
-                        <span className="font-semibold">{course?.assessment?.hasAssessment ? 'Yes' : 'No'}</span>
+                        <span className="font-semibold">
+                            {course?.assessment?.hasAssessment === true
+                                ? 'Yes'
+                                : course?.assessment?.hasAssessment === false
+                                  ? 'No'
+                                  : 'Not specified'}
+                        </span>{' '}
                     </li>
                     <li className="flex items-center">
                         <ClockCircleOutlined className="mr-3 text-gray-500" />
                         <span className="flex-grow">Duration</span>
-                        <span className="font-semibold">{/* Calculate total duration */}</span>
+                        <span className="font-semibold">{formatVideoLength(totalDuration)}</span>
                     </li>
                     <li className="flex items-center">
                         <UserOutlined className="mr-3 text-gray-500" />
@@ -153,11 +160,6 @@ const CoursePage: React.FC = () => {
                         <TeamOutlined className="mr-3 text-gray-500" />
                         <span className="flex-grow">Students</span>
                         <span className="font-semibold">{course?.stats.numberOfPaidStudents}</span>
-                    </li>
-                    <li className="flex items-center">
-                        <FileTextOutlined className="mr-3 text-gray-500" />
-                        <span className="flex-grow">Assessments</span>
-                        <span className="font-semibold">{course?.assessment.hasAssessment ? 'Yes' : 'No'}</span>
                     </li>
                 </ul>
             </Card>
