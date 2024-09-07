@@ -26,6 +26,17 @@ export const courseSlice = createSlice({
         },
         setSelectedCourse: (state, action: PayloadAction<CourseDto>) => {
             state.selectedCourse = action.payload;
+            // If the course has userCourses, update the state's userCourses
+            if (action.payload.userCourses && action.payload.userCourses.length > 0) {
+                const existingUserCourseIndex = state.userCourses.findIndex(uc => uc.courseId === action.payload.id);
+                if (existingUserCourseIndex !== -1) {
+                    // Update existing userCourse
+                    state.userCourses[existingUserCourseIndex] = action.payload.userCourses[0];
+                } else {
+                    // Add new userCourse
+                    state.userCourses.push(action.payload.userCourses[0]);
+                }
+            }
         },
         setUserCourses: (state, action: PayloadAction<UserCourseDto[]>) => {
             state.userCourses = action.payload;
@@ -56,10 +67,10 @@ export const courseSlice = createSlice({
             console.log(courseId, moduleId, episodeNumber);
             const userCourse = state.userCourses.find(uc => uc.courseId === courseId);
             if (userCourse) {
-                userCourse.progress.watchedEps = [
+                userCourse.progress.watchedEps = Array.from(new Set([
                     ...(userCourse.progress.watchedEps || []),
                     episodeNumber
-                ];
+                ]));
             }
         },
         setCurrentModule: (state, action: PayloadAction<{
