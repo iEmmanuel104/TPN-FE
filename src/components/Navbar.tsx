@@ -57,8 +57,8 @@ const CourseSearchResult: React.FC<{ course: CourseDto }> = ({ course }) => {
                     </span>
                 </div>
             </div>
-            <div className="text-sm font-semibold" style={{ color: course.price === 0 ? '#52c41a' : '#f5222d' }}>
-                {course.price === 0 ? 'Free' : `${course.currency.symbol}${course.price.toFixed(2)}`}
+            <div className="text-sm font-semibold">
+                {course.level}
             </div>
         </div>
     );
