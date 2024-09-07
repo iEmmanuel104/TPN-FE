@@ -37,10 +37,11 @@ interface VideoPlayerProps {
         currentTime: number;
         episodeNumber: number;
     };
+    watchedEps?: number[];
 }
 
 const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
-    ({ url, className = '', videoId, moduleId, frames, onVideoWatched, initialProgress }, ref) => {
+    ({ url, className = '', videoId, moduleId, frames, onVideoWatched, initialProgress, watchedEps }, ref) => {
         const [isPlaying, setIsPlaying] = useState(false);
         const [currentTime, setCurrentTime] = useState(initialProgress?.currentTime || 0);
         const [isMuted, setIsMuted] = useState(false);
@@ -56,6 +57,7 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         const containerRef = useRef<HTMLDivElement>(null);
         const [updateModuleWatchProgress] = useUpdateModuleWatchProgressMutation();
         const lastUpdateTimeRef = useRef(0);
+        const episodeNumberRef = useRef(initialProgress?.episodeNumber || 1);
 
         useEffect(() => {
             if (initialProgress && playerRef.current) {
@@ -71,6 +73,7 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
                 }
                 playerRef.current!.seekTo(currentTime);
             } else {
+                console.log('paused');
                 // Update progress when pausing
                 updateProgress();
             }
@@ -149,55 +152,76 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
             };
         }, [isFullscreen]);
 
-        const updateProgress = () => {
-            if (moduleId) {
-                updateModuleWatchProgress({
-                    id: moduleId,
-                    currentTime: currentTime,
-                    episodeNumber: initialProgress?.episodeNumber || 1,
-                });
-            }
-            lastUpdateTimeRef.current = Date.now();
-        };
+         const updateProgress = () => {
+             const currentTimeInSeconds = Math.floor(currentTime);
+             if (moduleId && currentTime > 0 && episodeNumberRef.current) {
+                 // Check if the episode has already been watched
+                 if (watchedEps && !watchedEps.includes(episodeNumberRef.current)) {
+                     updateModuleWatchProgress({
+                         id: moduleId,
+                         currentTime: currentTimeInSeconds,
+                         episodeNumber: episodeNumberRef.current,
+                     });
+                     console.log(`Updating progress for episode ${episodeNumberRef.current}: ${currentTimeInSeconds} seconds`);
+                 } else {
+                     console.log(`Episode ${episodeNumberRef.current} already watched, skipping progress update`);
+                 }
+             } else {
+                console.log({
+                    moduleId,
+                    currentTime: currentTimeInSeconds,
+                    episodeNumber: episodeNumberRef.current,
+                })
+                 console.log('Missing required data for progress update');
+             }
+             lastUpdateTimeRef.current = Date.now();
+         };
 
-        useEffect(() => {
-            const intervalId = setInterval(() => {
-                if (isPlaying && playerRef.current) {
-                    const newCurrentTime = playerRef.current.getCurrentTime();
-                    setCurrentTime(newCurrentTime);
+         useEffect(() => {
+             const intervalId = setInterval(() => {
+                 if (isPlaying && playerRef.current) {
+                     const newCurrentTime = playerRef.current.getCurrentTime();
+                     setCurrentTime(newCurrentTime);
 
-                    // Update progress every 5 minutes
-                    if (Date.now() - lastUpdateTimeRef.current >= 5 * 60 * 1000) {
-                        updateProgress();
-                    }
+                    //  // Update progress every 5 minutes
+                    //  if (Date.now() - lastUpdateTimeRef.current >= 5 * 60 * 1000) {
+                    //      console.log('Checking for progress update');
+                    //      updateProgress();
+                    //  }
 
-                    // Check if 85% of the video has been watched
-                    const duration = playerRef.current.getDuration();
-                    if (newCurrentTime / duration >= 0.85 && !hasBeenCounted) {
-                        setHasBeenCounted(true);
-                        onVideoWatched && onVideoWatched(videoId);
-                        if (moduleId) {
-                            updateModuleWatchProgress({
-                                id: moduleId,
-                                currentTime: newCurrentTime,
-                                episodeNumber: initialProgress?.episodeNumber || 1,
-                                completed: true,
-                            });
-                        }
-                    }
-                }
-            }, 1000);
+                     // Check if 85% of the video has been watched
+                     const duration = playerRef.current.getDuration();
+                     if (newCurrentTime / duration >= 0.85 && !hasBeenCounted) {
+                         setHasBeenCounted(true);
+                         onVideoWatched && onVideoWatched(videoId);
+                         if (moduleId) {
+                             // Check if the episode has already been watched
+                             if (!watchedEps || !watchedEps.includes(episodeNumberRef.current)) {
+                                 updateModuleWatchProgress({
+                                     id: moduleId,
+                                     currentTime: Math.floor(newCurrentTime),
+                                     episodeNumber: episodeNumberRef.current,
+                                     completed: true,
+                                 });
+                                 console.log(`Marking episode ${episodeNumberRef.current} as completed at ${Math.floor(newCurrentTime)} seconds`);
+                             } else {
+                                 console.log(`Episode ${episodeNumberRef.current} already completed, skipping update`);
+                             }
+                         }
+                     }
+                 }
+             }, 1000);
 
-            return () => {
-                clearInterval(intervalId);
-                if (controlsTimeoutRef.current) {
-                    clearTimeout(controlsTimeoutRef.current);
-                }
-                // Update progress when unmounting
-                updateProgress();
-            };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [isPlaying, moduleId, videoId, hasBeenCounted, onVideoWatched, updateModuleWatchProgress, initialProgress, currentTime]);
+             return () => {
+                 clearInterval(intervalId);
+                 if (controlsTimeoutRef.current) {
+                     clearTimeout(controlsTimeoutRef.current);
+                 }
+                 // Update progress when unmounting
+                 updateProgress();
+             };
+             // eslint-disable-next-line react-hooks/exhaustive-deps
+         }, [isPlaying, moduleId, videoId, hasBeenCounted, onVideoWatched, updateModuleWatchProgress, watchedEps]);
 
         const SettingsMenu = () => {
             return (
