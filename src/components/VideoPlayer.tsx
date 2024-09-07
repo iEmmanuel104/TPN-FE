@@ -20,6 +20,9 @@ import {
 import { List, Switch, Select, Slider } from 'antd';
 import { formatTime } from '../utils/formatTime';
 import { useUpdateModuleWatchProgressMutation } from '../api/moduleApi';
+import { useDispatch, useSelector } from 'react-redux'; // Add this import
+import { updateUserCourseProgress, markModuleAsCompleted } from '../state/slices/courseSlice'; // Add this import
+import { RootState } from '../state/store'; // Add this import
 
 interface Frame {
     title: string;
@@ -30,9 +33,11 @@ interface VideoPlayerProps {
     url?: string;
     className?: string;
     videoId: string;
-    moduleId?: string;
+    id: string;
+    courseId?: string;
+    isModule: boolean;
     frames?: Frame[];
-    onVideoWatched?: (videoId: string) => void;
+    onVideoWatched?: (id: string) => void;
     initialProgress?: {
         currentTime: number;
         episodeNumber: number;
@@ -41,7 +46,10 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
-    ({ url, className = '', videoId, moduleId, frames, onVideoWatched, initialProgress, watchedEps }, ref) => {
+    ({ url, className = '', id, courseId, videoId, isModule, frames, onVideoWatched, initialProgress, watchedEps }, ref) => {
+        const dispatch = useDispatch(); // Add this line
+        const { currentEpisodeNumber } = useSelector((state: RootState) => state.course); // Add this line
+
         const [isPlaying, setIsPlaying] = useState(false);
         const [currentTime, setCurrentTime] = useState(initialProgress?.currentTime || 0);
         const [isMuted, setIsMuted] = useState(false);
@@ -57,7 +65,7 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         const containerRef = useRef<HTMLDivElement>(null);
         const [updateModuleWatchProgress] = useUpdateModuleWatchProgressMutation();
         const lastUpdateTimeRef = useRef(0);
-        const episodeNumberRef = useRef(initialProgress?.episodeNumber || 1);
+        const episodeNumberRef = useRef(initialProgress?.episodeNumber || currentEpisodeNumber || 1);
 
         useEffect(() => {
             if (initialProgress && playerRef.current) {
@@ -152,76 +160,86 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
             };
         }, [isFullscreen]);
 
-         const updateProgress = () => {
-             const currentTimeInSeconds = Math.floor(currentTime);
-             if (moduleId && currentTime > 0 && episodeNumberRef.current) {
-                 // Check if the episode has already been watched
-                 if (watchedEps && !watchedEps.includes(episodeNumberRef.current)) {
-                     updateModuleWatchProgress({
-                         id: moduleId,
-                         currentTime: currentTimeInSeconds,
-                         episodeNumber: episodeNumberRef.current,
-                     });
-                     console.log(`Updating progress for episode ${episodeNumberRef.current}: ${currentTimeInSeconds} seconds`);
-                 } else {
-                     console.log(`Episode ${episodeNumberRef.current} already watched, skipping progress update`);
-                 }
-             } else {
+        const updateProgress = () => {
+            const currentTimeInSeconds = Math.floor(currentTime);
+            if (isModule && courseId && currentTime > 0 && episodeNumberRef.current) {
+                // Check if the episode has already been watched
+                if (watchedEps && !watchedEps.includes(episodeNumberRef.current)) {
+                    dispatch(
+                        updateUserCourseProgress({
+                            courseId,
+                            moduleId: id,
+                            currentTime: currentTimeInSeconds,
+                            episodeNumber: episodeNumberRef.current,
+                        }),
+                    );
+                    updateModuleWatchProgress({
+                        id,
+                        currentTime: currentTimeInSeconds,
+                        episodeNumber: episodeNumberRef.current,
+                    });
+                    console.log(`Updating progress for episode ${episodeNumberRef.current}: ${currentTimeInSeconds} seconds`);
+                } else {
+                    console.log(`Episode ${episodeNumberRef.current} already watched, skipping progress update`);
+                }
+            } else {
                 console.log({
-                    moduleId,
+                    id,
+                    courseId,
                     currentTime: currentTimeInSeconds,
                     episodeNumber: episodeNumberRef.current,
-                })
-                 console.log('Missing required data for progress update');
-             }
-             lastUpdateTimeRef.current = Date.now();
-         };
+                });
+                console.log('Missing required data for progress update');
+            }
+            lastUpdateTimeRef.current = Date.now();
+        };
 
-         useEffect(() => {
-             const intervalId = setInterval(() => {
-                 if (isPlaying && playerRef.current) {
-                     const newCurrentTime = playerRef.current.getCurrentTime();
-                     setCurrentTime(newCurrentTime);
+        useEffect(() => {
+            const intervalId = setInterval(() => {
+                if (isPlaying && playerRef.current) {
+                    const newCurrentTime = playerRef.current.getCurrentTime();
+                    setCurrentTime(newCurrentTime);
 
-                    //  // Update progress every 5 minutes
-                    //  if (Date.now() - lastUpdateTimeRef.current >= 5 * 60 * 1000) {
-                    //      console.log('Checking for progress update');
-                    //      updateProgress();
-                    //  }
+                    // Check if 85% of the video has been watched
+                    const duration = playerRef.current.getDuration();
+                    if (newCurrentTime / duration >= 0.85 && !hasBeenCounted) {
+                        setHasBeenCounted(true);
+                        onVideoWatched && onVideoWatched(id);
+                        if (isModule && courseId) {
+                            // Check if the episode has already been watched
+                            if (!watchedEps || !watchedEps.includes(episodeNumberRef.current)) {
+                                dispatch(
+                                    markModuleAsCompleted({
+                                        courseId,
+                                        moduleId: id,
+                                        episodeNumber: episodeNumberRef.current,
+                                    }),
+                                );
+                                updateModuleWatchProgress({
+                                    id,
+                                    currentTime: Math.floor(newCurrentTime),
+                                    episodeNumber: episodeNumberRef.current,
+                                    completed: true,
+                                });
+                                console.log(`Marking episode ${episodeNumberRef.current} as completed at ${Math.floor(newCurrentTime)} seconds`);
+                            } else {
+                                console.log(`Episode ${episodeNumberRef.current} already completed, skipping update`);
+                            }
+                        }
+                    }
+                }
+            }, 1000);
 
-                     // Check if 85% of the video has been watched
-                     const duration = playerRef.current.getDuration();
-                     if (newCurrentTime / duration >= 0.85 && !hasBeenCounted) {
-                         setHasBeenCounted(true);
-                         onVideoWatched && onVideoWatched(videoId);
-                         if (moduleId) {
-                             // Check if the episode has already been watched
-                             if (!watchedEps || !watchedEps.includes(episodeNumberRef.current)) {
-                                 updateModuleWatchProgress({
-                                     id: moduleId,
-                                     currentTime: Math.floor(newCurrentTime),
-                                     episodeNumber: episodeNumberRef.current,
-                                     completed: true,
-                                 });
-                                 console.log(`Marking episode ${episodeNumberRef.current} as completed at ${Math.floor(newCurrentTime)} seconds`);
-                             } else {
-                                 console.log(`Episode ${episodeNumberRef.current} already completed, skipping update`);
-                             }
-                         }
-                     }
-                 }
-             }, 1000);
-
-             return () => {
-                 clearInterval(intervalId);
-                 if (controlsTimeoutRef.current) {
-                     clearTimeout(controlsTimeoutRef.current);
-                 }
-                 // Update progress when unmounting
-                 updateProgress();
-             };
-             // eslint-disable-next-line react-hooks/exhaustive-deps
-         }, [isPlaying, moduleId, videoId, hasBeenCounted, onVideoWatched, updateModuleWatchProgress, watchedEps]);
+            return () => {
+                clearInterval(intervalId);
+                if (controlsTimeoutRef.current) {
+                    clearTimeout(controlsTimeoutRef.current);
+                }
+                // Update progress when unmounting
+                updateProgress();
+            };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [isPlaying, id, courseId, hasBeenCounted, onVideoWatched, updateModuleWatchProgress, watchedEps, isModule, dispatch]);
 
         const SettingsMenu = () => {
             return (

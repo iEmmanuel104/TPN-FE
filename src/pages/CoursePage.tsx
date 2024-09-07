@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List } from 'antd';
 import {
     UserOutlined,
@@ -18,6 +19,8 @@ import { useGetSingleCourseInfoQuery, useGetAllSimilarOrPopularCoursesQuery } fr
 import VideoPlayer from '../components/VideoPlayer';
 import { formatVideoLength } from '../utils/formatVideoLength';
 import CourseEnrollmentProgress from '../components/CourseEnrollmentProgress';
+import { setSelectedCourse, setCurrentModule } from '../state/slices/courseSlice'; // Add this import
+import { RootState } from '../state/store';
 
 const { Panel } = Collapse;
 
@@ -29,8 +32,11 @@ interface StarRatingProps {
 
 const CoursePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const dispatch = useDispatch(); // Add this line
     const { data: courseData, isLoading, isError } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
     const { data: similarCoursesData } = useGetAllSimilarOrPopularCoursesQuery({ id });
+    const { selectedCourse, userCourses } = useSelector((state: RootState) => state.course); // Add this line
+    console.log({ selectedCourse, userCourses });
 
     const [activeSection, setActiveSection] = useState('overview');
     const [showBottomNav, setShowBottomNav] = useState(false);
@@ -39,6 +45,12 @@ const CoursePage: React.FC = () => {
     const SimilarCoursesRef = useRef<HTMLDivElement>(null);
     const overviewRef = useRef<HTMLDivElement>(null);
     const courseInfoRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (courseData?.data) {
+            dispatch(setSelectedCourse(courseData.data));
+        }
+    }, [courseData, dispatch]);
 
     const scrollToSection = (sectionId: string) => {
         const element = document.getElementById(sectionId);
@@ -58,6 +70,15 @@ const CoursePage: React.FC = () => {
         if (ratingCount === 0) return 0;
         const count = reviews.filter((review) => Math.round(review.rating) === star).length;
         return (count / ratingCount) * 100;
+    };
+
+    const handlePanelClick = (key: string | string[]) => {
+        if (typeof key === 'string') {
+            const module = selectedCourse?.modules.find((m) => m.id === key);
+            if (module) {
+                dispatch(setCurrentModule({ moduleId: module.id, episodeNumber: module.episodeNumber }));
+            }
+        }
     };
 
     useEffect(() => {
@@ -176,7 +197,7 @@ const CoursePage: React.FC = () => {
         );
     }
 
-    if (isError || !courseData) {
+    if (isError || !selectedCourse) {
         return (
             <PublicLayout>
                 <div className="flex justify-center items-center h-screen">
@@ -259,13 +280,14 @@ const CoursePage: React.FC = () => {
 
                             <Card id="curriculum" className="mb-8">
                                 <SectionTitle title="CURRICULUM" />
-                                <Collapse accordion className="mb-4">
-                                    {course?.modules
+                                <Collapse accordion className="mb-4" onChange={handlePanelClick}>
+                                    {selectedCourse.modules
                                         .slice()
                                         .sort((a, b) => a.episodeNumber - b.episodeNumber)
                                         .map((module) => {
-                                            const userCourse = course.userCourses[0];
+                                            const userCourse = userCourses.find((uc) => uc.courseId === selectedCourse.id);
                                             const isEnrolledAndPaid = userCourse && userCourse.paid;
+                                            console.log({isEnrolledAndPaid, userCourse})
                                             return (
                                                 <Panel
                                                     header={
@@ -281,7 +303,9 @@ const CoursePage: React.FC = () => {
                                                         <VideoPlayer
                                                             url={module.url}
                                                             videoId={module.id}
-                                                            moduleId={isEnrolledAndPaid ? module.id : undefined}
+                                                            id={module.id}
+                                                            courseId={selectedCourse.id}
+                                                            isModule={true}
                                                             frames={module.frames}
                                                             className="mb-4"
                                                             initialProgress={
@@ -292,9 +316,9 @@ const CoursePage: React.FC = () => {
                                                                       }
                                                                     : undefined
                                                             }
-                                                            onVideoWatched={(videoId) => {
+                                                            onVideoWatched={(id) => {
                                                                 // Handle video watched event if needed
-                                                                console.log(`Video ${videoId} has been watched`);
+                                                                console.log(`Video ${id} has been watched`);
                                                             }}
                                                             watchedEps={userCourse?.progress.watchedEps}
                                                         />
