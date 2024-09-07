@@ -137,7 +137,7 @@ const CoursePage: React.FC = () => {
     const CourseInfo = () => {
         if (!courseData) return null;
         const course = courseData?.data;
-        const userCourse = course?.userCourses[0];
+        // const userCourse = course?.userCourses[0];
         const totalDuration = course?.modules.reduce((acc, module) => acc + (module.videoInfo?.length || 0), 0) || 0;
 
         return (
@@ -146,7 +146,7 @@ const CoursePage: React.FC = () => {
                     <img src={course?.media.videoThumbnail} alt={course?.title} className="w-full h-48 object-cover" />
                 </div>
                 <Text className="block text-3xl font-bold mt-4">{`${course?.currency.symbol}${course?.price}`}</Text>
-                {course && <CourseEnrollmentProgress course={course} userCourse={userCourse} />}
+                {course && <CourseEnrollmentProgress course={course} />}
                 <Title level={4} className="mt-8 mb-4">
                     Course Features
                 </Title>
