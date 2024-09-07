@@ -73,6 +73,7 @@ export interface UserCourseDto {
         moduleId: string;
         currentTime: number;
         episodeNumber: number;
+        watchedEps?: number[];
     };
     status: UserCourseStatus;
     certificateUrl: string | null;
