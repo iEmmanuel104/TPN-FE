@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, Progress, Typography, Badge, Modal, message, Checkbox, List, Space } from 'antd';
 import { FileTextOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { CourseDto, UserCourseDto, UserCourseStatus } from '../api/courseApi';
 import { useEnrollForCourseMutation, useGenerateCourseCertificateMutation } from '../api/courseApi';
 import { useLazyRequestQuizQuery } from '../api/quizApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '../state/store';
 
 const { Text, Paragraph, Title } = Typography;
 interface CourseEnrollmentProgressProps {
@@ -11,7 +13,11 @@ interface CourseEnrollmentProgressProps {
     userCourse?: UserCourseDto;
 }
 
-const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ course, userCourse }) => {
+const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ course, userCourse: propUserCourse }) => {
+    const { userCourses } = useSelector((state: RootState) => state.course);
+    const stateUserCourse = userCourses.find((uc) => uc.courseId === course.id);
+    const userCourse = stateUserCourse || propUserCourse;
+
     const [enrollForCourse] = useEnrollForCourseMutation();
     const [generateCertificate] = useGenerateCourseCertificateMutation();
     const [requestQuiz, { data: quizData, isLoading: isQuizLoading }] = useLazyRequestQuizQuery();
@@ -67,7 +73,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         console.log('Taking quiz', quizData);
     };
 
-    const calculateProgress = (): number => {
+    const calculateProgress = useCallback((): number => {
         if (!userCourse || !userCourse.progress) return 0;
 
         const totalDuration = course.modules.reduce((acc, module) => acc + (module.videoInfo?.length || 0), 0);
@@ -86,7 +92,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         }
 
         return Math.round((watchedDuration / totalDuration) * 100);
-    };
+    }, [course.modules, userCourse]);
 
     if (!userCourse) {
         return (
@@ -204,4 +210,5 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
     return <div className="space-y-4">{renderProgress()}</div>;
 };
 
-export default CourseEnrollmentProgress;
+const MemoizedCourseEnrollmentProgress = React.memo(CourseEnrollmentProgress);
+export default MemoizedCourseEnrollmentProgress;

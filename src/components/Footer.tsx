@@ -19,7 +19,7 @@ const CustomFooter: React.FC = () => {
                 <Row gutter={[16, 32]} className="flex-col sm:flex-row">
                     <Col xs={24} sm={24} md={8} className="mb-8 sm:mb-0">
                         <Title level={3} className="text-primary tracking-widest uppercase text-lg sm:text-xl md:text-2xl">
-                            Texas Preventive Network
+                            Texas Prevention Network
                         </Title>
                         <Text className="text-gray-600 dark:text-black/70 block mt-3 text-sm sm:text-base">
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna

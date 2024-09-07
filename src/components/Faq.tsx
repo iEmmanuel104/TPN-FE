@@ -7,7 +7,7 @@ const { Title, Paragraph } = Typography;
 const Faq = () => {
     const faqItems = [
         {
-            question: 'How can I learn from Texas Preventive network?',
+            question: 'How can I learn from Texas Prevention network?',
             answer: 'TPN connects your business with targeted communities and professionals across the globe, enabling you to expand your reach, engage with key audiences, and foster strategic partnerships.',
         },
         {
