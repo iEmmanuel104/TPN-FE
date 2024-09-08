@@ -62,8 +62,13 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
     const handleRequestCertificate = async () => {
         setIsGeneratingCertificate(true);
         try {
-            await generateCertificate({ courseId: course.id }).unwrap();
-            message.success('Certificate generated successfully!');
+            const response = await generateCertificate({ courseId: course.id }).unwrap();
+            if (response.data && response.data.certificateUrl) {
+                message.success('Certificate generated successfully!');
+                window.open(response.data.certificateUrl, '_blank');
+            } else {
+                throw new Error('Certificate URL not received');
+            }
         } catch (error) {
             console.error('Failed to generate certificate:', error);
             message.error('Failed to generate certificate. Please try again.');
