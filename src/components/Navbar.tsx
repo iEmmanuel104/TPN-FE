@@ -18,6 +18,8 @@ import { RootState } from '../state/store';
 import { logOut } from '../state/slices/authSlice';
 import { useGetAllCoursesQuery } from '../api/courseApi';
 import { CourseDto } from '../api/courseApi';
+import categories from '../constants/categories.json';
+
 
 const { Header } = Layout;
 const { Search } = Input;
@@ -72,6 +74,21 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
 
     const { data: coursesData } = useGetAllCoursesQuery({ q: searchValue, page: 1, size: 5 });
 
+    const isCoursePage = location.pathname === '/courses';
+
+    const handleCategoryClick = (category: string) => {
+        if (isCoursePage) {
+            // If already on the course page, use the existing filter mechanism
+            // This assumes you have a function to update filters on the course page
+            // You might need to implement this using context or state management
+            // For now, we'll just log it
+            console.log(`Filter courses by category: ${category}`);
+        } else {
+            // Redirect to the course page with the category as a query parameter
+            navigate(`/courses?category=${encodeURIComponent(category)}`);
+        }
+    };
+
     useEffect(() => {
         if (isLoggedIn && location.pathname === '/') {
             navigate('/dashboard');
@@ -125,16 +142,15 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
         </Menu>
     );
 
-    const categoryMenu = (
-        <Menu>
-            <Menu.Item key="1">Parenting</Menu.Item>
-            <Menu.Item key="2">Anger Management</Menu.Item>
-            <Menu.Item key="3">Alcohol Addiction</Menu.Item>
-            <Menu.Item key="4">Drug Addiction</Menu.Item>
-            <Menu.Item key="5">Domestic Violence</Menu.Item>
-        </Menu>
-    );
-
+     const categoryMenu = (
+         <Menu>
+             {categories.slice(0, 10).map((category, index) => (
+                 <Menu.Item key={index} onClick={() => handleCategoryClick(category)}>
+                     {category}
+                 </Menu.Item>
+             ))}
+         </Menu>
+     );
     const pagesMenu = (
         <Menu>
             <Menu.Item key="1" onClick={() => handleNavigation('/courses')}>
@@ -293,7 +309,17 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                     </AutoComplete>
                     <Menu mode="inline" className="w-full border-r-0">
                         <Menu.SubMenu key="categories" title="Categories" icon={<MenuOutlined />}>
-                            {categoryMenu.props.children}
+                            {categories.map((category, index) => (
+                                <Menu.Item
+                                    key={index}
+                                    onClick={() => {
+                                        handleCategoryClick(category);
+                                        setDrawerVisible(false);
+                                    }}
+                                >
+                                    {category}
+                                </Menu.Item>
+                            ))}
                         </Menu.SubMenu>
                         <Menu.SubMenu key="pages" title="Page" icon={<DownOutlined />}>
                             {pagesMenu.props.children}
