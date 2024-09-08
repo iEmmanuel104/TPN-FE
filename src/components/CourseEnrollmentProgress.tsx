@@ -3,9 +3,9 @@ import { Button, Progress, Typography, Badge, Modal, message, Checkbox, List, Sp
 import { FileTextOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { CourseDto, UserCourseDto, UserCourseStatus } from '../api/courseApi';
 import { useEnrollForCourseMutation, useGenerateCourseCertificateMutation } from '../api/courseApi';
-import { useLazyRequestQuizQuery } from '../api/quizApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../state/store';
+import AssessmentModal from './AssessmentModal';
 
 const { Text, Paragraph, Title } = Typography;
 interface CourseEnrollmentProgressProps {
@@ -17,11 +17,10 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
     const { userCourses } = useSelector((state: RootState) => state.course);
     const stateUserCourse = userCourses.find((uc) => uc.courseId === course.id);
     const userCourse = stateUserCourse || propUserCourse;
+     const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
 
     const [enrollForCourse] = useEnrollForCourseMutation();
     const [generateCertificate] = useGenerateCourseCertificateMutation();
-    const [requestQuiz, { data: quizData, isLoading: isQuizLoading }] = useLazyRequestQuizQuery();
-    const [isQuizRequested, setIsQuizRequested] = useState(false);
 
     const [isEnrolling, setIsEnrolling] = useState(false);
     const [isGeneratingCertificate, setIsGeneratingCertificate] = useState(false);
@@ -64,13 +63,8 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         }
     };
 
-    const handleTakeQuiz = async () => {
-        if (!isQuizRequested) {
-            setIsQuizRequested(true);
-            await requestQuiz(course.id);
-        }
-        // Implement quiz taking functionality
-        console.log('Taking quiz', quizData);
+    const handleTakeQuiz = () => {
+        setIsQuizModalVisible(true);
     };
 
     const calculateProgress = useCallback((): number => {
@@ -186,9 +180,10 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                 return (
                     <>
                         <Text>Course completed - Quiz available</Text>
-                        <Button icon={<FileTextOutlined />} onClick={handleTakeQuiz} loading={isQuizLoading}>
-                            {isQuizRequested ? 'Continue Quiz' : 'Take Quiz'}
+                        <Button icon={<FileTextOutlined />} onClick={handleTakeQuiz}>
+                            Take Quiz
                         </Button>
+                        <AssessmentModal isVisible={isQuizModalVisible} onClose={() => setIsQuizModalVisible(false)} courseId={course.id} />
                     </>
                 );
             case UserCourseStatus.Completed:
