@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Table, Button, Modal, Form, Input, Radio, Space, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useGetCourseQuizQuery, useCreateQuizMutation, useUpdateQuizMutation, useDeleteQuizMutation, IQuiz } from '../../api/quizApi';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import QuillContent from '../Admin/QuillContent';
 
 interface QuizFormProps {
     courseId: string;
@@ -30,6 +31,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
         } else {
             setEditingQuestion(null);
             form.resetFields();
+            form.setFieldsValue({ options: ['', ''] }); // Start with 2 options
         }
         setIsModalVisible(true);
     };
@@ -74,7 +76,12 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
     };
 
     const columns = [
-        { title: 'Question', dataIndex: 'question', key: 'question' },
+        {
+            title: 'Question',
+            dataIndex: 'question',
+            key: 'question',
+            render: (text: string) => <QuillContent content={text} />,
+        },
         { title: 'Options', dataIndex: 'options', key: 'options', render: (options: { text: string }[]) => options.map((o) => o.text).join(', ') },
         { title: 'Answer', dataIndex: 'answer', key: 'answer' },
         {
@@ -100,35 +107,61 @@ const QuizForm: React.FC<QuizFormProps> = ({ courseId }) => {
                 open={isModalVisible}
                 onOk={handleOk}
                 onCancel={() => setIsModalVisible(false)}
+                width={800}
             >
                 <Form form={form} layout="vertical">
                     <Form.Item name="question" label="Question" rules={[{ required: true, message: 'Please input the question!' }]}>
                         <ReactQuill theme="snow" />
                     </Form.Item>
-                    <Form.List name="options" initialValue={['', '', '', '']}>
-                        {(fields) => (
+                    <Form.List
+                        name="options"
+                        rules={[
+                            {
+                                validator: async (_, options) => {
+                                    if (!options || options.length < 2) {
+                                        return Promise.reject(new Error('At least 2 options are required'));
+                                    }
+                                },
+                            },
+                        ]}
+                    >
+                        {(fields, { add, remove }, { errors }) => (
                             <>
                                 {fields.map((field, index) => (
-                                    <Form.Item key={field.key} label={`Option ${String.fromCharCode(65 + index)}`} required={false}>
+                                    <Form.Item required={false} key={field.key} label={`Option ${String.fromCharCode(65 + index)}`}>
                                         <Form.Item
                                             {...field}
                                             validateTrigger={['onChange', 'onBlur']}
-                                            rules={[{ required: true, whitespace: true, message: 'Please input the option or delete this field.' }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    whitespace: true,
+                                                    message: 'Please input the option or delete this field.',
+                                                },
+                                            ]}
                                             noStyle
                                         >
-                                            <Input style={{ width: '80%' }} />
+                                            <Input style={{ width: '60%' }} />
                                         </Form.Item>
+                                        {fields.length > 2 && (
+                                            <MinusCircleOutlined className="dynamic-delete-button ml-2" onClick={() => remove(field.name)} />
+                                        )}
+                                        {index === fields.length - 1 && fields.length < 4 && (
+                                            <PlusCircleOutlined className="dynamic-add-button ml-2" onClick={() => add()} />
+                                        )}
                                     </Form.Item>
                                 ))}
+                                <Form.ErrorList errors={errors} />
                             </>
                         )}
                     </Form.List>
                     <Form.Item name="answer" label="Correct Answer" rules={[{ required: true, message: 'Please select the correct answer!' }]}>
                         <Radio.Group>
-                            <Radio value={0}>A</Radio>
-                            <Radio value={1}>B</Radio>
-                            <Radio value={2}>C</Radio>
-                            <Radio value={3}>D</Radio>
+                            {['A', 'B', 'C', 'D'].slice(0, form.getFieldValue('options')?.length).map((option, index) => (
+                                <Radio key={option} value={index}>
+                                    {option}
+                                </Radio>
+                            ))}
                         </Radio.Group>
                     </Form.Item>
                 </Form>

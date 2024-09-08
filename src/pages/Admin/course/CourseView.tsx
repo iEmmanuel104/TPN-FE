@@ -7,6 +7,7 @@ import DashboardLayout from '../../../components/Admin/DashboardLayout';
 import { useGetSingleCourseInfoQuery } from '../../../api/courseApi';
 import VideoPlayer from '../../../components/VideoPlayer';
 import { formatVideoLength } from '../../../utils/formatVideoLength';
+import QuillContent from '../../../components/Admin/QuillContent';
 
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -87,7 +88,9 @@ const CourseView: React.FC = () => {
                 <Row gutter={16}>
                     <Col span={16}>
                         <Card title="Description" size="small">
-                            <Paragraph className="text-sm">{course.description}</Paragraph>
+                            <Paragraph className="text-sm">
+                                <QuillContent content={course.description} />
+                            </Paragraph>
                         </Card>
                         <Card title="Requirements" size="small" className="mt-4">
                             <ul className="list-disc list-inside text-sm">
@@ -109,7 +112,9 @@ const CourseView: React.FC = () => {
                                     <Text className="text-xs text-gray-500">{course.instructor.email}</Text>
                                 </div>
                             </div>
-                            <Paragraph className="text-xs mt-2">{course.instructor.bio}</Paragraph>
+                            <Paragraph className="text-xs mt-2">
+                                <QuillContent content={course?.instructor.bio} />
+                            </Paragraph>
                             {course.instructor.socials && (
                                 <div className="mt-2">
                                     {course.instructor.socials.x && (
@@ -139,40 +144,45 @@ const CourseView: React.FC = () => {
                     <Col span={16}>
                         <Card>
                             <Collapse accordion className="mb-4">
-                                {course.modules.slice().sort((a, b) => a.episodeNumber - b.episodeNumber).map((module) => (
-                                    <Panel 
-                                        header={
-                                            <div className="flex justify-between items-center">
-                                                <Text strong>{`Module ${module.episodeNumber}: ${module.title}`}</Text>
-                                                <Text className="text-gray-500">{formatVideoLength(module.videoInfo?.length || 0)}</Text>
-                                            </div>
-                                        }
-                                        key={module.id}
-                                    >
-                                        <Paragraph className="text-sm mb-2">{module.description}</Paragraph>
-                                        <VideoPlayer url={module.url} videoId={module.id} frames={module.frames} className="mb-4" />
-                                        <List
-                                            size="small"
-                                            dataSource={[
-                                                {
-                                                    icon: <PlayCircleOutlined />,
-                                                    text: 'Video Lecture',
-                                                    duration: formatVideoLength(module.videoInfo?.length || 0),
-                                                },
-                                                {
-                                                    icon: <FileTextOutlined />,
-                                                    text: 'Reading Material',
-                                                    duration: '10 mins',
-                                                },
-                                            ]}
-                                            renderItem={(item) => (
-                                                <List.Item>
-                                                    <List.Item.Meta avatar={item.icon} title={item.text} description={item.duration} />
-                                                </List.Item>
-                                            )}
-                                        />
-                                    </Panel>
-                                ))}
+                                {course.modules
+                                    .slice()
+                                    .sort((a, b) => a.episodeNumber - b.episodeNumber)
+                                    .map((module) => (
+                                        <Panel
+                                            header={
+                                                <div className="flex justify-between items-center">
+                                                    <Text strong>{`Module ${module.episodeNumber}: ${module.title}`}</Text>
+                                                    <Text className="text-gray-500">{formatVideoLength(module.videoInfo?.length || 0)}</Text>
+                                                </div>
+                                            }
+                                            key={module.id}
+                                        >
+                                            <Paragraph className="text-sm mb-2">
+                                                <QuillContent content={module.description} />
+                                            </Paragraph>
+                                            <VideoPlayer url={module.url} videoId={module.id} frames={module.frames} className="mb-4" />
+                                            <List
+                                                size="small"
+                                                dataSource={[
+                                                    {
+                                                        icon: <PlayCircleOutlined />,
+                                                        text: 'Video Lecture',
+                                                        duration: formatVideoLength(module.videoInfo?.length || 0),
+                                                    },
+                                                    {
+                                                        icon: <FileTextOutlined />,
+                                                        text: 'Reading Material',
+                                                        duration: '10 mins',
+                                                    },
+                                                ]}
+                                                renderItem={(item) => (
+                                                    <List.Item>
+                                                        <List.Item.Meta avatar={item.icon} title={item.text} description={item.duration} />
+                                                    </List.Item>
+                                                )}
+                                            />
+                                        </Panel>
+                                    ))}
                             </Collapse>
                         </Card>
                     </Col>

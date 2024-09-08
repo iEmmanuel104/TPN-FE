@@ -21,6 +21,7 @@ import { formatVideoLength } from '../utils/formatVideoLength';
 import CourseEnrollmentProgress from '../components/CourseEnrollmentProgress';
 import { setSelectedCourse, setCurrentModule } from '../state/slices/courseSlice'; // Add this import
 import { RootState } from '../state/store';
+import QuillContent from '../components/Admin/QuillContent';
 
 const { Panel } = Collapse;
 
@@ -303,7 +304,9 @@ const CoursePage: React.FC = () => {
                                                     }
                                                     key={module.id}
                                                 >
-                                                    <Paragraph className="text-sm mb-2">{module.description}</Paragraph>
+                                                    <Paragraph className="text-sm mb-2">
+                                                        <QuillContent content={module.description} />
+                                                    </Paragraph>
                                                     {isEnrolledAndPaid && (
                                                         <VideoPlayer
                                                             url={module.url}
@@ -370,7 +373,9 @@ const CoursePage: React.FC = () => {
                                             <TwitterOutlined className="mr-2 text-blue-400" />
                                             <LinkedinOutlined className="text-blue-800" />
                                         </div>
-                                        <Paragraph className="text-gray-600">{course?.instructor.bio}</Paragraph>
+                                        <Paragraph className="text-gray-600">
+                                            <QuillContent content={course?.instructor.bio ?? ""}/>
+                                        </Paragraph>
                                     </div>
                                 </div>
                             </Card>

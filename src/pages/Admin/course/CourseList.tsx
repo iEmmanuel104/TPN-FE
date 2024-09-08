@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import DashboardLayout from '../../../components/Admin/DashboardLayout';
 import { useGetAllCoursesQuery } from '../../../api/courseApi';
 import { UserOutlined, ReadOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import QuillContent from '../../../components/Admin/QuillContent';
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -56,9 +57,10 @@ const CourseList: React.FC = () => {
 
     const courses = coursesData?.data?.courses || [];
 
-    const truncateDescription = (description: string, maxLength: number) => {
-        if (description.length <= maxLength) return description;
-        return description.slice(0, maxLength) + '...';
+    const truncateDescription = (content: string, maxLength: number) => {
+        const strippedContent = content.replace(/<[^>]+>/g, '');
+        if (strippedContent.length <= maxLength) return content;
+        return strippedContent.slice(0, maxLength) + '...';
     };
 
     const getLevelColor = (level: string) => {
@@ -197,7 +199,7 @@ const CourseList: React.FC = () => {
                                             {course.title}
                                         </Title>
                                         <Text className="text-gray-500 text-xs mb-2 h-8 overflow-hidden">
-                                            {truncateDescription(course.description, 60)}
+                                            <QuillContent content={truncateDescription(course.description, 60)} />
                                         </Text>
                                         <div className="flex items-center mb-2">
                                             <Rate disabled defaultValue={course.stats.overallRating} className="text-xs mr-1" />
