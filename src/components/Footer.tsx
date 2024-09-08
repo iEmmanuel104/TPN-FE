@@ -1,63 +1,67 @@
 import React from 'react';
 import { Layout, Typography, Row, Col, Space } from 'antd';
 import { PhoneOutlined, EnvironmentOutlined, InstagramOutlined, WhatsAppOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 const { Footer } = Layout;
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 
 const FooterLinks = [
-    { title: 'Home', link: '/#' },
-    { title: 'About', link: '/#about' },
-    { title: 'Contact', link: '/#contact' },
-    { title: 'Blog', link: '/#blog' },
+    { title: 'Home', link: '/' },
+    { title: 'Courses', link: '/courses' },
+    { title: 'Blog', link: '/blogs' },
+    { title: 'About Us', link: '/#about-us' },
+    { title: 'Contact', link: '/contact' },
+    { title: 'FAQs', link: '/#faq' },
+    { title: 'Events', link: '/events' },
 ];
 
 const CustomFooter: React.FC = () => {
     return (
-        <Footer className="bg-blue-200 px-4 sm:px-6 lg:px-8 py-8">
+        <Footer style={{ backgroundColor: '#333333', padding: '48px 24px' }}>
             <div className="max-w-7xl mx-auto">
                 <Row gutter={[16, 32]} className="flex-col sm:flex-row">
                     <Col xs={24} sm={24} md={8} className="mb-8 sm:mb-0">
-                        <Title level={3} className="text-primary tracking-widest uppercase text-lg sm:text-xl md:text-2xl">
+                        <Title level={3} className="tracking-widest uppercase text-lg sm:text-xl md:text-2xl" style={{ color: 'white' }}>
                             Texas Prevention Network
                         </Title>
-                        <Text className="text-gray-600 dark:text-black/70 block mt-3 text-sm sm:text-base">
+                        <Text className="block mt-3 text-sm sm:text-base" style={{ color: '#999999' }}>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
                             aliqua.
                         </Text>
                     </Col>
                     <Col xs={24} sm={12} md={8} className="mb-8 sm:mb-0">
-                        <Title level={4} className="text-lg sm:text-xl">
+                        <Title level={4} className="text-lg sm:text-xl" style={{ color: 'white' }}>
                             Important Links
                         </Title>
                         <Space direction="vertical" size="small" className="w-full">
                             {FooterLinks.map((link, index) => (
-                                <Link key={index} href={link.link} className="text-gray-600 hover:text-black text-sm sm:text-base">
+                                <Link key={index} to={link.link} className="text-sm sm:text-base hover:underline" style={{ color: '#999999' }}>
                                     {link.title}
                                 </Link>
                             ))}
                         </Space>
                     </Col>
                     <Col xs={24} sm={12} md={8}>
-                        <Title level={4} className="text-lg sm:text-xl">
+                        <Title level={4} className="text-lg sm:text-xl" style={{ color: 'white' }}>
                             Address
                         </Title>
                         <Space direction="vertical" size="small" className="w-full">
-                            <Text className="flex items-center text-sm sm:text-base">
+                            <Text className="flex items-center text-sm sm:text-base" style={{ color: '#999999' }}>
                                 <EnvironmentOutlined className="mr-2" />
                                 43 bakers street, London
                             </Text>
-                            <Text className="flex items-center text-sm sm:text-base">
+                            <Text className="flex items-center text-sm sm:text-base" style={{ color: '#999999' }}>
                                 <PhoneOutlined className="mr-2" />
                                 +234 8185513597
                             </Text>
                             <Space size="large" className="mt-4">
-                                <Link href="#" className="text-gray-600 hover:text-primary">
+                                <a href="#" className="hover:opacity-80" style={{ color: '#999999' }}>
                                     <InstagramOutlined className="text-xl sm:text-2xl" />
-                                </Link>
-                                <Link href="https://wa.me/2348064203690" className="text-gray-600 hover:text-primary">
+                                </a>
+                                <a href="https://wa.me/2348064203690" className="hover:opacity-80" style={{ color: '#999999' }}>
                                     <WhatsAppOutlined className="text-xl sm:text-2xl" />
-                                </Link>
+                                </a>
                             </Space>
                         </Space>
                     </Col>

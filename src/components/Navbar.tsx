@@ -194,7 +194,11 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                             allowClear
                             onSearch={handleSearch}
                             onChange={(e) => setSearchValue(e.target.value)}
-                            className="w-full"
+                            style={{
+                                backgroundColor: '#f0f0f0',
+                                overflow: 'hidden',
+                            }}
+                            className="w-full custom-search-input"
                         />
                     </AutoComplete>
 
