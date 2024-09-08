@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List } from 'antd';
+import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List, Modal } from 'antd';
 import {
     UserOutlined,
     BookOutlined,
@@ -22,6 +22,7 @@ import CourseEnrollmentProgress from '../components/CourseEnrollmentProgress';
 import { setSelectedCourse, setCurrentModule } from '../state/slices/courseSlice'; // Add this import
 import { RootState } from '../state/store';
 import QuillContent from '../components/Admin/QuillContent';
+import { useGetReviewsByCourseQuery } from '../api/reviewApi';
 
 const { Panel } = Collapse;
 
@@ -37,7 +38,8 @@ const CoursePage: React.FC = () => {
     const { data: courseData, isLoading, isError } = useGetSingleCourseInfoQuery({ id: (id as string) ?? '' });
     const { data: similarCoursesData } = useGetAllSimilarOrPopularCoursesQuery({ id });
     const { selectedCourse, userCourses } = useSelector((state: RootState) => state.course); // Add this line
-    console.log({ selectedCourse, userCourses });
+    const { data: reviewsData } = useGetReviewsByCourseQuery(id as string);
+    const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
 
     const [activeSection, setActiveSection] = useState('overview');
     const [showBottomNav, setShowBottomNav] = useState(false);
@@ -213,6 +215,51 @@ const CoursePage: React.FC = () => {
         );
     }
 
+    const renderReviews = () => {
+        if (!reviewsData || !reviewsData.data) return null;
+
+        const reviews = reviewsData.data;
+        const displayedReviews = reviews.slice(0, 3);
+
+        return (
+            <>
+                <List
+                    itemLayout="horizontal"
+                    dataSource={displayedReviews}
+                    renderItem={(review) => (
+                        <List.Item>
+                            <List.Item.Meta
+                                avatar={<Avatar icon={<UserOutlined />} />}
+                                title={<Rate disabled defaultValue={review.rating} />}
+                                description={review.comment}
+                            />
+                        </List.Item>
+                    )}
+                />
+                {reviews.length > 3 && (
+                    <Button onClick={() => setIsReviewModalVisible(true)} className="mt-4">
+                        View All Reviews
+                    </Button>
+                )}
+                <Modal title="All Reviews" open={isReviewModalVisible} onCancel={() => setIsReviewModalVisible(false)} footer={null} width={800}>
+                    <List
+                        itemLayout="horizontal"
+                        dataSource={reviews}
+                        renderItem={(review) => (
+                            <List.Item>
+                                <List.Item.Meta
+                                    avatar={<Avatar icon={<UserOutlined />} />}
+                                    title={<Rate disabled defaultValue={review.rating} />}
+                                    description={review.comment}
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </Modal>
+            </>
+        );
+    };
+
     return (
         <PublicLayout>
             <div className="bg-white min-h-screen">
@@ -374,7 +421,7 @@ const CoursePage: React.FC = () => {
                                             <LinkedinOutlined className="text-blue-800" />
                                         </div>
                                         <Paragraph className="text-gray-600">
-                                            <QuillContent content={course?.instructor.bio ?? ""}/>
+                                            <QuillContent content={course?.instructor.bio ?? ''} />
                                         </Paragraph>
                                     </div>
                                 </div>
@@ -424,6 +471,7 @@ const CoursePage: React.FC = () => {
                                             ))}
                                         </div>
                                     </Col>
+                                    <Col span={24}>{renderReviews()}</Col>
                                 </Row>
                             </Card>
                         </Col>

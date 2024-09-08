@@ -1,5 +1,6 @@
 // src/api/reviewApi.ts
 import { ApiResponse, apiSlice } from './api';
+import { UserInfoFromApi } from './authApi';
 
 export interface IReview {
     id: string;
@@ -8,6 +9,7 @@ export interface IReview {
     reviewerId: string;
     courseId?: string | null;
     createdAt?: string;
+    reviewer?: UserInfoFromApi  
 }
 
 export const reviewApiSlice = apiSlice.injectEndpoints({
