@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Card, Radio, Space, message, Typography, Spin, Progress } from 'antd';
 import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '../api/quizApi';
 import QuillContent from './Admin/QuillContent';
@@ -24,22 +24,22 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
     const [quizCompleted, setQuizCompleted] = useState(false);
     const [quizResult, setQuizResult] = useState<{ grade: number; passed: boolean } | null>(null);
 
+    const handleStartQuiz = useCallback(async () => {
+        await requestQuiz(courseId);
+        setQuizStarted(true);
+    }, [requestQuiz, courseId]);
+
     useEffect(() => {
         if (isVisible && !quizStarted && !isQuizLoading) {
             handleStartQuiz();
         }
-    }, [isVisible, quizStarted, isQuizLoading]);
+    }, [isVisible, quizStarted, isQuizLoading, handleStartQuiz]);
 
     useEffect(() => {
         if (quizData?.data) {
             setQuestions(quizData.data);
         }
     }, [quizData]);
-
-    const handleStartQuiz = async () => {
-        await requestQuiz(courseId);
-        setQuizStarted(true);
-    };
 
     const handleAnswerChange = (questionId: number, optionId: string) => {
         setUserAnswers((prev) => {
@@ -69,9 +69,11 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
 
         try {
             const response = await gradeQuiz({ courseId, answers: userAnswers }).unwrap();
+            const grade = response.data?.grade ?? 0;
+            const passed = response.data?.passed ?? grade >= 1;
             setQuizCompleted(true);
-            setQuizResult({ grade: response.data?.grade ?? 0, passed: response.data?.passed ?? false });
-            if (response.data?.passed) {
+            setQuizResult({ grade, passed });
+            if (passed || grade >= 1) {
                 confetti({
                     particleCount: 100,
                     spread: 70,
@@ -130,6 +132,7 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         type="primary"
                         onClick={handleNextQuestion}
                         disabled={!userAnswers.find((a) => a.questionId === currentQuestion.id.toString())}
+                        loading={isGrading}
                     >
                         {currentQuestionIndex === questions.length - 1 ? 'Submit Quiz' : 'Next Question'}
                     </Button>
@@ -140,17 +143,23 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         Quiz Results
                     </Title>
                     <div className="flex justify-center mb-4">
-                        {quizResult?.passed ? (
+                        {quizResult?.passed || (quizResult?.grade !== undefined && quizResult.grade >= 1) ? (
                             <CheckCircleOutlined className="text-6xl text-green-500" />
                         ) : (
                             <CloseCircleOutlined className="text-6xl text-red-500" />
                         )}
                     </div>
                     <Title level={3} className="mb-4">
-                        {quizResult?.passed ? 'Congratulations! You passed the quiz.' : 'You did not pass the quiz.'}
+                        {quizResult?.passed || (quizResult?.grade !== undefined && quizResult.grade >= 1)
+                            ? 'Congratulations! You passed the quiz.'
+                            : 'You did not pass the quiz.'}
                     </Title>
-                    <Paragraph className="text-xl mb-4">Your grade: {quizResult?.grade}%</Paragraph>
-                    {!quizResult?.passed && <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>}
+                    <Paragraph className="text-xl mb-4">
+                        Your score: {quizResult?.grade !== undefined ? `${Math.round(quizResult.grade * 100)}%` : 'N/A'}
+                    </Paragraph>
+                    {!quizResult?.passed && quizResult?.grade !== undefined && quizResult.grade < 1 && (
+                        <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>
+                    )}
                     <Button type="primary" onClick={handleClose}>
                         Close
                     </Button>
