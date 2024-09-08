@@ -221,19 +221,21 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                 );
             case UserCourseStatus.Completed:
                 return (
-                    <>
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                         <Badge status="success" text="Course Completed" />
-                        {course.assessment.hasAssessment && (
-                            <Button icon={<FileTextOutlined />} onClick={handleRequestCertificate} loading={isGeneratingCertificate}>
-                                Request Certificate
-                            </Button>
-                        )}
-                        {!hasUserReviewed && (
-                            <Button icon={<StarOutlined />} onClick={handleLeaveReview}>
-                                Leave a Review
-                            </Button>
-                        )}
-                    </>
+                        <Space>
+                            {course.assessment.hasAssessment && (
+                                <Button icon={<FileTextOutlined />} onClick={handleRequestCertificate} loading={isGeneratingCertificate}>
+                                    Request Certificate
+                                </Button>
+                            )}
+                            {!hasUserReviewed && (
+                                <Button icon={<StarOutlined />} onClick={handleLeaveReview}>
+                                    Leave a Review
+                                </Button>
+                            )}
+                        </Space>
+                    </Space>
                 );
             default:
                 return null;
