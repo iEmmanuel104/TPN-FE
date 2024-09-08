@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Card, Radio, Space, message, Typography, Spin, Progress } from 'antd';
 import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '../api/quizApi';
 import QuillContent from './Admin/QuillContent';
-import confetti from 'canvas-confetti';
+import confetti, { Options } from 'canvas-confetti'; // Import Options type from 'canvas-confetti'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -35,10 +35,10 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
     }, [requestQuiz, courseId]);
 
     useEffect(() => {
-        if (isVisible && !quizStarted && !isQuizLoading) {
+        if (isVisible && !quizStarted && !isQuizLoading && !quizCompleted) {
             handleStartQuiz();
         }
-    }, [isVisible, quizStarted, isQuizLoading, handleStartQuiz]);
+    }, [isVisible, quizStarted, isQuizLoading, quizCompleted, handleStartQuiz]);
 
     useEffect(() => {
         if (quizData?.data) {
@@ -66,51 +66,53 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
         }
     };
 
-const handleSubmitQuiz = async () => {
-    if (userAnswers.length !== questions.length) {
-        message.error('Please answer all questions before submitting.');
-        return;
-    }
-
-    try {
-        const response = await gradeQuiz({ courseId, answers: userAnswers }).unwrap();
-        if (response.data) {
-            const { grade, passed, userCourse } = response.data;
-            setQuizCompleted(true);
-            setQuizResult({ grade, passed });
-
-            // Update the Redux state with the new UserCourseDto
-            if (userCourse) {
-                dispatch(setUserCourses([userCourse]));
-            }
-
-            if (passed || grade >= 1) {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                });
-            }
-        } else {
-            throw new Error('No data received from gradeQuiz');
+    const handleSubmitQuiz = async () => {
+        if (userAnswers.length !== questions.length) {
+            message.error('Please answer all questions before submitting.');
+            return;
         }
-    } catch (error) {
-        console.error('Failed to grade quiz:', error);
-        message.error('Failed to submit quiz. Please try again.');
-    }
-};
+
+        try {
+            const response = await gradeQuiz({ courseId, answers: userAnswers }).unwrap();
+            if (response.data) {
+                const { grade, passed, userCourse } = response.data;
+                setQuizCompleted(true);
+                setQuizResult({ grade, passed });
+
+                // Update the Redux state with the new UserCourseDto
+                if (userCourse) {
+                    dispatch(setUserCourses([userCourse]));
+                }
+
+                if (passed || grade >= 1) {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        duration: 5000, // Increased duration to 5 seconds
+                    } as Options); // Add 'as Options' to specify the type
+                }
+            } else {
+                throw new Error('No data received from gradeQuiz');
+            }
+        } catch (error) {
+            console.error('Failed to grade quiz:', error);
+            message.error('Failed to submit quiz. Please try again.');
+        }
+    };
 
     const handleClose = () => {
-        if (quizCompleted && quizResult?.passed) {
-            navigate(0);
-        } else {
+        if (!quizCompleted) {
             setQuizStarted(false);
-            setQuizCompleted(false);
             setUserAnswers([]);
             setCurrentQuestionIndex(0);
             setQuizResult(null);
-            onClose();
         }
+        onClose();
+    };
+
+    const handleBackToCourse = () => {
+        navigate(0);
     };
 
     const currentQuestion = questions[currentQuestionIndex];
@@ -186,7 +188,7 @@ const handleSubmitQuiz = async () => {
                     {!quizResult?.passed && quizResult?.grade !== undefined && quizResult.grade < 1 && (
                         <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>
                     )}
-                    <Button type="primary" onClick={handleClose}>
+                    <Button type="primary" onClick={quizResult?.passed ? handleBackToCourse : handleClose}>
                         {quizResult?.passed ? 'Back to Course' : 'Close'}
                     </Button>
                 </Card>
