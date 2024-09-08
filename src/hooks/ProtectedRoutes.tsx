@@ -8,7 +8,7 @@ export const ProtectedUserRoute: React.FC = () => {
     const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
 
     if (!isLoggedIn) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
 
     return <Outlet />;
