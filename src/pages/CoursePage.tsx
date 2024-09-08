@@ -22,7 +22,8 @@ import CourseEnrollmentProgress from '../components/CourseEnrollmentProgress';
 import { setSelectedCourse, setCurrentModule } from '../state/slices/courseSlice'; // Add this import
 import { RootState } from '../state/store';
 import QuillContent from '../components/Admin/QuillContent';
-import { useGetReviewsByCourseQuery } from '../api/reviewApi';
+import { IReview, useGetReviewsByCourseQuery } from '../api/reviewApi';
+import { formatDate } from '../utils/formatDate';
 
 const { Panel } = Collapse;
 
@@ -218,24 +219,34 @@ const CoursePage: React.FC = () => {
     const renderReviews = () => {
         if (!reviewsData || !reviewsData.data) return null;
 
-        const reviews = reviewsData.data;
+        const reviews: IReview[] = reviewsData.data;
         const displayedReviews = reviews.slice(0, 3);
+
+        const ReviewItem = ({ review }: { review: IReview }) => (
+            <List.Item>
+                <List.Item.Meta
+                    avatar={<Avatar src={review.reviewer?.displayImage} icon={<UserOutlined />} />}
+                    title={
+                        <div className="flex justify-between items-center">
+                            <span>{`${review.reviewer?.firstName} ${review.reviewer?.lastName}`}</span>
+                            <Rate disabled defaultValue={review.rating} />
+                        </div>
+                    }
+                    description={
+                        <div>
+                            <Text type="secondary" className="block mb-2 text-sm">
+                                {formatDate(review.createdAt ?? '')}
+                            </Text>
+                            <Paragraph>{review.comment}</Paragraph>
+                        </div>
+                    }
+                />
+            </List.Item>
+        );
 
         return (
             <>
-                <List
-                    itemLayout="horizontal"
-                    dataSource={displayedReviews}
-                    renderItem={(review) => (
-                        <List.Item>
-                            <List.Item.Meta
-                                avatar={<Avatar icon={<UserOutlined />} />}
-                                title={<Rate disabled defaultValue={review.rating} />}
-                                description={review.comment}
-                            />
-                        </List.Item>
-                    )}
-                />
+                <List itemLayout="vertical" dataSource={displayedReviews} renderItem={(review) => <ReviewItem review={review} />} />
                 {reviews.length > 3 && (
                     <Button onClick={() => setIsReviewModalVisible(true)} className="mt-4">
                         View All Reviews
@@ -243,17 +254,14 @@ const CoursePage: React.FC = () => {
                 )}
                 <Modal title="All Reviews" open={isReviewModalVisible} onCancel={() => setIsReviewModalVisible(false)} footer={null} width={800}>
                     <List
-                        itemLayout="horizontal"
+                        itemLayout="vertical"
                         dataSource={reviews}
-                        renderItem={(review) => (
-                            <List.Item>
-                                <List.Item.Meta
-                                    avatar={<Avatar icon={<UserOutlined />} />}
-                                    title={<Rate disabled defaultValue={review.rating} />}
-                                    description={review.comment}
-                                />
-                            </List.Item>
-                        )}
+                        renderItem={(review) => <ReviewItem review={review} />}
+                        pagination={{
+                            pageSize: 10,
+                            total: reviews.length,
+                            showSizeChanger: false,
+                        }}
                     />
                 </Modal>
             </>
