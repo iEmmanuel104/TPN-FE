@@ -1,13 +1,15 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Progress, Typography, Badge, Modal, message, Checkbox, List, Space } from 'antd';
-import { FileTextOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Button, Progress, Typography, Badge, Modal, message, Checkbox, List, Space, Rate, Input } from 'antd';
+import { FileTextOutlined, InfoCircleOutlined, StarOutlined } from '@ant-design/icons';
 import { CourseDto, UserCourseDto, UserCourseStatus } from '../api/courseApi';
 import { useEnrollForCourseMutation, useGenerateCourseCertificateMutation } from '../api/courseApi';
 import { useSelector } from 'react-redux';
 import { RootState } from '../state/store';
 import AssessmentModal from './AssessmentModal';
+import { useAddReviewMutation } from '../api/reviewApi';
 
 const { Text, Paragraph, Title } = Typography;
+
 interface CourseEnrollmentProgressProps {
     course: CourseDto;
     userCourse?: UserCourseDto;
@@ -15,17 +17,24 @@ interface CourseEnrollmentProgressProps {
 
 const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ course, userCourse: propUserCourse }) => {
     const { userCourses } = useSelector((state: RootState) => state.course);
+    const { user } = useSelector((state: RootState) => state.auth);
     const stateUserCourse = userCourses.find((uc) => uc.courseId === course.id);
     const userCourse = stateUserCourse || propUserCourse;
-     const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
+    const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
 
     const [enrollForCourse] = useEnrollForCourseMutation();
     const [generateCertificate] = useGenerateCourseCertificateMutation();
+    const [addReview] = useAddReviewMutation();
 
     const [isEnrolling, setIsEnrolling] = useState(false);
     const [isGeneratingCertificate, setIsGeneratingCertificate] = useState(false);
     const [showEnrollConfirmation, setShowEnrollConfirmation] = useState(false);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+    const [reviewRating, setReviewRating] = useState(0);
+    const [reviewComment, setReviewComment] = useState('');
+
+    const hasUserReviewed = course.reviews.some((review) => review.reviewerId === user?.id);
 
     const handleEnroll = async () => {
         if (!termsAccepted) {
@@ -65,6 +74,25 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
 
     const handleTakeQuiz = () => {
         setIsQuizModalVisible(true);
+    };
+
+    const handleLeaveReview = () => {
+        setIsReviewModalVisible(true);
+    };
+
+    const handleSubmitReview = async () => {
+        try {
+            await addReview({
+                courseId: course.id,
+                rating: reviewRating,
+                comment: reviewComment,
+            }).unwrap();
+            message.success('Review submitted successfully!');
+            setIsReviewModalVisible(false);
+        } catch (error) {
+            console.error('Failed to submit review:', error);
+            message.error('Failed to submit review. Please try again.');
+        }
     };
 
     const calculateProgress = useCallback((): number => {
@@ -195,6 +223,11 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                                 Request Certificate
                             </Button>
                         )}
+                        {!hasUserReviewed && (
+                            <Button icon={<StarOutlined />} onClick={handleLeaveReview}>
+                                Leave a Review
+                            </Button>
+                        )}
                     </>
                 );
             default:
@@ -202,7 +235,23 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         }
     };
 
-    return <div className="space-y-4">{renderProgress()}</div>;
+    return (
+        <div className="space-y-4">
+            {renderProgress()}
+            <AssessmentModal isVisible={isQuizModalVisible} onClose={() => setIsQuizModalVisible(false)} courseId={course.id} />
+            <Modal title="Leave a Review" visible={isReviewModalVisible} onOk={handleSubmitReview} onCancel={() => setIsReviewModalVisible(false)}>
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <Rate allowHalf value={reviewRating} onChange={setReviewRating} />
+                    <Input.TextArea
+                        rows={4}
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="Write your review here..."
+                    />
+                </Space>
+            </Modal>
+        </div>
+    );
 };
 
 const MemoizedCourseEnrollmentProgress = React.memo(CourseEnrollmentProgress);

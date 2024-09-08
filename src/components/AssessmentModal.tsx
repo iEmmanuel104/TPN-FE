@@ -1,4 +1,3 @@
-// src/components/AssessmentModal.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Card, Radio, Space, message, Typography, Spin, Progress } from 'antd';
 import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '../api/quizApi';
@@ -6,6 +5,8 @@ import QuillContent from './Admin/QuillContent';
 import confetti from 'canvas-confetti';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUserCourses } from '../state/slices/courseSlice';
 
 const { Title, Paragraph } = Typography;
 
@@ -17,6 +18,7 @@ interface QuizModalProps {
 
 const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseId }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [requestQuiz, { data: quizData, isLoading: isQuizLoading }] = useLazyRequestQuizQuery();
     const [gradeQuiz, { isLoading: isGrading }] = useGradeQuizMutation();
 
@@ -64,18 +66,24 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
         }
     };
 
-    const handleSubmitQuiz = async () => {
-        if (userAnswers.length !== questions.length) {
-            message.error('Please answer all questions before submitting.');
-            return;
-        }
+const handleSubmitQuiz = async () => {
+    if (userAnswers.length !== questions.length) {
+        message.error('Please answer all questions before submitting.');
+        return;
+    }
 
-        try {
-            const response = await gradeQuiz({ courseId, answers: userAnswers }).unwrap();
-            const grade = response.data?.grade ?? 0;
-            const passed = response.data?.passed ?? grade >= 1;
+    try {
+        const response = await gradeQuiz({ courseId, answers: userAnswers }).unwrap();
+        if (response.data) {
+            const { grade, passed, userCourse } = response.data;
             setQuizCompleted(true);
             setQuizResult({ grade, passed });
+
+            // Update the Redux state with the new UserCourseDto
+            if (userCourse) {
+                dispatch(setUserCourses([userCourse]));
+            }
+
             if (passed || grade >= 1) {
                 confetti({
                     particleCount: 100,
@@ -83,11 +91,14 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                     origin: { y: 0.6 },
                 });
             }
-        } catch (error) {
-            console.error('Failed to grade quiz:', error);
-            message.error('Failed to submit quiz. Please try again.');
+        } else {
+            throw new Error('No data received from gradeQuiz');
         }
-    };
+    } catch (error) {
+        console.error('Failed to grade quiz:', error);
+        message.error('Failed to submit quiz. Please try again.');
+    }
+};
 
     const handleClose = () => {
         if (quizCompleted && quizResult?.passed) {
