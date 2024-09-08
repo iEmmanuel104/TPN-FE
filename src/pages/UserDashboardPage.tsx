@@ -58,18 +58,20 @@ const Dashboard: React.FC = () => {
                     Welcome back, {user?.firstName || 'User'}!
                 </Title>
 
-                <section className="mb-12">
-                    <Title level={3} className="mb-4">
-                        Continue Learning
-                    </Title>
-                    <Carousel autoplay>
-                        {inProgressCourses.map((course) => (
-                            <div key={course.id} className="px-4">
-                                <CourseCard {...course} isList={true} progress={course.userCourses[0]?.progress} />
-                            </div>
-                        ))}
-                    </Carousel>
-                </section>
+                {inProgressCourses.length > 0 && (
+                    <section className="mb-12">
+                        <Title level={3} className="mb-4">
+                            Continue Learning
+                        </Title>
+                        <Carousel autoplay>
+                            {inProgressCourses.map((course) => (
+                                <div key={course.id} className="px-4">
+                                    <CourseCard {...course} isList={true} progress={course.userCourses[0]?.progress} />
+                                </div>
+                            ))}
+                        </Carousel>
+                    </section>
+                )}
 
                 <section className="mb-12">
                     <Title level={3} className="mb-4">
@@ -93,12 +95,12 @@ const Dashboard: React.FC = () => {
 
                 <section className="mb-12">
                     <Title level={3} className="mb-4">
-                        Popular Courses
+                        Recommended Courses
                     </Title>
-                    <div className="overflow-x-auto whitespace-nowrap pb-4">
-                        <Row gutter={16} className="flex-nowrap">
-                            {popularCourses.map((course) => (
-                                <Col key={course.id} className="w-64 flex-shrink-0">
+                    <div className="overflow-x-auto scrollbar-hide">
+                        <Row gutter={16} className="flex-nowrap" style={{ marginLeft: 0, marginRight: 0 }}>
+                            {similarCourses.map((course) => (
+                                <Col key={course.id} style={{ padding: 8 }}>
                                     <CourseCard {...course} />
                                 </Col>
                             ))}
@@ -108,12 +110,12 @@ const Dashboard: React.FC = () => {
 
                 <section className="mb-12">
                     <Title level={3} className="mb-4">
-                        Similar Courses
+                        Popular Courses
                     </Title>
-                    <div className="overflow-x-auto whitespace-nowrap pb-4">
-                        <Row gutter={16} className="flex-nowrap">
-                            {similarCourses.map((course) => (
-                                <Col key={course.id} className="w-64 flex-shrink-0">
+                    <div className="overflow-x-auto scrollbar-hide">
+                        <Row gutter={16} className="flex-nowrap" style={{ marginLeft: 0, marginRight: 0 }}>
+                            {popularCourses.map((course) => (
+                                <Col key={course.id} style={{ padding: 8 }}>
                                     <CourseCard {...course} />
                                 </Col>
                             ))}
