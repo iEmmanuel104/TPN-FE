@@ -1,3 +1,4 @@
+// src/components/AssessmentModal.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Card, Radio, Space, message, Typography, Spin, Progress } from 'antd';
 import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '../api/quizApi';
@@ -81,10 +82,6 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                     spread: 70,
                     origin: { y: 0.6 },
                 });
-                // Refresh the page after a short delay to show the confetti
-                setTimeout(() => {
-                    navigate(0);
-                }, 3000);
             }
         } catch (error) {
             console.error('Failed to grade quiz:', error);
@@ -93,18 +90,30 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
     };
 
     const handleClose = () => {
-        setQuizStarted(false);
-        setQuizCompleted(false);
-        setUserAnswers([]);
-        setCurrentQuestionIndex(0);
-        setQuizResult(null);
-        onClose();
+        if (quizCompleted && quizResult?.passed) {
+            navigate(0);
+        } else {
+            setQuizStarted(false);
+            setQuizCompleted(false);
+            setUserAnswers([]);
+            setCurrentQuestionIndex(0);
+            setQuizResult(null);
+            onClose();
+        }
     };
 
     const currentQuestion = questions[currentQuestionIndex];
 
     return (
-        <Modal title="Course Quiz" open={isVisible} onCancel={handleClose} footer={null} width={800}>
+        <Modal
+            title="Course Quiz"
+            open={isVisible}
+            onCancel={handleClose}
+            footer={null}
+            width={800}
+            maskClosable={false}
+            className="assessment-modal"
+        >
             {isQuizLoading ? (
                 <div className="flex justify-center items-center">
                     <Spin size="large" />
@@ -167,7 +176,7 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>
                     )}
                     <Button type="primary" onClick={handleClose}>
-                        Close
+                        {quizResult?.passed ? 'Back to Course' : 'Close'}
                     </Button>
                 </Card>
             )}

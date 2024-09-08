@@ -1,5 +1,5 @@
 // src/api/reviewApi.ts
-import { apiSlice } from './api';
+import { ApiResponse, apiSlice } from './api';
 
 export interface IReview {
     id: string;
@@ -11,7 +11,7 @@ export interface IReview {
 
 export const reviewApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        addReview: builder.mutation<IReview, Omit<IReview, 'id' | 'reviewerId'>>({
+        addReview: builder.mutation<ApiResponse<IReview>, Omit<IReview, 'id' | 'reviewerId'>>({
             query: (reviewData) => ({
                 url: '/review',
                 method: 'POST',
@@ -19,22 +19,22 @@ export const reviewApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Review'],
         }),
-        deleteReview: builder.mutation<void, string>({
+        deleteReview: builder.mutation<ApiResponse<null>, string>({
             query: (id) => ({
                 url: `/review?id=${id}`,
                 method: 'DELETE',
             }),
             invalidatesTags: ['Review'],
         }),
-        getReview: builder.query<IReview, string>({
+        getReview: builder.query<ApiResponse<IReview>, string>({
             query: (id) => `/review?id=${id}`,
             providesTags: ['Review'],
         }),
-        getReviewsByCourse: builder.query<IReview[], string>({
+        getReviewsByCourse: builder.query<ApiResponse<IReview[]>, string>({
             query: (courseId) => `/review/course?courseId=${courseId}`,
             providesTags: ['Review'],
         }),
-        getReviewsByUser: builder.query<IReview[], string | void>({
+        getReviewsByUser: builder.query<ApiResponse<IReview>[], string | void>({
             query: (userId) => `/review/user${userId ? `?userId=${userId}` : ''}`,
             providesTags: ['Review'],
         }),
