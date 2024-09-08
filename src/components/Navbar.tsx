@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties } from 'react';
+import React, { useState, CSSProperties, useEffect } from 'react';
 import { Layout, Menu, Input, Button, Drawer, Dropdown, Avatar, AutoComplete } from 'antd';
 import {
     MenuOutlined,
@@ -57,9 +57,7 @@ const CourseSearchResult: React.FC<{ course: CourseDto }> = ({ course }) => {
                     </span>
                 </div>
             </div>
-            <div className="text-sm font-semibold">
-                {course.level}
-            </div>
+            <div className="text-sm font-semibold">{course.level}</div>
         </div>
     );
 };
@@ -73,6 +71,12 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
     const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
 
     const { data: coursesData } = useGetAllCoursesQuery({ q: searchValue, page: 1, size: 5 });
+
+    useEffect(() => {
+        if (isLoggedIn && location.pathname === '/') {
+            navigate('/dashboard');
+        }
+    }, [isLoggedIn, location.pathname, navigate]);
 
     const handleSearch = (value: string) => {
         navigate(`/courses?search=${encodeURIComponent(value)}`);
@@ -161,7 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
             style={headerStyle}
         >
             <div className="container mx-auto flex items-center justify-between h-full">
-                <Link to="/" className="text-2xl font-bold text-indigo-700">
+                <Link to={isLoggedIn ? '/dashboard' : '/'} className="text-2xl font-bold text-indigo-700">
                     TPN
                 </Link>
 
@@ -210,13 +214,13 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                 <div className="hidden lg:flex items-center space-x-4">
                     {isLoggedIn ? (
                         <Dropdown overlay={userMenu} trigger={['click']}>
-                            <a className="ant-dropdown-link flex items-center cursor-pointer">
+                            <Link to="/dashboard" className="ant-dropdown-link flex items-center cursor-pointer">
                                 <Avatar src={user?.displayImage} icon={<UserOutlined />} />
                                 <span className="ml-2">
                                     {user?.firstName} {user?.lastName}
                                 </span>
                                 <DownOutlined className="ml-2" />
-                            </a>
+                            </Link>
                         </Dropdown>
                     ) : (
                         <>
@@ -233,9 +237,9 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                 {/* Mobile buttons */}
                 <div className="flex lg:hidden items-center space-x-4">
                     {isLoggedIn && (
-                        <Dropdown overlay={userMenu} trigger={['click']}>
+                        <Link to="/dashboard">
                             <Avatar src={user?.displayImage} icon={<UserOutlined />} />
-                        </Dropdown>
+                        </Link>
                     )}
                     <Button icon={<MenuOutlined />} onClick={() => setDrawerVisible(true)} />
                 </div>

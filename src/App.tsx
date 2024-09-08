@@ -31,6 +31,7 @@ import ContactPage from './pages/ContatcUsPage';
 
 // user pages
 import UserProfilePage from './pages/UserProfilePage';
+import UserDashboard from './pages/UserDashboardPage'; // Import the new UserDashboard component
 
 // Ant Design theme configuration
 const theme: ThemeConfig = {
@@ -77,10 +78,10 @@ function App() {
                             <Route path="blogs" element={<BlogManagement />} />
                         </Route>
 
-                        {/* Add protected user routes here */}
+                        {/* User Routes */}
                         <Route path="/dashboard" element={<ProtectedUserRoute />}>
-                            <Route index element={<UserProfilePage />} />
-                            <Route path="profile" element={<UserProfilePage />} />  
+                            <Route index element={<UserDashboard />} /> {/* Add this line */}
+                            <Route path="profile" element={<UserProfilePage />} />
                         </Route>
 
                         <Route path="*" element={<NotFound />} />

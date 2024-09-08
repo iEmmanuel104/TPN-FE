@@ -41,6 +41,7 @@ export interface BlogActivityDto {
     liked: boolean;
     comment: string | null;
     user: UserInfoFromApi;
+    createdAt?: string;
 }
 
 export interface GetAllBlogsParams {

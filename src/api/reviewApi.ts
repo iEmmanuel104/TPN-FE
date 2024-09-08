@@ -7,6 +7,7 @@ export interface IReview {
     rating: number;
     reviewerId: string;
     courseId?: string | null;
+    createdAt?: string;
 }
 
 export const reviewApiSlice = apiSlice.injectEndpoints({

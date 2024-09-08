@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Avatar, Rate, Divider } from 'antd';
+import { Card, Typography, Avatar, Rate, Divider, Progress } from 'antd';
 import { UserOutlined, StarOutlined, FileTextOutlined } from '@ant-design/icons';
 import { CourseDto } from '../api/courseApi';
 import { useNavigate } from 'react-router-dom';
@@ -8,9 +8,15 @@ const { Title, Text, Paragraph } = Typography;
 
 interface CourseCardProps extends CourseDto {
     isList?: boolean;
+    progress?: {
+        moduleId: string;
+        currentTime: number;
+        episodeNumber: number;
+        watchedEps?: number[];
+    };
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, price, currency, instructor, stats, isList = false }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, price, currency, instructor, stats, isList = false, progress }) => {
     const [truncateLength, setTruncateLength] = useState(45);
     const navigate = useNavigate();
 
@@ -43,14 +49,25 @@ const CourseCard: React.FC<CourseCardProps> = ({ id, title, description, media, 
         navigate(`/course/${id}`);
     };
 
+    const calculateProgress = () => {
+        if (!progress || !progress.watchedEps) return 0;
+        return Math.round((progress.watchedEps.length / stats.numberOfModules) * 100);
+    };
+
     if (isList) {
         return (
             <div
                 onClick={handleClick}
                 className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 hover:bg-gray-50 cursor-pointer border-b w-full"
             >
-                <div className="w-full sm:w-64 h-40 flex-shrink-0">
+                <div className="w-full sm:w-64 h-40 flex-shrink-0 relative">
                     <img src={media.videoThumbnail || '/placeholder-image.jpg'} alt={title} className="w-full h-full object-cover rounded" />
+                    {progress && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
+                            <Progress percent={calculateProgress()} showInfo={false} strokeColor="#52c41a" />
+                            <Text className="text-xs">{calculateProgress()}% Complete</Text>
+                        </div>
+                    )}
                 </div>
                 <div className="flex-grow">
                     <Title level={4} className="mb-2 line-clamp-2 h-16 overflow-hidden">

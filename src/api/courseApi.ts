@@ -171,13 +171,6 @@ export const courseApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['UserCourse'],
         }),
-        getUserCourses: builder.query<ApiResponse<UserCourseDto[]>, void>({
-            query: () => ({
-                url: '/course/user-courses',
-                method: 'GET',
-            }),
-            providesTags: ['UserCourse'],
-        }),
         updateUserCourseProgress: builder.mutation<ApiResponse<UserCourseDto>, Partial<UserCourseDto>>({
             query: (userCourse) => ({
                 url: `/course/user-progress`,
@@ -204,7 +197,6 @@ export const {
     useDeleteCourseMutation,
     useEnrollForCourseMutation,
     useGenerateCourseCertificateMutation,
-    useGetUserCoursesQuery,
     useUpdateUserCourseProgressMutation,
     useGetAllSimilarOrPopularCoursesQuery,
 } = courseApiSlice;
