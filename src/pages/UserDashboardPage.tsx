@@ -53,76 +53,81 @@ const Dashboard: React.FC = () => {
 
     return (
         <PublicLayout>
-            <div className="container mx-auto px-4 py-8">
-                <Title level={2} className="mb-8">
-                    Welcome back, {user?.firstName || 'User'}!
-                </Title>
+            <Row justify="center" className="py-4">
+                <Col xs={24} sm={22} md={20} lg={18} xl={16}>
+                    <Title level={2} className="mb-4 px-4">
+                        Welcome back, {user?.firstName || 'User'}!
+                    </Title>
+                    <div className="border overflow-hidden">
+                        <div className="p-4 sm:p-6 md:p-8">
+                            {inProgressCourses.length > 0 && (
+                                <section className="mb-12">
+                                    <Title level={3} className="mb-4">
+                                        Continue Learning
+                                    </Title>
+                                    <Carousel autoplay>
+                                        {inProgressCourses.map((course) => (
+                                            <div key={course.id}>
+                                                <CourseCard {...course} isList={true} progress={course.userCourses[0]?.progress} />
+                                            </div>
+                                        ))}
+                                    </Carousel>
+                                </section>
+                            )}
 
-                {inProgressCourses.length > 0 && (
-                    <section className="mb-12">
-                        <Title level={3} className="mb-4">
-                            Continue Learning
-                        </Title>
-                        <Carousel autoplay>
-                            {inProgressCourses.map((course) => (
-                                <div key={course.id} className="px-4">
-                                    <CourseCard {...course} isList={true} progress={course.userCourses[0]?.progress} />
+                            <section className="mb-12">
+                                <Title level={3} className="mb-4">
+                                    My Courses
+                                </Title>
+                                <Tabs activeKey={activeTab} onChange={setActiveTab}>
+                                    <TabPane tab="All Courses" key="1">
+                                        <CourseFrame courses={enrolledCourses} />
+                                    </TabPane>
+                                    <TabPane tab="In Progress" key="2">
+                                        <CourseFrame courses={inProgressCourses} />
+                                    </TabPane>
+                                    <TabPane tab="Not Started" key="3">
+                                        <CourseFrame courses={notStartedCourses} />
+                                    </TabPane>
+                                    <TabPane tab="Completed" key="4">
+                                        <CourseFrame courses={completedCourses} />
+                                    </TabPane>
+                                </Tabs>
+                            </section>
+
+                            <section className="mb-12">
+                                <Title level={3} className="mb-4">
+                                    Recommended Courses
+                                </Title>
+                                <div className="overflow-x-auto scrollbar-hide -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
+                                    <Row gutter={[16, 16]} className="flex-nowrap" style={{ margin: 0 }}>
+                                        {similarCourses.map((course) => (
+                                            <Col key={course.id} xs={20} sm={16} md={12} lg={8} xl={6} style={{ padding: 8 }}>
+                                                <CourseCard {...course} />
+                                            </Col>
+                                        ))}
+                                    </Row>
                                 </div>
-                            ))}
-                        </Carousel>
-                    </section>
-                )}
+                            </section>
 
-                <section className="mb-12">
-                    <Title level={3} className="mb-4">
-                        My Courses
-                    </Title>
-                    <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                        <TabPane tab="All Courses" key="1">
-                            <CourseFrame courses={enrolledCourses} />
-                        </TabPane>
-                        <TabPane tab="In Progress" key="2">
-                            <CourseFrame courses={inProgressCourses} />
-                        </TabPane>
-                        <TabPane tab="Not Started" key="3">
-                            <CourseFrame courses={notStartedCourses} />
-                        </TabPane>
-                        <TabPane tab="Completed" key="4">
-                            <CourseFrame courses={completedCourses} />
-                        </TabPane>
-                    </Tabs>
-                </section>
-
-                <section className="mb-12">
-                    <Title level={3} className="mb-4">
-                        Recommended Courses
-                    </Title>
-                    <div className="overflow-x-auto scrollbar-hide">
-                        <Row gutter={16} className="flex-nowrap" style={{ marginLeft: 0, marginRight: 0 }}>
-                            {similarCourses.map((course) => (
-                                <Col key={course.id} style={{ padding: 8 }}>
-                                    <CourseCard {...course} />
-                                </Col>
-                            ))}
-                        </Row>
+                            <section className="mb-12">
+                                <Title level={3} className="mb-4">
+                                    Popular Courses
+                                </Title>
+                                <div className="overflow-x-auto scrollbar-hide -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
+                                    <Row gutter={[16, 16]} className="flex-nowrap" style={{ margin: 0 }}>
+                                        {popularCourses.map((course) => (
+                                            <Col key={course.id} xs={20} sm={16} md={12} lg={8} xl={6} style={{ padding: 8 }}>
+                                                <CourseCard {...course} />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
+                            </section>
+                        </div>
                     </div>
-                </section>
-
-                <section className="mb-12">
-                    <Title level={3} className="mb-4">
-                        Popular Courses
-                    </Title>
-                    <div className="overflow-x-auto scrollbar-hide">
-                        <Row gutter={16} className="flex-nowrap" style={{ marginLeft: 0, marginRight: 0 }}>
-                            {popularCourses.map((course) => (
-                                <Col key={course.id} style={{ padding: 8 }}>
-                                    <CourseCard {...course} />
-                                </Col>
-                            ))}
-                        </Row>
-                    </div>
-                </section>
-            </div>
+                </Col>
+            </Row>
         </PublicLayout>
     );
 };
