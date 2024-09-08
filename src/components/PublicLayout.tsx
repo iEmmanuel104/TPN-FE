@@ -24,7 +24,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     };
 
     return (
-        <Layout className="min-h-screen flex flex-col">
+        <Layout className="min-h-screen flex flex-col" style={{ position: 'relative', background: 'none' }}>
             <Navbar
                 onOpenAuthModal={handleOpenAuthModal}
                 isAuthModalOpen={isAuthModalOpen}

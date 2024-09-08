@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Typography, Tabs, Carousel, Spin, Row, Col } from 'antd';
+import { Typography, Tabs, Carousel, Spin, Row, Col, Empty } from 'antd';
 import { useSelector } from 'react-redux';
 import { useGetAllCoursesQuery, useGetAllSimilarOrPopularCoursesQuery, UserCourseStatus } from '../api/courseApi';
 import { RootState } from '../state/store';
@@ -81,16 +81,32 @@ const Dashboard: React.FC = () => {
                                 </Title>
                                 <Tabs activeKey={activeTab} onChange={setActiveTab}>
                                     <TabPane tab="All Courses" key="1">
-                                        <CourseFrame courses={enrolledCourses} />
+                                        {enrolledCourses.length > 0 ? (
+                                            <CourseFrame courses={enrolledCourses} />
+                                        ) : (
+                                            <Empty description="You haven't enrolled in any courses yet" />
+                                        )}
                                     </TabPane>
                                     <TabPane tab="In Progress" key="2">
-                                        <CourseFrame courses={inProgressCourses} />
+                                        {inProgressCourses.length > 0 ? (
+                                            <CourseFrame courses={inProgressCourses} />
+                                        ) : (
+                                            <Empty description="You don't have any courses in progress" />
+                                        )}
                                     </TabPane>
                                     <TabPane tab="Not Started" key="3">
-                                        <CourseFrame courses={notStartedCourses} />
+                                        {notStartedCourses.length > 0 ? (
+                                            <CourseFrame courses={notStartedCourses} />
+                                        ) : (
+                                            <Empty description="You don't have any courses to start" />
+                                        )}
                                     </TabPane>
                                     <TabPane tab="Completed" key="4">
-                                        <CourseFrame courses={completedCourses} />
+                                        {completedCourses.length > 0 ? (
+                                            <CourseFrame courses={completedCourses} />
+                                        ) : (
+                                            <Empty description="You haven't completed any courses yet" />
+                                        )}
                                     </TabPane>
                                 </Tabs>
                             </section>
@@ -100,13 +116,17 @@ const Dashboard: React.FC = () => {
                                     Recommended Courses
                                 </Title>
                                 <div className="overflow-x-auto scrollbar-hide -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
-                                    <Row gutter={[16, 16]} className="flex-nowrap" style={{ margin: 0 }}>
-                                        {similarCourses.map((course) => (
-                                            <Col key={course.id} xs={20} sm={16} md={12} lg={8} xl={6} style={{ padding: 8 }}>
-                                                <CourseCard {...course} />
-                                            </Col>
-                                        ))}
-                                    </Row>
+                                    {similarCourses.length > 0 ? (
+                                        <Row gutter={[16, 16]} className="flex-nowrap" style={{ margin: 0 }}>
+                                            {similarCourses.map((course) => (
+                                                <Col key={course.id} xs={20} sm={16} md={12} lg={8} xl={6} style={{ padding: 8 }}>
+                                                    <CourseCard {...course} />
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    ) : (
+                                        <Empty description="No recommended courses available" />
+                                    )}
                                 </div>
                             </section>
 
@@ -115,13 +135,17 @@ const Dashboard: React.FC = () => {
                                     Popular Courses
                                 </Title>
                                 <div className="overflow-x-auto scrollbar-hide -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
-                                    <Row gutter={[16, 16]} className="flex-nowrap" style={{ margin: 0 }}>
-                                        {popularCourses.map((course) => (
-                                            <Col key={course.id} xs={20} sm={16} md={12} lg={8} xl={6} style={{ padding: 8 }}>
-                                                <CourseCard {...course} />
-                                            </Col>
-                                        ))}
-                                    </Row>
+                                    {popularCourses.length > 0 ? (
+                                        <Row gutter={[16, 16]} className="flex-nowrap" style={{ margin: 0 }}>
+                                            {popularCourses.map((course) => (
+                                                <Col key={course.id} xs={20} sm={16} md={12} lg={8} xl={6} style={{ padding: 8 }}>
+                                                    <CourseCard {...course} />
+                                                </Col>
+                                            ))}
+                                        </Row>
+                                    ) : (
+                                        <Empty description="No popular courses available" />
+                                    )}
                                 </div>
                             </section>
                         </div>
