@@ -4,6 +4,7 @@ import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '.
 import QuillContent from './Admin/QuillContent';
 import confetti from 'canvas-confetti';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
 
@@ -14,6 +15,7 @@ interface QuizModalProps {
 }
 
 const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseId }) => {
+    const navigate = useNavigate();
     const [requestQuiz, { data: quizData, isLoading: isQuizLoading }] = useLazyRequestQuizQuery();
     const [gradeQuiz, { isLoading: isGrading }] = useGradeQuizMutation();
 
@@ -79,6 +81,10 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                     spread: 70,
                     origin: { y: 0.6 },
                 });
+                // Refresh the page after a short delay to show the confetti
+                setTimeout(() => {
+                    navigate(0);
+                }, 3000);
             }
         } catch (error) {
             console.error('Failed to grade quiz:', error);
