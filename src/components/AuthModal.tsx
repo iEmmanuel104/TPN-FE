@@ -18,6 +18,14 @@ interface AuthModalProps {
     onSwitchType: (type: AuthModalType) => void;
 }
 
+interface FormValues {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    otpCode: string;
+}
+
 const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchType }) => {
     const [form] = Form.useForm();
     const dispatch = useDispatch();
@@ -27,7 +35,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
     const [resendVerificationEmail] = useResendVerificationEmailMutation();
     const [forgotPassword] = useForgotPasswordMutation();
 
-    const handleSubmit = async (values: any) => {
+    const handleSubmit = async (values: FormValues) => {
         try {
             switch (type) {
                 case AuthModalType.SIGNUP: {
@@ -178,12 +186,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">
                         {type === AuthModalType.LOGIN
-                            ? AuthModalType.LOGIN
+                            ? 'Login'
                             : type === AuthModalType.SIGNUP
-                              ? AuthModalType.SIGNUP
+                              ? 'Sign Up'
                               : type === AuthModalType.VERIFY_EMAIL
-                                ? AuthModalType.VERIFY_EMAIL
-                                : AuthModalType.FORGOT_PASSWORD}
+                                ? 'Verify Email'
+                                : 'Forgot Password'}
                     </Button>
                 </Form.Item>
             </Form>
