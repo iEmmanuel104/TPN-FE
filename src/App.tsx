@@ -32,6 +32,7 @@ import ContactPage from './pages/ContatcUsPage';
 // user pages
 import UserProfilePage from './pages/UserProfilePage';
 import UserDashboard from './pages/UserDashboardPage'; // Import the new UserDashboard component
+import PasswordResetPage from './pages/PasswordResetpage';
 
 // Ant Design theme configuration
 const theme: ThemeConfig = {
@@ -58,6 +59,7 @@ function App() {
                         <Route path="/blogs" element={<BlogOverview />} />
                         <Route path="/blog/:id" element={<BlogPage />} />
                         <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/reset-password" element={<PasswordResetPage />} />
 
                         {/* Admin Routes */}
                         <Route path="/iadmin/login" element={<AdminLogin />} />
