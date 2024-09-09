@@ -1,0 +1,56 @@
+{
+    "faqQuestions": [
+        {
+            "question": "How do I register on the platform?",
+            "answer": "To register, complete a registration form with your personal details. You'll receive an email verification. Once verified, use your registered email and password to login, granting you access to the platform."
+        },
+        {
+            "question": "Can I enroll in multiple courses simultaneously?",
+            "answer": "Yes, you may enroll in multiple courses at the same time. It's advisable to carefully manage your workload to ensure timely completion of all course requirements."
+        },
+        {
+            "question": "How can I monitor my progress in a course?",
+            "answer": "You can track your progress via your personalized dashboard, which displays the percentage of course completion, upcoming assignments, and key milestones."
+        },
+        {
+            "question": "Will I receive certification upon completing a course?",
+            "answer": "Yes, upon successful completion of a course, you'll be awarded a digital certificate of completion. This certificate will be accessible from your profile and will include relevant course details and verification from the instructor."
+        },
+        {
+            "question": "Can I communicate with instructors for additional support?",
+            "answer": "Yes, you can communicate with instructors through the course's live sessions or webinars. Please find the 'Event section' for further assistance."
+        },
+        {
+            "question": "How is my data secured on the platform?",
+            "answer": "The platform employs industry-standard encryption and security protocols to ensure the protection of your personal data. In addition, the system complies with GDPR (General Data Protection Regulation)."
+        },
+        {
+            "question": "What steps should I take if I experience technical difficulties?",
+            "answer": "For technical issues, consult the Help Center for troubleshooting guides or contact the support team. Our support team is available to address more complex issues and ensure the platform operates smoothly."
+        },
+        {
+            "question": "Can I access the platform on mobile or tablet devices?",
+            "answer": "Yes, the platform is designed to be responsive and can be accessed on desktops, tablets, and mobile devices."
+        },
+        {
+            "question": "How do I provide feedback on courses I have completed?",
+            "answer": "Upon course completion, you can submit feedback through the review space. You may rate the course, comment on the content and structure, and suggest areas for improvement."
+        },
+        {
+            "question": "Are the courses offered on the platform free of charge?",
+            "answer": "No, all courses provided on the platform are paid for."
+        },
+        {
+            "question": "What types of courses are available?",
+            "answer": "The platform offers a variety of courses, including literacy programs, vocational training, personal development, and technical skills. Users can browse the course catalog to find educational offerings that align with their interests and goals."
+        },
+        {
+            "question": "How long do I have to complete a course?",
+            "answer": "All courses are self-paced."
+        },
+        {
+            "question": "What should I do if I forget my password?",
+            "answer": "If you forget your password, you can reset it through the password recovery process on the login page."
+        }
+    ]
+}
