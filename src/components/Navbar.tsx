@@ -181,7 +181,8 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
             style={headerStyle}
         >
             <div className="container mx-auto flex items-center justify-between h-full">
-                <Link to={isLoggedIn ? '/dashboard' : '/'} className="text-2xl font-bold text-indigo-700">
+                <Link to={'/'} className="text-2xl font-bold text-indigo-700">
+                {/* <Link to={isLoggedIn ? '/dashboard' : '/'} className="text-2xl font-bold text-indigo-700"> */}
                     TPN
                 </Link>
 
