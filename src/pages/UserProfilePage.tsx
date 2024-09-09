@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Typography, Form, Input, Button, message, Tabs, Avatar, Spin, Card, Row, Col, Select, Modal, Alert, Divider } from 'antd';
-import { UserOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, ExclamationCircleOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 import { useGetLoggedUserQuery, useChangePasswordMutation, UserInfoFromApi } from '../api/authApi';
 import { useUpdateUserMutation } from '../api/userApi';
 import PublicLayout from '../components/PublicLayout';
@@ -41,6 +41,13 @@ const UserProfilePage: React.FC = () => {
     const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
     const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(false);
     const [isDeactivationModalVisible, setIsDeactivationModalVisible] = useState(false);
+    const [passwordRequirements, setPasswordRequirements] = useState({
+        lowercase: false,
+        uppercase: false,
+        number: false,
+        specialChar: false,
+        length: false,
+    });
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -100,15 +107,51 @@ const UserProfilePage: React.FC = () => {
         }
     };
 
-    const handlePasswordChange = async (values: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
+    const isValidPassword = (password: string): boolean => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$&*\-^!])[a-zA-Z\d@#$&*\-^!]{6,}$/;
+        return passwordRegex.test(password);
+    };
+
+    const checkPasswordRequirements = (password: string) => {
+        setPasswordRequirements({
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            number: /\d/.test(password),
+            specialChar: /[@#$&*\-^!]/.test(password),
+            length: password.length >= 6,
+        });
+    };
+
+    const handlePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const password = e.target.value;
+        checkPasswordRequirements(password);
+    };
+
+    const handlePasswordFormSubmit = async (values: { oldPassword: string; newPassword: string; confirmPassword: string }) => {
         try {
-            await changePassword(values).unwrap();
+            if (!isValidPassword(values.newPassword)) {
+                message.error('New password does not meet all requirements');
+                return;
+            }
+
+            await changePassword({
+                oldPassword: values.oldPassword,
+                newPassword: values.newPassword,
+            }).unwrap();
+
             message.success('Password changed successfully');
             passwordForm.resetFields();
         } catch (error) {
-            message.error('Failed to change password');
+            message.error('Failed to change password. Please check your current password and try again.');
         }
     };
+
+    const renderPasswordRequirement = (met: boolean, text: string) => (
+        <div className={`flex items-center ${met ? 'text-green-500' : 'text-red-500'}`}>
+            {met ? <CheckCircleFilled /> : <CloseCircleFilled />}
+            <span className="ml-2">{text}</span>
+        </div>
+    );
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -281,7 +324,7 @@ const UserProfilePage: React.FC = () => {
                             </Card>
                         </TabPane>
                         <TabPane tab="Change Password" key="3">
-                            <Form form={passwordForm} layout="vertical" onFinish={handlePasswordChange} className="bg-white rounded-lg">
+                            <Form form={passwordForm} layout="vertical" onFinish={handlePasswordFormSubmit} className="bg-white rounded-lg">
                                 <Row gutter={16}>
                                     <Col span={24}>
                                         <Form.Item
@@ -298,11 +341,24 @@ const UserProfilePage: React.FC = () => {
                                             label="New Password"
                                             rules={[
                                                 { required: true, message: 'Please input your new password!' },
-                                                { min: 8, message: 'Password must be at least 8 characters long' },
+                                                {
+                                                    validator: (_, value) =>
+                                                        isValidPassword(value)
+                                                            ? Promise.resolve()
+                                                            : Promise.reject('Password does not meet requirements'),
+                                                },
                                             ]}
                                         >
-                                            <Input.Password size="small" />
+                                            <Input.Password size="small" onChange={handlePasswordInputChange} />
                                         </Form.Item>
+                                        <div className="mb-4">
+                                            <p className="text-sm font-semibold mb-2">Password Requirements:</p>
+                                            {renderPasswordRequirement(passwordRequirements.lowercase, 'One lowercase letter')}
+                                            {renderPasswordRequirement(passwordRequirements.uppercase, 'One uppercase letter')}
+                                            {renderPasswordRequirement(passwordRequirements.number, 'One number')}
+                                            {renderPasswordRequirement(passwordRequirements.specialChar, 'One special character (@#$&*-^!)')}
+                                            {renderPasswordRequirement(passwordRequirements.length, 'At least 6 characters long')}
+                                        </div>
                                     </Col>
                                     <Col span={12}>
                                         <Form.Item

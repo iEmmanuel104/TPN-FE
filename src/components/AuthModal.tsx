@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
 import { useDispatch } from 'react-redux';
 import {
@@ -10,6 +10,7 @@ import {
 } from '../api/authApi';
 import { setUserCredentials } from '../state/slices/authSlice';
 import { AuthModalType } from '../constants';
+import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons';
 
 interface AuthModalProps {
     visible: boolean;
@@ -34,11 +35,50 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
     const [verifyEmail] = useVerifyEmailMutation();
     const [resendVerificationEmail] = useResendVerificationEmailMutation();
     const [forgotPassword] = useForgotPasswordMutation();
+    const [passwordRequirements, setPasswordRequirements] = useState({
+        lowercase: false,
+        uppercase: false,
+        number: false,
+        specialChar: false,
+        length: false,
+    });
+
+    const isValidPassword = (password: string): boolean => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$&*\-^!])[a-zA-Z\d@#$&*\-^!]{6,}$/;
+        return passwordRegex.test(password);
+    };
+
+    const checkPasswordRequirements = (password: string) => {
+        setPasswordRequirements({
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            number: /\d/.test(password),
+            specialChar: /[@#$&*\-^!]/.test(password),
+            length: password.length >= 6,
+        });
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const password = e.target.value;
+        checkPasswordRequirements(password);
+        form.setFieldsValue({ password });
+    };
+
+    const renderPasswordRequirement = (met: boolean, text: string) => (
+        <div className={`flex items-center ${met ? 'text-green-500' : 'text-red-500'}`}>
+            {met ? <CheckCircleFilled /> : <CloseCircleFilled />}
+            <span className="ml-2">{text}</span>
+        </div>
+    );
 
     const handleSubmit = async (values: FormValues) => {
         try {
             switch (type) {
                 case AuthModalType.SIGNUP: {
+                    if (!isValidPassword(values.password)) {
+                        message.error('Password does not meet all requirements');
+                        return;
+                    }
                     const signupResponse = await signup(values).unwrap();
                     dispatch(
                         setUserCredentials({
@@ -111,9 +151,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
                         >
                             <Input />
                         </Form.Item>
-                        <Form.Item name="password" label="Password" rules={[{ required: true, message: 'Please input your password!' }]}>
-                            <Input.Password />
+                        <Form.Item
+                            name="password"
+                            label="Password"
+                            rules={[
+                                { required: true, message: 'Please input your password!' },
+                                {
+                                    validator: (_, value) =>
+                                        isValidPassword(value) ? Promise.resolve() : Promise.reject('Password does not meet requirements'),
+                                },
+                            ]}
+                        >
+                            <Input.Password onChange={handlePasswordChange} />
                         </Form.Item>
+                        <div className="mb-4">
+                            <p className="text-sm font-semibold mb-2">Password Requirements:</p>
+                            {renderPasswordRequirement(passwordRequirements.lowercase, 'One lowercase letter')}
+                            {renderPasswordRequirement(passwordRequirements.uppercase, 'One uppercase letter')}
+                            {renderPasswordRequirement(passwordRequirements.number, 'One number')}
+                            {renderPasswordRequirement(passwordRequirements.specialChar, 'One special character (@#$&*-^!)')}
+                            {renderPasswordRequirement(passwordRequirements.length, 'At least 6 characters long')}
+                        </div>
                     </>
                 );
             case AuthModalType.LOGIN:
