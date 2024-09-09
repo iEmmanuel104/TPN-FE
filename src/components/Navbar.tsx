@@ -78,10 +78,6 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
 
     const handleCategoryClick = (category: string) => {
         if (isCoursePage) {
-            // If already on the course page, use the existing filter mechanism
-            // This assumes you have a function to update filters on the course page
-            // You might need to implement this using context or state management
-            // For now, we'll just log it
             console.log(`Filter courses by category: ${category}`);
         } else {
             // Redirect to the course page with the category as a query parameter
