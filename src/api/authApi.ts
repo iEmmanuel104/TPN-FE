@@ -171,7 +171,6 @@ export const authApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: {
                     email,
-                    redirectUrl: 'https://yourwebsite.com/reset-password',
                 },
             }),
         }),
