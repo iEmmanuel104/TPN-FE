@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image, Avatar, Card, Col, Row } from 'antd';
+import { Button, Table, Tag, Space, Modal, Form, Input, Select, message, Tabs, Image, Avatar, Card, Col, Row, Tooltip } from 'antd';
 import {
     PlusOutlined,
     EditOutlined,
@@ -88,9 +88,15 @@ const BlogManagement: React.FC = () => {
             key: 'actions',
             render: (_: unknown, record: BlogDto) => (
                 <Space size="middle">
-                    <Button icon={<EyeOutlined />} onClick={() => handleEdit(record)} />
-                    <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-                    <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
+                    <Tooltip title="Preview Blog">
+                        <Button icon={<EyeOutlined />} onClick={() => handlePreview(record)} />
+                    </Tooltip>
+                    <Tooltip title="Edit">
+                        <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                        <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
+                    </Tooltip>
                 </Space>
             ),
         },
@@ -108,6 +114,21 @@ const BlogManagement: React.FC = () => {
             'author.bio': blog.author?.bio,
         });
         setIsModalVisible(true);
+    };
+
+    const handlePreview = (blog: BlogDto) => {
+        setEditingBlog(blog);
+        setImages(blog.media?.images || []);
+        setAuthorImage(blog.author?.image || '');
+        form.setFieldsValue({
+            ...blog,
+            tags: blog.tags || [],
+            'author.name': blog.author?.name,
+            'author.email': blog.author?.email,
+            'author.bio': blog.author?.bio,
+        });
+        setIsModalVisible(true);
+        setActiveTab('preview');
     };
 
     const handleDelete = async (id: string) => {
@@ -331,9 +352,9 @@ const BlogManagement: React.FC = () => {
                             </Select>
                         </div>
                         {selectedTemplate === 'template1' ? (
-                            <BlogTemplate1 blog={getCompleteBlogData()} />
-                        ) : (
                             <BlogTemplate2 blog={getCompleteBlogData()} />
+                        ) : (
+                            <BlogTemplate1 blog={getCompleteBlogData()} />
                         )}
                     </TabPane>
                 </Tabs>
