@@ -1,8 +1,9 @@
 import React from 'react';
-import { Typography, Tabs, Divider } from 'antd';
+import { Typography, Tabs, Divider, Breadcrumb } from 'antd';
 import { ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import EventImage from '../assets/drugrehab.jpeg';
+import { Link } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -33,11 +34,12 @@ const EventsPage: React.FC = () => {
     return (
         <PublicLayout>
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="text-sm text-gray-500 mb-4">
-                    <span>Home</span>
-                    <span className="mx-2">&gt;</span>
-                    <span>Events</span>
-                </div>
+                <Breadcrumb className="mb-4">
+                    <Breadcrumb.Item>
+                        <Link to="/">Home</Link>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>Events</Breadcrumb.Item>
+                </Breadcrumb>
 
                 <Tabs defaultActiveKey="1" centered className="mb-8">
                     <TabPane tab="Happening" key="1" />

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Typography, Input, Row, Col, List, Avatar, Tag, Pagination, Breadcrumb } from 'antd';
 import { BlogStatus, useGetAllBlogsQuery } from '../api/blogApi';
 import { useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PublicLayout from '../components/PublicLayout';
 import QuillContent from '../components/Admin/QuillContent';
 
@@ -45,7 +45,9 @@ const BlogOverview: React.FC = () => {
         <PublicLayout>
             <div className="bg-white min-h-screen">
                 <Breadcrumb className="container mx-auto px-4 py-4">
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                        <Link to="/">Home</Link>
+                    </Breadcrumb.Item>
                     <Breadcrumb.Item>Blogs</Breadcrumb.Item>
                 </Breadcrumb>
 

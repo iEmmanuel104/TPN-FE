@@ -6,6 +6,7 @@ import CourseCard from '../components/CourseCard';
 import { useGetAllCoursesQuery } from '../api/courseApi';
 import { CourseLevel, CourseStatus } from '../api/courseApi';
 import categories from '../constants/categories.json';
+import { Link } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -136,7 +137,9 @@ const CourseOverview: React.FC = () => {
         <PublicLayout>
             <div className="container mx-auto px-4 py-8">
                 <Breadcrumb className="mb-4">
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                        <Link to="/">Home</Link>
+                    </Breadcrumb.Item>
                     <Breadcrumb.Item>Courses</Breadcrumb.Item>
                 </Breadcrumb>
 

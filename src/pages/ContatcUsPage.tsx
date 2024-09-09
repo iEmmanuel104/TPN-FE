@@ -1,11 +1,12 @@
 import React from 'react';
-import { Typography, Row, Col, Card } from 'antd';
+import { Typography, Row, Col, Card, Breadcrumb } from 'antd';
 import { EnvironmentOutlined, PhoneOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
+import { Link } from 'react-router-dom';
 
 const { Title, Paragraph } = Typography;
 
-const ContactInfo = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
+const ContactInfo = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
     <Card className="h-full text-center">
         <div className="text-4xl mb-4 flex justify-center">{icon}</div>
         <Title level={3}>{title}</Title>
@@ -17,6 +18,13 @@ const ContactPage = () => {
     return (
         <PublicLayout>
             <div className="container mx-auto px-4 py-8">
+                <Breadcrumb className="mb-4">
+                    <Breadcrumb.Item>
+                        <Link to="/">Home</Link>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>Contact</Breadcrumb.Item>
+                </Breadcrumb>
+
                 <Title>Contact</Title>
                 <Row gutter={[24, 24]} className="mt-8">
                     <Col xs={24} md={8}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Breadcrumb, Typography, Row, Col, Button, Rate, Avatar, Card, Affix, Divider, Menu, Drawer, Spin, Collapse, List, Modal } from 'antd';
 import {
@@ -272,8 +272,12 @@ const CoursePage: React.FC = () => {
         <PublicLayout>
             <div className="bg-white min-h-screen">
                 <Breadcrumb className="container mx-auto px-4 py-4">
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>Courses</Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                        <Link to="/">Home</Link>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>
+                        <Link to="/courses">Courses</Link>
+                    </Breadcrumb.Item>
                     <Breadcrumb.Item>{course?.category[0] ?? ''}</Breadcrumb.Item>
                 </Breadcrumb>
 
