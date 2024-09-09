@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties, useEffect } from 'react';
+import React, { useState, CSSProperties } from 'react';
 import { Layout, Menu, Input, Button, Drawer, Dropdown, Avatar, AutoComplete } from 'antd';
 import {
     MenuOutlined,
@@ -9,6 +9,7 @@ import {
     LogoutOutlined,
     StarOutlined,
     FileTextOutlined,
+    DashboardOutlined,
 } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -85,12 +86,6 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
         }
     };
 
-    useEffect(() => {
-        if (isLoggedIn && location.pathname === '/') {
-            navigate('/dashboard');
-        }
-    }, [isLoggedIn, location.pathname, navigate]);
-
     const handleSearch = (value: string) => {
         navigate(`/courses?search=${encodeURIComponent(value)}`);
     };
@@ -126,6 +121,9 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
 
     const userMenu = (
         <Menu>
+            <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
+                <Link to="/dashboard">Dashboard</Link>
+            </Menu.Item>
             <Menu.Item key="profile" icon={<UserOutlined />}>
                 <Link to="/dashboard/profile">Profile</Link>
             </Menu.Item>
@@ -178,7 +176,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
         >
             <div className="container mx-auto flex items-center justify-between h-full">
                 <Link to={'/'} className="text-2xl font-bold text-indigo-700">
-                {/* <Link to={isLoggedIn ? '/dashboard' : '/'} className="text-2xl font-bold text-indigo-700"> */}
+                    {/* <Link to={isLoggedIn ? '/dashboard' : '/'} className="text-2xl font-bold text-indigo-700"> */}
                     TPN
                 </Link>
 
@@ -328,6 +326,11 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                     {isLoggedIn ? (
                         <div className="mt-auto">
                             <Menu mode="inline" className="w-full border-r-0">
+                                <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
+                                    <Link to="/dashboard" onClick={() => setDrawerVisible(false)}>
+                                        Dashboard
+                                    </Link>
+                                </Menu.Item>
                                 <Menu.Item key="profile" icon={<UserOutlined />}>
                                     <Link to="/dashboard/profile" onClick={() => setDrawerVisible(false)}>
                                         Profile
