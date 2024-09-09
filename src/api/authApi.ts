@@ -169,9 +169,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
             query: ({ email }) => ({
                 url: URL_PREFIX + '/forgotpassword',
                 method: 'POST',
-                body: {
-                    email,
-                },
+                body: { email },
             }),
         }),
         resetPassword: builder.mutation<ResetPasswordResponse, { resetToken: string; email: string; newPassword: string }>({
