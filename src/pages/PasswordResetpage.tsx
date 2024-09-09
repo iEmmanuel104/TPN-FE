@@ -98,14 +98,6 @@ const PasswordResetPage: React.FC = () => {
                         >
                             <Input.Password onChange={handlePasswordChange} />
                         </Form.Item>
-                        <div className="mb-4">
-                            <Text strong>Password Requirements:</Text>
-                            {renderPasswordRequirement(passwordRequirements.lowercase, 'One lowercase letter')}
-                            {renderPasswordRequirement(passwordRequirements.uppercase, 'One uppercase letter')}
-                            {renderPasswordRequirement(passwordRequirements.number, 'One number')}
-                            {renderPasswordRequirement(passwordRequirements.specialChar, 'One special character (@#$&*-^!)')}
-                            {renderPasswordRequirement(passwordRequirements.length, 'At least 6 characters long')}
-                        </div>
                         <Form.Item
                             name="confirmPassword"
                             label="Confirm New Password"
@@ -124,6 +116,14 @@ const PasswordResetPage: React.FC = () => {
                         >
                             <Input.Password />
                         </Form.Item>
+                        <div className="mb-4">
+                            <Text strong>Password Requirements:</Text>
+                            {renderPasswordRequirement(passwordRequirements.lowercase, 'One lowercase letter')}
+                            {renderPasswordRequirement(passwordRequirements.uppercase, 'One uppercase letter')}
+                            {renderPasswordRequirement(passwordRequirements.number, 'One number')}
+                            {renderPasswordRequirement(passwordRequirements.specialChar, 'One special character (@#$&*-^!)')}
+                            {renderPasswordRequirement(passwordRequirements.length, 'At least 6 characters long')}
+                        </div>
                         <Form.Item>
                             <Button type="primary" htmlType="submit" loading={isLoading} className="w-full">
                                 Reset Password
