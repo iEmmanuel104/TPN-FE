@@ -42,6 +42,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
         specialChar: false,
         length: false,
     });
+    const [isLoading, setIsLoading] = useState(false);
+    const [isResendingEmail, setIsResendingEmail] = useState(false);
 
     const isValidPassword = (password: string): boolean => {
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$&*\-^!])[a-zA-Z\d@#$&*\-^!]{6,}$/;
@@ -72,6 +74,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
     );
 
     const handleSubmit = async (values: FormValues) => {
+        setIsLoading(true);
         try {
             switch (type) {
                 case AuthModalType.SIGNUP: {
@@ -117,6 +120,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
             }
         } catch (error) {
             message.error('Action failed. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -127,6 +132,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
             message.success('Verification email resent successfully!');
         } catch (error) {
             message.error('Failed to resend verification email. Please try again.');
+        } finally {
+            setIsResendingEmail(false);
         }
     };
 
@@ -212,7 +219,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
                         >
                             <Input />
                         </Form.Item>
-                        <Button onClick={handleResendVerificationEmail}>Resend Verification Email</Button>
+                        <Button onClick={handleResendVerificationEmail} loading={isResendingEmail} className="mt-4 w-full">
+                            Resend Verification Email
+                        </Button>
                     </>
                 );
             case AuthModalType.FORGOT_PASSWORD:
@@ -242,7 +251,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ visible, onClose, type, onSwitchT
             <Form form={form} onFinish={handleSubmit} layout="vertical">
                 {renderForm()}
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">
+                    <Button type="primary" htmlType="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" loading={isLoading}>
                         {type === AuthModalType.LOGIN
                             ? 'Login'
                             : type === AuthModalType.SIGNUP
