@@ -54,8 +54,23 @@ const UserProfilePage: React.FC = () => {
         const tab = params.get('tab');
         if (tab === 'settings') {
             setActiveTab('2');
+        } else if (tab === 'change-password') {
+            setActiveTab('3');
+        } else {
+            setActiveTab('1');
         }
     }, [location]);
+
+    const handleTabChange = (key: string) => {
+        setActiveTab(key);
+        if (key === '1') {
+            navigate('/dashboard/profile');
+        } else if (key === '2') {
+            navigate('/dashboard/profile?tab=settings');
+        } else if (key === '3') {
+            navigate('/dashboard/profile?tab=change-password');
+        }
+    };
 
     const { openWidget: openProfilePictureWidget } = useCloudinaryWidget({
         onSuccess: (url) => {
@@ -204,7 +219,7 @@ const UserProfilePage: React.FC = () => {
                     User Profile
                 </Title>
                 <Card>
-                    <Tabs activeKey={activeTab} defaultActiveKey="1">
+                    <Tabs activeKey={activeTab} defaultActiveKey="1"  onChange={handleTabChange}>
                         <TabPane tab="Personal Information" key="1">
                             <div className="flex items-center mb-8">
                                 <div className="relative">
