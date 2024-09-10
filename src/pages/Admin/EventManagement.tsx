@@ -59,11 +59,14 @@ const EventManagement: React.FC = () => {
         try {
             const values = await form.validateFields();
 
-            console.log({ values });
+            // Format the start_time to ISO 8601 with timezone offset
+            const formattedStartTime = moment(values.start_time).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
             const eventData = {
                 ...values,
-                start_time: moment(values.start_time).format(), // This will preserve both date and time
+                start_time: formattedStartTime,
             };
+
             await addEvent(eventData).unwrap();
             message.success('Event added successfully');
             setIsModalVisible(false);
@@ -108,19 +111,19 @@ const EventManagement: React.FC = () => {
         [deleteEvent, refetchEvents],
     );
 
-      const getEventStatus = (event: EventDto): 'upcoming' | 'ongoing' | 'concluded' => {
-          const now = moment();
-          const startTime = moment(event.start_time);
-          const endTime = moment(event.start_time).add(event.duration, 'minutes');
+    const getEventStatus = (event: EventDto): 'upcoming' | 'ongoing' | 'concluded' => {
+        const now = moment();
+        const startTime = moment(event.start_time);
+        const endTime = moment(event.start_time).add(event.duration, 'minutes');
 
-          if (now.isBefore(startTime)) {
-              return 'upcoming';
-          } else if (now.isAfter(endTime)) {
-              return 'concluded';
-          } else {
-              return 'ongoing';
-          }
-      };
+        if (now.isBefore(startTime)) {
+            return 'upcoming';
+        } else if (now.isAfter(endTime)) {
+            return 'concluded';
+        } else {
+            return 'ongoing';
+        }
+    };
 
     const handleBannerUpload = () => {
         setIsBannerUploading(true);
@@ -229,7 +232,7 @@ const EventManagement: React.FC = () => {
                         </Col>
                         <Col span={12}>
                             <Form.Item name="start_time" label="Start Time" rules={[{ required: true }]}>
-                                <DatePicker showTime format="YYYY-MM-DD HH:mm" className="w-full" />
+                                <DatePicker showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" className="w-full" />
                             </Form.Item>
                         </Col>
                     </Row>
