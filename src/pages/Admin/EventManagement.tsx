@@ -24,6 +24,7 @@ const EventManagement: React.FC = () => {
     const [bannerUrl, setBannerUrl] = useState<string>('');
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<GetAllEventsParams['status']>('all');
+    const [isBannerUploading, setIsBannerUploading] = useState(false);
 
     const { data: eventsData, isLoading: isEventsLoading, refetch: refetchEvents } = useGetAllEventsQuery({ status: statusFilter });
     const [addEvent, { isLoading: isAddingEvent }] = useAddEventMutation();
@@ -34,6 +35,11 @@ const EventManagement: React.FC = () => {
         onSuccess: (url: string) => {
             setBannerUrl(url);
             form.setFieldsValue({ banner: url });
+            setIsBannerUploading(false);
+        },
+        onError: () => {
+            setIsBannerUploading(false);
+            message.error('Failed to upload banner');
         },
     });
 
@@ -56,7 +62,7 @@ const EventManagement: React.FC = () => {
             console.log({ values });
             const eventData = {
                 ...values,
-                start_time: moment(values.start_time),
+                start_time: moment(values.start_time).format(), // This will preserve both date and time
             };
             await addEvent(eventData).unwrap();
             message.success('Event added successfully');
@@ -102,18 +108,23 @@ const EventManagement: React.FC = () => {
         [deleteEvent, refetchEvents],
     );
 
-    const getEventStatus = (event: EventDto): 'upcoming' | 'ongoing' | 'concluded' => {
-        const now = moment();
-        const startTime = moment(event.start_time);
-        const endTime = moment(event.start_time).add(event.duration, 'minutes');
+      const getEventStatus = (event: EventDto): 'upcoming' | 'ongoing' | 'concluded' => {
+          const now = moment();
+          const startTime = moment(event.start_time);
+          const endTime = moment(event.start_time).add(event.duration, 'minutes');
 
-        if (now.isBefore(startTime)) {
-            return 'upcoming';
-        } else if (now.isAfter(endTime)) {
-            return 'concluded';
-        } else {
-            return 'ongoing';
-        }
+          if (now.isBefore(startTime)) {
+              return 'upcoming';
+          } else if (now.isAfter(endTime)) {
+              return 'concluded';
+          } else {
+              return 'ongoing';
+          }
+      };
+
+    const handleBannerUpload = () => {
+        setIsBannerUploading(true);
+        openCloudinaryWidget();
     };
 
     const columns = [
@@ -255,9 +266,9 @@ const EventManagement: React.FC = () => {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item label="Banner">
+                            <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
                                 <div className="flex items-center space-x-4">
-                                    <Button icon={<UploadOutlined />} onClick={openCloudinaryWidget}>
+                                    <Button icon={<UploadOutlined />} onClick={handleBannerUpload} loading={isBannerUploading}>
                                         {bannerUrl ? 'Change Banner' : 'Upload Banner'}
                                     </Button>
                                 </div>
@@ -274,9 +285,6 @@ const EventManagement: React.FC = () => {
                             )}
                         </Col>
                     </Row>
-                    <Form.Item name="banner" hidden>
-                        <Input />
-                    </Form.Item>
                 </Form>
             </Modal>
             <Modal title="Add Attendee" open={isAttendeeModalVisible} onOk={handleAddAttendee} onCancel={() => setIsAttendeeModalVisible(false)}>
