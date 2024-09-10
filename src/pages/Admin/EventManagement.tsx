@@ -103,7 +103,7 @@ const EventManagement: React.FC = () => {
     };
 
     const generateMonthOptions = () => {
-        return moment.months().map((month, index) => (
+        return moment.months().map((index) => (
             <Option key={index + 1} value={(index + 1).toString().padStart(2, '0')}>
                 {(index + 1).toString().padStart(2, '0')}
             </Option>
