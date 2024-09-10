@@ -72,8 +72,10 @@ const EventsPage: React.FC = () => {
                         {events.map((event) => (
                             <div key={event.id} className="flex flex-col sm:flex-row items-center border overflow-hidden">
                                 <div className="flex-shrink-0 w-full sm:w-24 py-4 sm:py-6 flex flex-row sm:flex-col justify-center items-center">
-                                    <Text className="text-5xl font-bold text-yellow-400 mr-2 sm:mr-0">{moment(event.start_time).format('DD')}</Text>
-                                    <Text className="text-yellow-400">{moment(event.start_time).format('MMM')}</Text>
+                                    <Text className="text-5xl font-bold text-yellow-400 mr-2 sm:mr-0">
+                                        {moment(event.start_time_info.date).format('DD')}
+                                    </Text>
+                                    <Text className="text-yellow-400">{moment(event.start_time_info.date).format('MMM')}</Text>
                                 </div>
                                 <Divider type="vertical" className="hidden sm:block h-32 self-center mx-4" style={{ borderWidth: 0.5 }} />
                                 <div className="flex-grow w-full sm:w-auto py-4 sm:py-6 px-4 sm:pr-6 flex flex-col justify-start">
@@ -83,11 +85,17 @@ const EventsPage: React.FC = () => {
                                     <div className="text-gray-500 mb-2 text-start">
                                         <ClockCircleOutlined className="mr-2" />
                                         <span>
-                                            {moment(event.start_time).format('h:mm A')} -{' '}
-                                            {moment(event.start_time).add(event.duration, 'minutes').format('h:mm A')}
+                                            {moment
+                                                .tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone)
+                                                .format('h:mm A')}{' '}
+                                            -{' '}
+                                            {moment
+                                                .tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone)
+                                                .add(event.duration, 'minutes')
+                                                .format('h:mm A')}
                                         </span>
                                         <EnvironmentOutlined className="ml-4 mr-2" />
-                                        <span>{event.timezone}</span>
+                                        <span>{event.start_time_info.timezone}</span>
                                     </div>
                                     <Text className="text-gray-600 text-start mb-4">Duration: {event.duration} minutes</Text>
                                     <button

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Button, Space, Modal, Form, Input, DatePicker, InputNumber, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, DatePicker, Switch, message, Tag, Tooltip, Row, Col, Select, TimePicker } from 'antd';
 import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
@@ -59,12 +59,13 @@ const EventManagement: React.FC = () => {
         try {
             const values = await form.validateFields();
 
-            // Format the start_time to ISO 8601 with timezone offset
-            const formattedStartTime = moment(values.start_time).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-
             const eventData = {
                 ...values,
-                start_time: formattedStartTime,
+                start_time_info: {
+                    date: moment(values.start_time_info.date).format('YYYY-MM-DD'),
+                    time: moment(values.start_time_info.time).format('HH:mm'),
+                    timezone: values.start_time_info.timezone,
+                },
             };
 
             await addEvent(eventData).unwrap();
@@ -113,8 +114,9 @@ const EventManagement: React.FC = () => {
 
     const getEventStatus = (event: EventDto): 'upcoming' | 'ongoing' | 'concluded' => {
         const now = moment();
-        const startTime = moment(event.start_time);
-        const endTime = moment(event.start_time).add(event.duration, 'minutes');
+        const { date, time, timezone } = event.start_time_info;
+        const startTime = moment.tz(`${date} ${time}`, timezone);
+        const endTime = startTime.clone().add(event.duration, 'minutes');
 
         if (now.isBefore(startTime)) {
             return 'upcoming';
@@ -138,9 +140,11 @@ const EventManagement: React.FC = () => {
         },
         {
             title: 'Start Time',
-            dataIndex: 'start_time',
             key: 'start_time',
-            render: (time: string, record: EventDto) => moment(time).tz(record.timezone).format('YYYY-MM-DD HH:mm'),
+            render: (_: unknown, record: EventDto) => {
+                const { date, time, timezone } = record.start_time_info;
+                return moment.tz(`${date} ${time}`, timezone).format('YYYY-MM-DD HH:mm z');
+            },
         },
         {
             title: 'Duration (minutes)',
@@ -228,25 +232,32 @@ const EventManagement: React.FC = () => {
             >
                 <Form form={form} layout="vertical">
                     <Row gutter={16}>
-                        <Col span={12}>
+                        <Col span={24}>
                             <Form.Item name="topic" label="Topic" rules={[{ required: true }]}>
                                 <Input />
                             </Form.Item>
                         </Col>
+                    </Row>
+                    <Row gutter={16}>
                         <Col span={12}>
-                            <Form.Item name="start_time" label="Start Time" rules={[{ required: true }]}>
-                                <DatePicker showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" className="w-full" />
+                            <Form.Item name={['start_time_info', 'date']} label="Date" rules={[{ required: true }]}>
+                                <DatePicker className="w-full" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item name={['start_time_info', 'time']} label="Time" rules={[{ required: true }]}>
+                                <TimePicker format="HH:mm" className="w-full" />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item name="duration" label="Duration (minutes)" rules={[{ required: true }]}>
-                                <InputNumber min={1} max={60} className="w-full" />
+                                <Input type="number" min={1} max={1440} />
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item name="timezone" label="Timezone" rules={[{ required: true }]}>
+                            <Form.Item name={['start_time_info', 'timezone']} label="Timezone" rules={[{ required: true }]}>
                                 <Select
                                     showSearch
                                     className="w-full"

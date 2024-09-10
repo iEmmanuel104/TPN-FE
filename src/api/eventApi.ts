@@ -3,21 +3,22 @@ import { ApiResponse, apiSlice } from './api';
 export interface EventDto {
     id: string;
     topic: string;
-    start_time: string;
+    start_time_info: {
+        date: string;  // YYYY-MM-DD
+        time: string;  // HH:mm
+        timezone: string;
+    };
     duration: number;
-    timezone: string;
     zoom_meeting_id: string;
     zoom_join_url: string;
     is_public: boolean;
     banner: string;
-    host_id: string;
     attendees: Array<{ email: string; user_id?: string }>;
 }
 
 export interface GetAllEventsParams {
     page?: number;
     size?: number;
-    hostId?: string;
     status?: 'upcoming' | 'ongoing' | 'concluded' | 'all';
 }
 
@@ -36,7 +37,6 @@ export const eventApiSlice = apiSlice.injectEndpoints({
                 const queryParams = new URLSearchParams();
                 if (params.page) queryParams.append('page', params.page.toString());
                 if (params.size) queryParams.append('size', params.size.toString());
-                if (params.hostId) queryParams.append('hostId', params.hostId);
                 if (params.status) queryParams.append('status', params.status);
 
                 return {
