@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Button, Space, Modal, Form, Input, DatePicker, Switch, message, Tag, Tooltip, Row, Col, Select, TimePicker } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, DatePicker, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
 import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
@@ -63,7 +63,7 @@ const EventManagement: React.FC = () => {
                 ...values,
                 start_time_info: {
                     date: moment(values.start_time_info.date).format('YYYY-MM-DD'),
-                    time: moment(values.start_time_info.time).format('HH:mm'),
+                    time: values.start_time_info.time, // This is now a string in HH:mm format
                     timezone: values.start_time_info.timezone,
                 },
             };
@@ -245,8 +245,18 @@ const EventManagement: React.FC = () => {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item name={['start_time_info', 'time']} label="Time" rules={[{ required: true }]}>
-                                <TimePicker format="HH:mm" className="w-full" />
+                            <Form.Item
+                                name={['start_time_info', 'time']}
+                                label="Time (24-hour format)"
+                                rules={[
+                                    { required: true, message: 'Please input the time' },
+                                    {
+                                        pattern: /^([01]\d|2[0-3]):([0-5]\d)$/,
+                                        message: 'Please enter a valid time in 24-hour format (HH:mm)',
+                                    },
+                                ]}
+                            >
+                                <Input placeholder="HH:mm" />
                             </Form.Item>
                         </Col>
                     </Row>
