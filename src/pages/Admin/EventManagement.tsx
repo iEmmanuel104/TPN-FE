@@ -3,7 +3,14 @@ import { Table, Button, Space, Modal, Form, Input, DatePicker, InputNumber, Swit
 import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
-import { useGetAllEventsQuery, useAddEventMutation, useDeleteEventMutation, useAddAttendeeMutation, EventDto } from '../../api/eventApi';
+import {
+    useGetAllEventsQuery,
+    useAddEventMutation,
+    useDeleteEventMutation,
+    useAddAttendeeMutation,
+    EventDto,
+    GetAllEventsParams,
+} from '../../api/eventApi';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 
 const { confirm } = Modal;
@@ -16,13 +23,12 @@ const EventManagement: React.FC = () => {
     const [isAttendeeModalVisible, setIsAttendeeModalVisible] = useState(false);
     const [bannerUrl, setBannerUrl] = useState<string>('');
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState<GetAllEventsParams['status']>('all');
 
-    const { data: eventsData, isLoading: isEventsLoading, refetch: refetchEvents } = useGetAllEventsQuery({});
+    const { data: eventsData, isLoading: isEventsLoading, refetch: refetchEvents } = useGetAllEventsQuery({ status: statusFilter });
     const [addEvent, { isLoading: isAddingEvent }] = useAddEventMutation();
     const [deleteEvent] = useDeleteEventMutation();
     const [addAttendee] = useAddAttendeeMutation();
-
-    console.log({ eventsData });
 
     const { openWidget: openCloudinaryWidget } = useCloudinaryWidget({
         onSuccess: (url: string) => {
@@ -43,22 +49,24 @@ const EventManagement: React.FC = () => {
         attendeeForm.resetFields();
     };
 
-     const handleOk = async () => {
-         try {
-             const values = await form.validateFields();
-             const eventData = {
-                 ...values,
-                 start_time: moment(values.start_time).format(), // Use ISO format
-             };
-             await addEvent(eventData).unwrap();
-             message.success('Event added successfully');
-             setIsModalVisible(false);
-             refetchEvents();
-         } catch (error) {
-             console.error('Failed to add event:', error);
-             message.error('Failed to add event');
-         }
-     };
+    const handleOk = async () => {
+        try {
+            const values = await form.validateFields();
+
+            console.log({ values });
+            const eventData = {
+                ...values,
+                start_time: moment(values.start_time),
+            };
+            await addEvent(eventData).unwrap();
+            message.success('Event added successfully');
+            setIsModalVisible(false);
+            refetchEvents();
+        } catch (error) {
+            console.error('Failed to add event:', error);
+            message.error('Failed to add event');
+        }
+    };
 
     const handleAddAttendee = async () => {
         try {
@@ -94,6 +102,20 @@ const EventManagement: React.FC = () => {
         [deleteEvent, refetchEvents],
     );
 
+    const getEventStatus = (event: EventDto): 'upcoming' | 'ongoing' | 'concluded' => {
+        const now = moment();
+        const startTime = moment(event.start_time);
+        const endTime = moment(event.start_time).add(event.duration, 'minutes');
+
+        if (now.isBefore(startTime)) {
+            return 'upcoming';
+        } else if (now.isAfter(endTime)) {
+            return 'concluded';
+        } else {
+            return 'ongoing';
+        }
+    };
+
     const columns = [
         {
             title: 'Topic',
@@ -115,6 +137,19 @@ const EventManagement: React.FC = () => {
             title: 'Timezone',
             dataIndex: 'timezone',
             key: 'timezone',
+        },
+        {
+            title: 'Status',
+            key: 'status',
+            render: (_: unknown, record: EventDto) => {
+                const status = getEventStatus(record);
+                const colorMap = {
+                    upcoming: 'blue',
+                    ongoing: 'green',
+                    concluded: 'gray',
+                };
+                return <Tag color={colorMap[status]}>{status.toUpperCase()}</Tag>;
+            },
         },
         {
             title: 'Public',
@@ -148,9 +183,21 @@ const EventManagement: React.FC = () => {
             <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold">Event Management</h1>
-                    <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
-                        Add New Event
-                    </Button>
+                    <Space>
+                        <Select
+                            defaultValue="all"
+                            style={{ width: 120 }}
+                            onChange={(value) => setStatusFilter(value as GetAllEventsParams['status'])}
+                        >
+                            <Option value="all">All Events</Option>
+                            <Option value="upcoming">Upcoming</Option>
+                            <Option value="ongoing">Ongoing</Option>
+                            <Option value="concluded">Concluded</Option>
+                        </Select>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+                            Add New Event
+                        </Button>
+                    </Space>
                 </div>
                 <Table columns={columns} dataSource={events} loading={isEventsLoading} rowKey="id" />
             </div>
