@@ -83,6 +83,6 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
 
 export const apiSlice = createApi({
     baseQuery: baseQuery,
-    tagTypes: ['User', 'Course', 'Module', 'Instructor', 'Quiz', 'Review', 'Admin', 'UserCourse', 'Certificate', 'Blog'],
+    tagTypes: ['User', 'Course', 'Module', 'Instructor', 'Quiz', 'Review', 'Admin', 'UserCourse', 'Certificate', 'Blog', 'Event'],
     endpoints: () => ({}),
 });
