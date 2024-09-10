@@ -17,10 +17,12 @@ const EventManagement: React.FC = () => {
     const [bannerUrl, setBannerUrl] = useState<string>('');
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
-    const { data: eventsData, isLoading } = useGetAllEventsQuery({});
-    const [addEvent] = useAddEventMutation();
+    const { data: eventsData, isLoading: isEventsLoading, refetch: refetchEvents } = useGetAllEventsQuery({});
+    const [addEvent, { isLoading: isAddingEvent }] = useAddEventMutation();
     const [deleteEvent] = useDeleteEventMutation();
     const [addAttendee] = useAddAttendeeMutation();
+
+    console.log({ eventsData });
 
     const { openWidget: openCloudinaryWidget } = useCloudinaryWidget({
         onSuccess: (url: string) => {
@@ -41,21 +43,22 @@ const EventManagement: React.FC = () => {
         attendeeForm.resetFields();
     };
 
-    const handleOk = async () => {
-        try {
-            const values = await form.validateFields();
-            const eventData = {
-                ...values,
-                start_time: moment(values.start_time).tz(values.timezone).format(),
-            };
-            await addEvent(eventData).unwrap();
-            message.success('Event added successfully');
-            setIsModalVisible(false);
-        } catch (error) {
-            console.error('Failed to add event:', error);
-            message.error('Failed to add event');
-        }
-    };
+     const handleOk = async () => {
+         try {
+             const values = await form.validateFields();
+             const eventData = {
+                 ...values,
+                 start_time: moment(values.start_time).format(), // Use ISO format
+             };
+             await addEvent(eventData).unwrap();
+             message.success('Event added successfully');
+             setIsModalVisible(false);
+             refetchEvents();
+         } catch (error) {
+             console.error('Failed to add event:', error);
+             message.error('Failed to add event');
+         }
+     };
 
     const handleAddAttendee = async () => {
         try {
@@ -64,6 +67,7 @@ const EventManagement: React.FC = () => {
                 await addAttendee({ id: selectedEventId, ...values }).unwrap();
                 message.success('Attendee added successfully');
                 setIsAttendeeModalVisible(false);
+                refetchEvents();
             }
         } catch (error) {
             console.error('Failed to add attendee:', error);
@@ -79,6 +83,7 @@ const EventManagement: React.FC = () => {
                     try {
                         await deleteEvent(id).unwrap();
                         message.success('Event deleted successfully');
+                        refetchEvents();
                     } catch (error) {
                         console.error('Failed to delete event:', error);
                         message.error('Failed to delete event');
@@ -86,7 +91,7 @@ const EventManagement: React.FC = () => {
                 },
             });
         },
-        [deleteEvent],
+        [deleteEvent, refetchEvents],
     );
 
     const columns = [
@@ -147,9 +152,16 @@ const EventManagement: React.FC = () => {
                         Add New Event
                     </Button>
                 </div>
-                <Table columns={columns} dataSource={events} loading={isLoading} rowKey="id" />
+                <Table columns={columns} dataSource={events} loading={isEventsLoading} rowKey="id" />
             </div>
-            <Modal title="Add New Event" open={isModalVisible} onOk={handleOk} onCancel={() => setIsModalVisible(false)} width={800}>
+            <Modal
+                title="Add New Event"
+                open={isModalVisible}
+                onOk={handleOk}
+                onCancel={() => setIsModalVisible(false)}
+                width={800}
+                confirmLoading={isAddingEvent}
+            >
                 <Form form={form} layout="vertical">
                     <Row gutter={16}>
                         <Col span={12}>
@@ -159,7 +171,7 @@ const EventManagement: React.FC = () => {
                         </Col>
                         <Col span={12}>
                             <Form.Item name="start_time" label="Start Time" rules={[{ required: true }]}>
-                                <DatePicker showTime className="w-full" />
+                                <DatePicker showTime format="YYYY-MM-DD HH:mm" className="w-full" />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -176,7 +188,9 @@ const EventManagement: React.FC = () => {
                                     className="w-full"
                                     placeholder="Select a timezone"
                                     optionFilterProp="children"
-                                    filterOption={(input, option) => ((option?.children ?? '') as string).toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                    filterOption={(input, option) =>
+                                        ((option?.children ?? '') as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                    }
                                 >
                                     {moment.tz.names().map((tz) => (
                                         <Option key={tz} value={tz}>
