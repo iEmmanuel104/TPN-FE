@@ -8,6 +8,7 @@ export interface EventDto {
         time: string;  // HH:mm
         timezone: string;
     };
+    description: string;
     duration: number;
     zoom_meeting_id: string;
     zoom_join_url: string;

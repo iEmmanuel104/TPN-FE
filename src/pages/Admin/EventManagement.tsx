@@ -15,6 +15,7 @@ import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 
 const { confirm } = Modal;
 const { Option } = Select;
+const { TextArea } = Input;
 
 const EventManagement: React.FC = () => {
     const [form] = Form.useForm();
@@ -273,6 +274,16 @@ const EventManagement: React.FC = () => {
                 <Form form={form} layout="vertical">
                     <Form.Item name="topic" label="Topic" rules={[{ required: true }]}>
                         <Input />
+                    </Form.Item>
+                    <Form.Item
+                        name="description"
+                        label="Description"
+                        rules={[
+                            { required: true, message: 'Please input the event description' },
+                            { max: 300, message: 'Description cannot exceed 300 characters' },
+                        ]}
+                    >
+                        <TextArea rows={4} maxLength={300} showCount />
                     </Form.Item>
                     <Row gutter={16}>
                         <Col span={12}>
