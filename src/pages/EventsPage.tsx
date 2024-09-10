@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Typography, Tabs, Divider, Breadcrumb, Spin, Modal, Form, Input, message } from 'antd';
+import { Typography, Tabs, Breadcrumb, Spin, Modal, Form, Input, message, Card, Row, Col, Button, Pagination } from 'antd';
 import { ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import { Link } from 'react-router-dom';
-import { useGetAllEventsQuery, useAddAttendeeMutation, EventDto } from '../api/eventApi';
-import moment from 'moment';
+import { useGetAllEventsQuery, useAddAttendeeMutation, EventDto, GetAllEventsParams } from '../api/eventApi';
+import moment from 'moment-timezone';
 import { useSelector } from 'react-redux';
 import { RootState } from '../state/store';
 
@@ -16,16 +16,26 @@ const EventsPage: React.FC = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState<EventDto | null>(null);
     const [form] = Form.useForm();
+    const [page, setPage] = useState(1);
+    const pageSize = 10; // You can adjust this or make it dynamic if needed
 
-    const { data: eventsData, isLoading } = useGetAllEventsQuery({ status: activeTab });
+    const queryParams: GetAllEventsParams = {
+        page,
+        size: pageSize,
+        status: activeTab,
+    };
+
+    const { data: eventsData, isLoading } = useGetAllEventsQuery(queryParams);
     const [addAttendee] = useAddAttendeeMutation();
 
     const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
 
     const events = eventsData?.data?.events || [];
+    const totalEvents = eventsData?.data?.count || 0;
 
     const handleTabChange = (key: string) => {
         setActiveTab(key as 'upcoming' | 'ongoing' | 'concluded');
+        setPage(1); // Reset to first page when changing tabs
     };
 
     const showRegistrationModal = (event: EventDto) => {
@@ -62,11 +72,8 @@ const EventsPage: React.FC = () => {
         }
     };
 
-    const isEventConcluded = (event: EventDto) => {
-        const endTime = moment
-            .tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone)
-            .add(event.duration, 'minutes');
-        return moment().isAfter(endTime);
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
     };
 
     return (
@@ -79,7 +86,7 @@ const EventsPage: React.FC = () => {
                     <Breadcrumb.Item>Events</Breadcrumb.Item>
                 </Breadcrumb>
 
-                <Tabs defaultActiveKey="upcoming" centered className="mb-8" onChange={handleTabChange}>
+                <Tabs activeKey={activeTab} centered className="mb-8" onChange={handleTabChange}>
                     <TabPane tab="Upcoming" key="upcoming" />
                     <TabPane tab="Ongoing" key="ongoing" />
                     <TabPane tab="Concluded" key="concluded" />
@@ -90,51 +97,68 @@ const EventsPage: React.FC = () => {
                         <Spin size="large" />
                     </div>
                 ) : (
-                    <div className="space-y-6">
-                        {events.map((event) => (
-                            <div key={event.id} className="flex flex-col sm:flex-row items-center border overflow-hidden">
-                                <div className="flex-shrink-0 w-full sm:w-24 py-4 sm:py-6 flex flex-row sm:flex-col justify-center items-center">
-                                    <Text className="text-5xl font-bold text-yellow-400 mr-2 sm:mr-0">
-                                        {moment(event.start_time_info.date).format('DD')}
-                                    </Text>
-                                    <Text className="text-yellow-400">{moment(event.start_time_info.date).format('MMM')}</Text>
-                                </div>
-                                <Divider type="vertical" className="hidden sm:block h-32 self-center mx-4" style={{ borderWidth: 0.5 }} />
-                                <div className="flex-grow w-full sm:w-auto py-4 sm:py-6 px-4 sm:pr-6 flex flex-col justify-start">
-                                    <Title level={4} className="mb-2 text-start">
-                                        {event.topic}
-                                    </Title>
-                                    <div className="text-gray-500 mb-2 text-start">
-                                        <ClockCircleOutlined className="mr-2" />
-                                        <span>
-                                            {moment
-                                                .tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone)
-                                                .format('h:mm A')}{' '}
-                                            -{' '}
-                                            {moment
-                                                .tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone)
-                                                .add(event.duration, 'minutes')
-                                                .format('h:mm A')}
-                                        </span>
-                                        <EnvironmentOutlined className="ml-4 mr-2" />
-                                        <span>{event.start_time_info.timezone}</span>
-                                    </div>
-                                    <Text className="text-gray-600 text-start mb-4">Duration: {event.duration} minutes</Text>
-                                    {!event.is_public && !isEventConcluded(event) && (
-                                        <button
-                                            onClick={() => showRegistrationModal(event)}
-                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 self-start"
-                                        >
-                                            Register
-                                        </button>
-                                    )}
-                                </div>
-                                <div className="w-full sm:w-1/3 h-48 sm:h-auto">
-                                    <img src={event.banner} alt={event.topic} className="w-full h-full object-cover" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <>
+                        <div className="space-y-6">
+                            {events.map((event) => (
+                                <Card key={event.id} className="overflow-hidden">
+                                    <Row gutter={16} align="middle">
+                                        <Col xs={24} sm={4} className="text-center">
+                                            <Text className="text-5xl font-bold text-yellow-400">
+                                                {moment(event.start_time_info.date).format('DD')}
+                                            </Text>
+                                            <Text className="block text-yellow-400">{moment(event.start_time_info.date).format('MMM')}</Text>
+                                        </Col>
+                                        <Col xs={24} sm={12}>
+                                            <Title level={4} className="mb-2">
+                                                {event.topic}
+                                            </Title>
+                                            <div className="text-gray-500 mb-2">
+                                                <ClockCircleOutlined className="mr-2" />
+                                                <span>
+                                                    {moment
+                                                        .tz(
+                                                            `${event.start_time_info.date} ${event.start_time_info.time}`,
+                                                            event.start_time_info.timezone,
+                                                        )
+                                                        .format('h:mm A')}{' '}
+                                                    -{' '}
+                                                    {moment
+                                                        .tz(
+                                                            `${event.start_time_info.date} ${event.start_time_info.time}`,
+                                                            event.start_time_info.timezone,
+                                                        )
+                                                        .add(event.duration, 'minutes')
+                                                        .format('h:mm A')}
+                                                </span>
+                                            </div>
+                                            <div className="text-gray-500 mb-2">
+                                                <EnvironmentOutlined className="mr-2" />
+                                                <span>{event.start_time_info.timezone}</span>
+                                            </div>
+                                            <Text className="text-gray-600">Duration: {event.duration} minutes</Text>
+                                            {!event.is_public && activeTab !== 'concluded' && (
+                                                <Button type="primary" onClick={() => showRegistrationModal(event)} className="mt-4">
+                                                    Register
+                                                </Button>
+                                            )}
+                                        </Col>
+                                        <Col xs={24} sm={8}>
+                                            <div style={{ height: '200px', overflow: 'hidden' }}>
+                                                <img
+                                                    src={event.banner}
+                                                    alt={event.topic}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                                                />
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </Card>
+                            ))}
+                        </div>
+                        <div className="mt-8 flex justify-center">
+                            <Pagination current={page} pageSize={pageSize} total={totalEvents} onChange={handlePageChange} showSizeChanger={false} />
+                        </div>
+                    </>
                 )}
             </div>
 

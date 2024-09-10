@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Button, Space, Modal, Form, Input, DatePicker, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
+import { Table, Button, Space, Modal, Form, Input, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
 import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
@@ -62,12 +62,14 @@ const EventManagement: React.FC = () => {
         try {
             const values = await form.validateFields();
 
+            const { year, month, day } = values.start_time_info.date;
+            const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
             const eventData = {
                 ...values,
                 start_time_info: {
-                    date: moment(values.start_time_info.date).format('YYYY-MM-DD'),
-                    time: values.start_time_info.time,
-                    timezone: values.start_time_info.timezone,
+                    ...values.start_time_info,
+                    date: formattedDate,
                 },
             };
 
@@ -79,6 +81,31 @@ const EventManagement: React.FC = () => {
             console.error('Failed to add event:', error);
             message.error('Failed to add event');
         }
+    };
+
+    const generateYearOptions = () => {
+        const currentYear = moment().year();
+        return Array.from({ length: 10 }, (_, index) => currentYear + index).map((year) => (
+            <Option key={year} value={year.toString()}>
+                {year}
+            </Option>
+        ));
+    };
+
+    const generateMonthOptions = () => {
+        return moment.months().map((month, index) => (
+            <Option key={index + 1} value={(index + 1).toString().padStart(2, '0')}>
+                {month}
+            </Option>
+        ));
+    };
+
+    const generateDayOptions = () => {
+        return Array.from({ length: 31 }, (_, index) => index + 1).map((day) => (
+            <Option key={day} value={day.toString().padStart(2, '0')}>
+                {day}
+            </Option>
+        ));
     };
 
     const handleAddAttendee = async () => {
@@ -253,8 +280,20 @@ const EventManagement: React.FC = () => {
                     </Row>
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
-                            <Form.Item name={['start_time_info', 'date']} label="Date" rules={[{ required: true }]}>
-                                <DatePicker className="w-full" />
+                            <Form.Item name={['start_time_info', 'date', 'year']} noStyle rules={[{ required: true, message: 'Year is required' }]}>
+                                <Select style={{ width: '33.33%' }} placeholder="Year">
+                                    {generateYearOptions()}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name={['start_time_info', 'date', 'month']} noStyle rules={[{ required: true, message: 'Month is required' }]}>
+                                <Select style={{ width: '33.33%' }} placeholder="Month">
+                                    {generateMonthOptions()}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item name={['start_time_info', 'date', 'day']} noStyle rules={[{ required: true, message: 'Day is required' }]}>
+                                <Select style={{ width: '33.33%' }} placeholder="Day">
+                                    {generateDayOptions()}
+                                </Select>
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
