@@ -5,6 +5,8 @@ import PublicLayout from '../components/PublicLayout';
 import { Link } from 'react-router-dom';
 import { useGetAllEventsQuery, useAddAttendeeMutation, EventDto } from '../api/eventApi';
 import moment from 'moment';
+import { useSelector } from 'react-redux';
+import { RootState } from '../state/store';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -18,6 +20,8 @@ const EventsPage: React.FC = () => {
     const { data: eventsData, isLoading } = useGetAllEventsQuery({ status: activeTab });
     const [addAttendee] = useAddAttendeeMutation();
 
+    const { user, isLoggedIn } = useSelector((state: RootState) => state.auth);
+
     const events = eventsData?.data?.events || [];
 
     const handleTabChange = (key: string) => {
@@ -26,16 +30,27 @@ const EventsPage: React.FC = () => {
 
     const showRegistrationModal = (event: EventDto) => {
         setSelectedEvent(event);
-        setIsModalVisible(true);
+        if (isLoggedIn && user) {
+            form.setFieldsValue({
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+            });
+            handleRegistration(event.id);
+        } else {
+            setIsModalVisible(true);
+        }
     };
 
-    const handleRegistration = async () => {
+    const handleRegistration = async (eventId?: string) => {
         try {
             const values = await form.validateFields();
-            if (selectedEvent) {
+            const id = eventId || selectedEvent?.id;
+            if (id) {
                 await addAttendee({
-                    id: selectedEvent.id,
+                    id,
                     ...values,
+                    userId: user?.id,
                 }).unwrap();
                 message.success('Successfully registered for the event!');
                 setIsModalVisible(false);
@@ -45,6 +60,13 @@ const EventsPage: React.FC = () => {
             console.error('Failed to register:', error);
             message.error('Failed to register for the event');
         }
+    };
+
+    const isEventConcluded = (event: EventDto) => {
+        const endTime = moment
+            .tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone)
+            .add(event.duration, 'minutes');
+        return moment().isAfter(endTime);
     };
 
     return (
@@ -98,12 +120,14 @@ const EventsPage: React.FC = () => {
                                         <span>{event.start_time_info.timezone}</span>
                                     </div>
                                     <Text className="text-gray-600 text-start mb-4">Duration: {event.duration} minutes</Text>
-                                    <button
-                                        onClick={() => showRegistrationModal(event)}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 self-start"
-                                    >
-                                        Register
-                                    </button>
+                                    {!event.is_public && !isEventConcluded(event) && (
+                                        <button
+                                            onClick={() => showRegistrationModal(event)}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 self-start"
+                                        >
+                                            Register
+                                        </button>
+                                    )}
                                 </div>
                                 <div className="w-full sm:w-1/3 h-48 sm:h-auto">
                                     <img src={event.banner} alt={event.topic} className="w-full h-full object-cover" />
@@ -114,7 +138,7 @@ const EventsPage: React.FC = () => {
                 )}
             </div>
 
-            <Modal title="Register for Event" visible={isModalVisible} onOk={handleRegistration} onCancel={() => setIsModalVisible(false)}>
+            <Modal title="Register for Event" visible={isModalVisible} onOk={() => handleRegistration()} onCancel={() => setIsModalVisible(false)}>
                 <Form form={form} layout="vertical">
                     <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
                         <Input />
