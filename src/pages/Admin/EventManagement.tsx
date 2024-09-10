@@ -45,6 +45,7 @@ const EventManagement: React.FC = () => {
             setIsBannerUploading(false);
         },
     });
+
     const showModal = () => {
         setIsModalVisible(true);
         form.resetFields();
@@ -65,7 +66,7 @@ const EventManagement: React.FC = () => {
                 ...values,
                 start_time_info: {
                     date: moment(values.start_time_info.date).format('YYYY-MM-DD'),
-                    time: values.start_time_info.time, // This is now a string in HH:mm format
+                    time: values.start_time_info.time,
                     timezone: values.start_time_info.timezone,
                 },
             };
@@ -201,13 +202,13 @@ const EventManagement: React.FC = () => {
 
     return (
         <DashboardLayout>
-            <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">Event Management</h1>
-                    <Space>
+            <div className="p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold mb-4 sm:mb-0">Event Management</h1>
+                    <Space className="w-full sm:w-auto" direction="horizontal" size="middle" style={{ display: 'flex' }}>
                         <Select
                             defaultValue="all"
-                            style={{ width: 120 }}
+                            style={{ width: '100%' }}
                             onChange={(value) => setStatusFilter(value as GetAllEventsParams['status'])}
                         >
                             <Option value="all">All Events</Option>
@@ -215,12 +216,21 @@ const EventManagement: React.FC = () => {
                             <Option value="ongoing">Ongoing</Option>
                             <Option value="concluded">Concluded</Option>
                         </Select>
-                        <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+                        <Button type="primary" icon={<PlusOutlined />} onClick={showModal} style={{ width: '100%' }}>
                             Add New Event
                         </Button>
                     </Space>
                 </div>
-                <Table columns={columns} dataSource={events} loading={isEventsLoading} rowKey="id" />
+                <div className="overflow-x-auto">
+                    <Table
+                        columns={columns}
+                        dataSource={events}
+                        loading={isEventsLoading}
+                        rowKey="id"
+                        scroll={{ x: 'max-content' }}
+                        className="min-w-full"
+                    />
+                </div>
             </div>
             <Modal
                 title="Add New Event"
@@ -235,19 +245,19 @@ const EventManagement: React.FC = () => {
             >
                 <Form form={form} layout="vertical">
                     <Row gutter={16}>
-                        <Col span={24}>
+                        <Col xs={24}>
                             <Form.Item name="topic" label="Topic" rules={[{ required: true }]}>
                                 <Input />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name={['start_time_info', 'date']} label="Date" rules={[{ required: true }]}>
                                 <DatePicker className="w-full" />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
                                 name={['start_time_info', 'time']}
                                 label="Time (24-hour format)"
@@ -264,12 +274,12 @@ const EventManagement: React.FC = () => {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="duration" label="Duration (minutes)" rules={[{ required: true }]}>
                                 <Input type="number" min={1} max={1440} />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name={['start_time_info', 'timezone']} label="Timezone" rules={[{ required: true }]}>
                                 <Select
                                     showSearch
@@ -290,12 +300,12 @@ const EventManagement: React.FC = () => {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="is_public" label="Public Event" valuePropName="checked">
                                 <Switch />
                             </Form.Item>
                         </Col>
-                        <Col span={12}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
                                 <div className="flex items-center space-x-4">
                                     <Button
