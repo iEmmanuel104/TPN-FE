@@ -41,8 +41,10 @@ const EventManagement: React.FC = () => {
             setIsBannerUploading(false);
             message.error('Failed to upload banner');
         },
+        onClose: () => {
+            setIsBannerUploading(false);
+        },
     });
-
     const showModal = () => {
         setIsModalVisible(true);
         form.resetFields();
@@ -147,13 +149,14 @@ const EventManagement: React.FC = () => {
             },
         },
         {
-            title: 'Duration (minutes)',
+            title: 'Duration',
             dataIndex: 'duration',
             key: 'duration',
+            render: (duration: number) => `${duration} mins`,
         },
         {
             title: 'Timezone',
-            dataIndex: 'timezone',
+            dataIndex: ['start_time_info', 'timezone'],
             key: 'timezone',
         },
         {
@@ -295,8 +298,13 @@ const EventManagement: React.FC = () => {
                         <Col span={12}>
                             <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
                                 <div className="flex items-center space-x-4">
-                                    <Button icon={<UploadOutlined />} onClick={handleBannerUpload} loading={isBannerUploading}>
-                                        {bannerUrl ? 'Change Banner' : 'Upload Banner'}
+                                    <Button
+                                        icon={<UploadOutlined />}
+                                        onClick={handleBannerUpload}
+                                        loading={isBannerUploading}
+                                        disabled={isBannerUploading || !!bannerUrl}
+                                    >
+                                        {bannerUrl ? 'Banner Uploaded' : 'Upload Banner'}
                                     </Button>
                                 </div>
                             </Form.Item>
