@@ -1,16 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
-import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Modal, Form, Input, message, Tag, Tooltip, Row, Col, Select } from 'antd';
+import { PlusOutlined, DeleteOutlined, EyeOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
-import {
-    useGetAllEventsQuery,
-    useAddEventMutation,
-    useDeleteEventMutation,
-    useAddAttendeeMutation,
-    EventDto,
-    GetAllEventsParams,
-} from '../../api/eventApi';
+import { useGetAllEventsQuery, useAddEventMutation, useDeleteEventMutation, EventDto, GetAllEventsParams } from '../../api/eventApi';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 
 const { confirm } = Modal;
@@ -19,18 +12,14 @@ const { TextArea } = Input;
 
 const EventManagement: React.FC = () => {
     const [form] = Form.useForm();
-    const [attendeeForm] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isAttendeeModalVisible, setIsAttendeeModalVisible] = useState(false);
     const [bannerUrl, setBannerUrl] = useState<string>('');
-    const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<GetAllEventsParams['status']>('all');
     const [isBannerUploading, setIsBannerUploading] = useState(false);
 
     const { data: eventsData, isLoading: isEventsLoading, refetch: refetchEvents } = useGetAllEventsQuery({ status: statusFilter });
     const [addEvent, { isLoading: isAddingEvent }] = useAddEventMutation();
     const [deleteEvent] = useDeleteEventMutation();
-    const [addAttendee] = useAddAttendeeMutation();
 
     const { openWidget: openCloudinaryWidget } = useCloudinaryWidget({
         onSuccess: (url: string) => {
@@ -51,12 +40,6 @@ const EventManagement: React.FC = () => {
         setIsModalVisible(true);
         form.resetFields();
         setBannerUrl('');
-    };
-
-    const showAttendeeModal = (eventId: string) => {
-        setSelectedEventId(eventId);
-        setIsAttendeeModalVisible(true);
-        attendeeForm.resetFields();
     };
 
     const handleOk = async () => {
@@ -116,21 +99,6 @@ const EventManagement: React.FC = () => {
                 {day.toString().padStart(2, '0')}
             </Option>
         ));
-    };
-
-    const handleAddAttendee = async () => {
-        try {
-            const values = await attendeeForm.validateFields();
-            if (selectedEventId) {
-                await addAttendee({ id: selectedEventId, ...values }).unwrap();
-                message.success('Attendee added successfully');
-                setIsAttendeeModalVisible(false);
-                refetchEvents();
-            }
-        } catch (error) {
-            console.error('Failed to add attendee:', error);
-            message.error('Failed to add attendee');
-        }
     };
 
     const handleDelete = useCallback(
@@ -211,21 +179,12 @@ const EventManagement: React.FC = () => {
             },
         },
         {
-            title: 'Public',
-            dataIndex: 'is_public',
-            key: 'is_public',
-            render: (isPublic: boolean) => <Tag color={isPublic ? 'green' : 'red'}>{isPublic ? 'Public' : 'Private'}</Tag>,
-        },
-        {
             title: 'Actions',
             key: 'actions',
             render: (_: unknown, record: EventDto) => (
                 <Space size="middle">
                     <Tooltip title="View Event">
                         <Button icon={<EyeOutlined />} onClick={() => window.open(record.zoom_join_url, '_blank')} />
-                    </Tooltip>
-                    <Tooltip title="Add Attendee">
-                        <Button icon={<UserAddOutlined />} onClick={() => showAttendeeModal(record.id)} />
                     </Tooltip>
                     <Tooltip title="Delete">
                         <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
@@ -351,7 +310,7 @@ const EventManagement: React.FC = () => {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col span={18}>
+                        <Col span={16}>
                             <Form.Item name={['start_time_info', 'timezone']} label="Timezone" rules={[{ required: true }]}>
                                 <Select
                                     showSearch
@@ -369,40 +328,24 @@ const EventManagement: React.FC = () => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
-                            <Form.Item name="is_public" label="Public Event" valuePropName="checked">
-                                <Switch />
+                        <Col span={8}>
+                            <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
+                                <Button
+                                    icon={<UploadOutlined />}
+                                    onClick={handleBannerUpload}
+                                    loading={isBannerUploading}
+                                    disabled={isBannerUploading || !!bannerUrl}
+                                >
+                                    {bannerUrl ? 'Banner Uploaded' : 'Upload Banner'}
+                                </Button>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
-                        <Button
-                            icon={<UploadOutlined />}
-                            onClick={handleBannerUpload}
-                            loading={isBannerUploading}
-                            disabled={isBannerUploading || !!bannerUrl}
-                        >
-                            {bannerUrl ? 'Banner Uploaded' : 'Upload Banner'}
-                        </Button>
                         {bannerUrl && (
-                            <div className="mt-2">
+                            <div className="mt-2 w-full">
                                 <img src={bannerUrl} alt="Event banner" className="w-full h-32 object-cover rounded" />
                             </div>
                         )}
-                    </Form.Item>
-                </Form>
-            </Modal>
-            <Modal title="Add Attendee" open={isAttendeeModalVisible} onOk={handleAddAttendee} onCancel={() => setIsAttendeeModalVisible(false)}>
-                <Form form={attendeeForm} layout="vertical">
-                    <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
+                    </Row>
                 </Form>
             </Modal>
         </DashboardLayout>
