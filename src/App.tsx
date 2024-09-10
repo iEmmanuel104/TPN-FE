@@ -18,6 +18,7 @@ import InstructorManagement from './pages/Admin/InstructorManagement';
 import AdminManagement from './pages/Admin/AdminManagement';
 import StudentManagement from './pages/Admin/StudentManagement';
 import BlogManagement from './pages/Admin/BlogManagement';
+import EventManagement from './pages/Admin/EventManagement'; 
 
 // public pages
 import LandingPage from './pages/LandingPage';
@@ -78,6 +79,7 @@ function App() {
                             <Route path="admins" element={<AdminManagement />} />
                             <Route path="students" element={<StudentManagement />} />
                             <Route path="blogs" element={<BlogManagement />} />
+                            <Route path="events" element={<EventManagement />} />
                         </Route>
 
                         {/* User Routes */}
