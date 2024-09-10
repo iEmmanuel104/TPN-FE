@@ -1,36 +1,52 @@
-import React from 'react';
-import { Typography, Tabs, Divider, Breadcrumb } from 'antd';
+import React, { useState } from 'react';
+import { Typography, Tabs, Divider, Breadcrumb, Spin, Modal, Form, Input, message } from 'antd';
 import { ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
-import EventImage from '../assets/drugrehab.jpeg';
 import { Link } from 'react-router-dom';
+import { useGetAllEventsQuery, useAddAttendeeMutation, EventDto } from '../api/eventApi';
+import moment from 'moment';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
-interface Event {
-    id: number;
-    date: { day: number; month: string };
-    title: string;
-    time: string;
-    location: string;
-    description: string;
-    image: string;
-}
-
-const event: Event = {
-    id: 1,
-    date: { day: 15, month: 'Oct' },
-    title: 'Autumn Science Lectures',
-    time: '8:00 Am - 5:00 Pm',
-    location: 'Venice, Italy',
-    description: 'Morbi accumsan ipsum velit. Nam nec tellus a odio tincidunt auctor a ornare odio. Sed non mauris itae erat conuat',
-    image: EventImage,
-};
-
-const events = Array(3).fill(event);
-
 const EventsPage: React.FC = () => {
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'ongoing' | 'concluded'>('upcoming');
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<EventDto | null>(null);
+    const [form] = Form.useForm();
+
+    const { data: eventsData, isLoading } = useGetAllEventsQuery({ status: activeTab });
+    const [addAttendee] = useAddAttendeeMutation();
+
+    const events = eventsData?.data?.events || [];
+
+    const handleTabChange = (key: string) => {
+        setActiveTab(key as 'upcoming' | 'ongoing' | 'concluded');
+    };
+
+    const showRegistrationModal = (event: EventDto) => {
+        setSelectedEvent(event);
+        setIsModalVisible(true);
+    };
+
+    const handleRegistration = async () => {
+        try {
+            const values = await form.validateFields();
+            if (selectedEvent) {
+                await addAttendee({
+                    id: selectedEvent.id,
+                    ...values,
+                }).unwrap();
+                message.success('Successfully registered for the event!');
+                setIsModalVisible(false);
+                form.resetFields();
+            }
+        } catch (error) {
+            console.error('Failed to register:', error);
+            message.error('Failed to register for the event');
+        }
+    };
+
     return (
         <PublicLayout>
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -41,39 +57,68 @@ const EventsPage: React.FC = () => {
                     <Breadcrumb.Item>Events</Breadcrumb.Item>
                 </Breadcrumb>
 
-                <Tabs defaultActiveKey="1" centered className="mb-8">
-                    <TabPane tab="Happening" key="1" />
-                    <TabPane tab="Upcoming" key="2" />
-                    <TabPane tab="Expired" key="3" />
+                <Tabs defaultActiveKey="upcoming" centered className="mb-8" onChange={handleTabChange}>
+                    <TabPane tab="Upcoming" key="upcoming" />
+                    <TabPane tab="Ongoing" key="ongoing" />
+                    <TabPane tab="Concluded" key="concluded" />
                 </Tabs>
 
-                <div className="space-y-6">
-                    {events.map((item, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row items-center border overflow-hidden">
-                            <div className="flex-shrink-0 w-full sm:w-24 py-4 sm:py-6 flex flex-row sm:flex-col justify-center items-center">
-                                <Text className="text-5xl font-bold text-yellow-400 mr-2 sm:mr-0">{item.date.day}</Text>
-                                <Text className="text-yellow-400">{item.date.month}</Text>
-                            </div>
-                            <Divider type="vertical" className="hidden sm:block h-32 self-center mx-4" style={{ borderWidth: 0.5 }} />
-                            <div className="flex-grow w-full sm:w-auto py-4 sm:py-6 px-4 sm:pr-6 flex flex-col justify-start">
-                                <Title level={4} className="mb-2 text-start">
-                                    {item.title}
-                                </Title>
-                                <div className="text-gray-500 mb-2 text-start">
-                                    <ClockCircleOutlined className="mr-2" />
-                                    <span>{item.time}</span>
-                                    <EnvironmentOutlined className="ml-4 mr-2" />
-                                    <span>{item.location}</span>
+                {isLoading ? (
+                    <div className="flex justify-center">
+                        <Spin size="large" />
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {events.map((event) => (
+                            <div key={event.id} className="flex flex-col sm:flex-row items-center border overflow-hidden">
+                                <div className="flex-shrink-0 w-full sm:w-24 py-4 sm:py-6 flex flex-row sm:flex-col justify-center items-center">
+                                    <Text className="text-5xl font-bold text-yellow-400 mr-2 sm:mr-0">{moment(event.start_time).format('DD')}</Text>
+                                    <Text className="text-yellow-400">{moment(event.start_time).format('MMM')}</Text>
                                 </div>
-                                <Text className="text-gray-600 text-start">{item.description}</Text>
+                                <Divider type="vertical" className="hidden sm:block h-32 self-center mx-4" style={{ borderWidth: 0.5 }} />
+                                <div className="flex-grow w-full sm:w-auto py-4 sm:py-6 px-4 sm:pr-6 flex flex-col justify-start">
+                                    <Title level={4} className="mb-2 text-start">
+                                        {event.topic}
+                                    </Title>
+                                    <div className="text-gray-500 mb-2 text-start">
+                                        <ClockCircleOutlined className="mr-2" />
+                                        <span>
+                                            {moment(event.start_time).format('h:mm A')} -{' '}
+                                            {moment(event.start_time).add(event.duration, 'minutes').format('h:mm A')}
+                                        </span>
+                                        <EnvironmentOutlined className="ml-4 mr-2" />
+                                        <span>{event.timezone}</span>
+                                    </div>
+                                    <Text className="text-gray-600 text-start mb-4">Duration: {event.duration} minutes</Text>
+                                    <button
+                                        onClick={() => showRegistrationModal(event)}
+                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300 self-start"
+                                    >
+                                        Register
+                                    </button>
+                                </div>
+                                <div className="w-full sm:w-1/3 h-48 sm:h-auto">
+                                    <img src={event.banner} alt={event.topic} className="w-full h-full object-cover" />
+                                </div>
                             </div>
-                            <div className="w-full sm:w-1/3 h-48 sm:h-auto">
-                                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
+
+            <Modal title="Register for Event" visible={isModalVisible} onOk={handleRegistration} onCancel={() => setIsModalVisible(false)}>
+                <Form form={form} layout="vertical">
+                    <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
+                        <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </PublicLayout>
     );
 };

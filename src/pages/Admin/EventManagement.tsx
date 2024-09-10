@@ -1,21 +1,26 @@
 import React, { useState, useCallback } from 'react';
-import { Table, Button, Space, Modal, Form, Input, DatePicker, InputNumber, Switch, message, Tag, Tooltip } from 'antd';
-import { PlusOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import { Table, Button, Space, Modal, Form, Input, DatePicker, InputNumber, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
+import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined } from '@ant-design/icons';
+import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
-import { useGetAllEventsQuery, useAddEventMutation, useDeleteEventMutation, EventDto } from '../../api/eventApi';
+import { useGetAllEventsQuery, useAddEventMutation, useDeleteEventMutation, useAddAttendeeMutation, EventDto } from '../../api/eventApi';
 import { useCloudinaryWidget } from '../../hooks/useCloudinaryWidget';
 
 const { confirm } = Modal;
+const { Option } = Select;
 
 const EventManagement: React.FC = () => {
     const [form] = Form.useForm();
+    const [attendeeForm] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isAttendeeModalVisible, setIsAttendeeModalVisible] = useState(false);
     const [bannerUrl, setBannerUrl] = useState<string>('');
+    const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
     const { data: eventsData, isLoading } = useGetAllEventsQuery({});
     const [addEvent] = useAddEventMutation();
     const [deleteEvent] = useDeleteEventMutation();
+    const [addAttendee] = useAddAttendeeMutation();
 
     const { openWidget: openCloudinaryWidget } = useCloudinaryWidget({
         onSuccess: (url: string) => {
@@ -30,12 +35,18 @@ const EventManagement: React.FC = () => {
         setBannerUrl('');
     };
 
+    const showAttendeeModal = (eventId: string) => {
+        setSelectedEventId(eventId);
+        setIsAttendeeModalVisible(true);
+        attendeeForm.resetFields();
+    };
+
     const handleOk = async () => {
         try {
             const values = await form.validateFields();
             const eventData = {
                 ...values,
-                start_time: values.start_time.toISOString(),
+                start_time: moment(values.start_time).tz(values.timezone).format(),
             };
             await addEvent(eventData).unwrap();
             message.success('Event added successfully');
@@ -43,6 +54,20 @@ const EventManagement: React.FC = () => {
         } catch (error) {
             console.error('Failed to add event:', error);
             message.error('Failed to add event');
+        }
+    };
+
+    const handleAddAttendee = async () => {
+        try {
+            const values = await attendeeForm.validateFields();
+            if (selectedEventId) {
+                await addAttendee({ id: selectedEventId, ...values }).unwrap();
+                message.success('Attendee added successfully');
+                setIsAttendeeModalVisible(false);
+            }
+        } catch (error) {
+            console.error('Failed to add attendee:', error);
+            message.error('Failed to add attendee');
         }
     };
 
@@ -74,12 +99,17 @@ const EventManagement: React.FC = () => {
             title: 'Start Time',
             dataIndex: 'start_time',
             key: 'start_time',
-            render: (time: string) => moment(time).format('YYYY-MM-DD HH:mm'),
+            render: (time: string, record: EventDto) => moment(time).tz(record.timezone).format('YYYY-MM-DD HH:mm'),
         },
         {
             title: 'Duration (minutes)',
             dataIndex: 'duration',
             key: 'duration',
+        },
+        {
+            title: 'Timezone',
+            dataIndex: 'timezone',
+            key: 'timezone',
         },
         {
             title: 'Public',
@@ -94,6 +124,9 @@ const EventManagement: React.FC = () => {
                 <Space size="middle">
                     <Tooltip title="View Event">
                         <Button icon={<EyeOutlined />} onClick={() => window.open(record.zoom_join_url, '_blank')} />
+                    </Tooltip>
+                    <Tooltip title="Add Attendee">
+                        <Button icon={<UserAddOutlined />} onClick={() => showAttendeeModal(record.id)} />
                     </Tooltip>
                     <Tooltip title="Delete">
                         <Button icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} danger />
@@ -118,28 +151,82 @@ const EventManagement: React.FC = () => {
             </div>
             <Modal title="Add New Event" open={isModalVisible} onOk={handleOk} onCancel={() => setIsModalVisible(false)} width={800}>
                 <Form form={form} layout="vertical">
-                    <Form.Item name="topic" label="Topic" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="start_time" label="Start Time" rules={[{ required: true }]}>
-                        <DatePicker showTime />
-                    </Form.Item>
-                    <Form.Item name="duration" label="Duration (minutes)" rules={[{ required: true }]}>
-                        <InputNumber min={1} />
-                    </Form.Item>
-                    <Form.Item name="timezone" label="Timezone" rules={[{ required: true }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="is_public" label="Public Event" valuePropName="checked">
-                        <Switch />
-                    </Form.Item>
-                    <Form.Item label="Banner">
-                        <div className="flex items-center space-x-4">
-                            {bannerUrl && <img src={bannerUrl} alt="Event banner" className="w-32 h-32 object-cover" />}
-                            <Button onClick={openCloudinaryWidget}>{bannerUrl ? 'Change Banner' : 'Upload Banner'}</Button>
-                        </div>
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item name="topic" label="Topic" rules={[{ required: true }]}>
+                                <Input />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item name="start_time" label="Start Time" rules={[{ required: true }]}>
+                                <DatePicker showTime className="w-full" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item name="duration" label="Duration (minutes)" rules={[{ required: true }]}>
+                                <InputNumber min={1} max={60} className="w-full" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item name="timezone" label="Timezone" rules={[{ required: true }]}>
+                                <Select
+                                    showSearch
+                                    className="w-full"
+                                    placeholder="Select a timezone"
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) => ((option?.children ?? '') as string).toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                >
+                                    {moment.tz.names().map((tz) => (
+                                        <Option key={tz} value={tz}>
+                                            {tz}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item name="is_public" label="Public Event" valuePropName="checked">
+                                <Switch />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Banner">
+                                <div className="flex items-center space-x-4">
+                                    <Button icon={<UploadOutlined />} onClick={openCloudinaryWidget}>
+                                        {bannerUrl ? 'Change Banner' : 'Upload Banner'}
+                                    </Button>
+                                </div>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span={24}>
+                            {bannerUrl && (
+                                <div className="mt-4">
+                                    <p className="mb-2 font-semibold">Banner Preview:</p>
+                                    <img src={bannerUrl} alt="Event banner" className="w-full h-40 object-cover rounded" />
+                                </div>
+                            )}
+                        </Col>
+                    </Row>
                     <Form.Item name="banner" hidden>
+                        <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
+            <Modal title="Add Attendee" open={isAttendeeModalVisible} onOk={handleAddAttendee} onCancel={() => setIsAttendeeModalVisible(false)}>
+                <Form form={attendeeForm} layout="vertical">
+                    <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
                         <Input />
                     </Form.Item>
                 </Form>
