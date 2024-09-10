@@ -8,7 +8,7 @@ import moment from 'moment-timezone';
 import { useSelector } from 'react-redux';
 import { RootState } from '../state/store';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 const EventsPage: React.FC = () => {
@@ -112,6 +112,9 @@ const EventsPage: React.FC = () => {
                                             <Title level={4} className="mb-2">
                                                 {event.topic}
                                             </Title>
+                                            <Paragraph className="text-gray-600 mb-4" ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}>
+                                                {event.description}
+                                            </Paragraph>
                                             <div className="text-gray-500 mb-2">
                                                 <ClockCircleOutlined className="mr-2" />
                                                 <span>

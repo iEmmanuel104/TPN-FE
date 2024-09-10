@@ -66,6 +66,15 @@ const EventManagement: React.FC = () => {
             const { year, month, day } = values.start_time_info.date;
             const formattedDate = `${year}-${month}-${day}`;
 
+            // Check if the formatted date is in the future
+            const eventDate = moment(formattedDate);
+            const currentDate = moment().startOf('day');
+
+            if (eventDate.isSameOrBefore(currentDate)) {
+                message.error('Event date must be in the future');
+                return;
+            }
+
             const eventData = {
                 ...values,
                 start_time_info: {
