@@ -49,7 +49,6 @@ const EventManagement: React.FC = () => {
             const { year, month, day } = values.start_time_info.date;
             const formattedDate = `${year}-${month}-${day}`;
 
-            // Check if the formatted date is in the future
             const eventDate = moment(formattedDate);
             const currentDate = moment().startOf('day');
 
@@ -233,7 +232,8 @@ const EventManagement: React.FC = () => {
                 open={isModalVisible}
                 onOk={handleOk}
                 onCancel={() => setIsModalVisible(false)}
-                width={600}
+                width="100%"
+                style={{ maxWidth: '600px' }}
                 confirmLoading={isAddingEvent}
                 maskClosable={false}
                 closable={true}
@@ -253,8 +253,8 @@ const EventManagement: React.FC = () => {
                     >
                         <TextArea rows={4} maxLength={300} showCount />
                     </Form.Item>
-                    <Row gutter={16}>
-                        <Col span={12}>
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12}>
                             <Form.Item label="Date" required>
                                 <Input.Group compact>
                                     <Form.Item
@@ -272,7 +272,7 @@ const EventManagement: React.FC = () => {
                                         noStyle
                                         rules={[{ required: true, message: 'Month is required' }]}
                                     >
-                                        <Select style={{ width: '28%' }} placeholder="MM">
+                                        <Select style={{ width: '34%' }} placeholder="MM">
                                             {generateMonthOptions()}
                                         </Select>
                                     </Form.Item>
@@ -281,14 +281,14 @@ const EventManagement: React.FC = () => {
                                         noStyle
                                         rules={[{ required: true, message: 'Day is required' }]}
                                     >
-                                        <Select style={{ width: '23%' }} placeholder="DD">
+                                        <Select style={{ width: '33%' }} placeholder="DD">
                                             {generateDayOptions()}
                                         </Select>
                                     </Form.Item>
                                 </Input.Group>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                        <Col xs={24} sm={12}>
                             <Form.Item
                                 name={['start_time_info', 'time']}
                                 label="Time"
@@ -303,14 +303,14 @@ const EventManagement: React.FC = () => {
                                 <Input placeholder="HH:mm" />
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name="duration" label="Duration (min)" rules={[{ required: true }]}>
                                 <Input type="number" min={1} max={1440} />
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col span={16}>
+                        <Col xs={24} sm={12}>
                             <Form.Item name={['start_time_info', 'timezone']} label="Timezone" rules={[{ required: true }]}>
                                 <Select
                                     showSearch
@@ -328,24 +328,22 @@ const EventManagement: React.FC = () => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
-                            <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
-                                <Button
-                                    icon={<UploadOutlined />}
-                                    onClick={handleBannerUpload}
-                                    loading={isBannerUploading}
-                                    disabled={isBannerUploading || !!bannerUrl}
-                                >
-                                    {bannerUrl ? 'Banner Uploaded' : 'Upload Banner'}
-                                </Button>
-                            </Form.Item>
-                        </Col>
-                        {bannerUrl && (
-                            <div className="mt-2 w-full">
-                                <img src={bannerUrl} alt="Event banner" className="w-full h-32 object-cover rounded" />
-                            </div>
-                        )}
                     </Row>
+                    <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
+                        <Button
+                            icon={<UploadOutlined />}
+                            onClick={handleBannerUpload}
+                            loading={isBannerUploading}
+                            disabled={isBannerUploading || !!bannerUrl}
+                        >
+                            {bannerUrl ? 'Banner Uploaded' : 'Upload Banner'}
+                        </Button>
+                    </Form.Item>
+                    {bannerUrl && (
+                        <div className="mt-2 w-full">
+                            <img src={bannerUrl} alt="Event banner" className="w-full h-32 object-cover rounded" />
+                        </div>
+                    )}
                 </Form>
             </Modal>
         </DashboardLayout>
