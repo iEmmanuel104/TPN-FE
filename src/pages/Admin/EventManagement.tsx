@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Table, Button, Space, Modal, Form, Input, DatePicker, InputNumber, Switch, message, Tag, Tooltip, Row, Col, Select } from 'antd';
-import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EyeOutlined, UserAddOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import moment from 'moment-timezone';
 import DashboardLayout from '../../components/Admin/DashboardLayout';
 import {
@@ -222,6 +222,9 @@ const EventManagement: React.FC = () => {
                 onCancel={() => setIsModalVisible(false)}
                 width={800}
                 confirmLoading={isAddingEvent}
+                maskClosable={false}
+                closable={true}
+                closeIcon={<CloseOutlined />}
             >
                 <Form form={form} layout="vertical">
                     <Row gutter={16}>
