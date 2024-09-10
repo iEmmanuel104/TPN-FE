@@ -272,57 +272,72 @@ const EventManagement: React.FC = () => {
             >
                 <Form form={form} layout="vertical">
                     <Row gutter={16}>
-                        <Col xs={24}>
+                        <Col span={24}>
                             <Form.Item name="topic" label="Topic" rules={[{ required: true }]}>
                                 <Input />
                             </Form.Item>
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item name={['start_time_info', 'date', 'year']} noStyle rules={[{ required: true, message: 'Year is required' }]}>
-                                <Select style={{ width: '33.33%' }} placeholder="Year">
-                                    {generateYearOptions()}
-                                </Select>
-                            </Form.Item>
-                            <Form.Item name={['start_time_info', 'date', 'month']} noStyle rules={[{ required: true, message: 'Month is required' }]}>
-                                <Select style={{ width: '33.33%' }} placeholder="Month">
-                                    {generateMonthOptions()}
-                                </Select>
-                            </Form.Item>
-                            <Form.Item name={['start_time_info', 'date', 'day']} noStyle rules={[{ required: true, message: 'Day is required' }]}>
-                                <Select style={{ width: '33.33%' }} placeholder="Day">
-                                    {generateDayOptions()}
-                                </Select>
+                        <Col span={12}>
+                            <Form.Item label="Date" required>
+                                <Input.Group compact>
+                                    <Form.Item
+                                        name={['start_time_info', 'date', 'year']}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Year is required' }]}
+                                    >
+                                        <Select style={{ width: '40%' }} placeholder="Year">
+                                            {generateYearOptions()}
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        name={['start_time_info', 'date', 'month']}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Month is required' }]}
+                                    >
+                                        <Select style={{ width: '35%' }} placeholder="Month">
+                                            {generateMonthOptions()}
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        name={['start_time_info', 'date', 'day']}
+                                        noStyle
+                                        rules={[{ required: true, message: 'Day is required' }]}
+                                    >
+                                        <Select style={{ width: '25%' }} placeholder="Day">
+                                            {generateDayOptions()}
+                                        </Select>
+                                    </Form.Item>
+                                </Input.Group>
                             </Form.Item>
                         </Col>
-                        <Col xs={24} sm={12}>
+                        <Col span={6}>
                             <Form.Item
                                 name={['start_time_info', 'time']}
-                                label="Time (24-hour format)"
+                                label="Time"
                                 rules={[
                                     { required: true, message: 'Please input the time' },
                                     {
                                         pattern: /^([01]\d|2[0-3]):([0-5]\d)$/,
-                                        message: 'Please enter a valid time in 24-hour format (HH:mm)',
+                                        message: 'HH:mm format',
                                     },
                                 ]}
                             >
                                 <Input placeholder="HH:mm" />
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col xs={24} sm={12}>
-                            <Form.Item name="duration" label="Duration (minutes)" rules={[{ required: true }]}>
+                        <Col span={6}>
+                            <Form.Item name="duration" label="Duration (min)" rules={[{ required: true }]}>
                                 <Input type="number" min={1} max={1440} />
                             </Form.Item>
                         </Col>
-                        <Col xs={24} sm={12}>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
                             <Form.Item name={['start_time_info', 'timezone']} label="Timezone" rules={[{ required: true }]}>
                                 <Select
                                     showSearch
-                                    className="w-full"
                                     placeholder="Select a timezone"
                                     optionFilterProp="children"
                                     filterOption={(input, option) =>
@@ -337,14 +352,14 @@ const EventManagement: React.FC = () => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col xs={24} sm={12}>
+                        <Col span={6}>
                             <Form.Item name="is_public" label="Public Event" valuePropName="checked">
                                 <Switch />
                             </Form.Item>
                         </Col>
-                        <Col xs={24} sm={12}>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={24}>
                             <Form.Item name="banner" label="Banner" rules={[{ required: true, message: 'Please upload a banner' }]}>
                                 <div className="flex items-center space-x-4">
                                     <Button
@@ -355,18 +370,13 @@ const EventManagement: React.FC = () => {
                                     >
                                         {bannerUrl ? 'Banner Uploaded' : 'Upload Banner'}
                                     </Button>
+                                    {bannerUrl && (
+                                        <div className="ml-4">
+                                            <img src={bannerUrl} alt="Event banner" className="w-20 h-20 object-cover rounded" />
+                                        </div>
+                                    )}
                                 </div>
                             </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col span={24}>
-                            {bannerUrl && (
-                                <div className="mt-4">
-                                    <p className="mb-2 font-semibold">Banner Preview:</p>
-                                    <img src={bannerUrl} alt="Event banner" className="w-full h-40 object-cover rounded" />
-                                </div>
-                            )}
                         </Col>
                     </Row>
                 </Form>
