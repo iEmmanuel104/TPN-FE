@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Typography, Tabs, Breadcrumb, Spin, Card, Row, Col, Pagination } from 'antd';
+import { Typography, Tabs, Breadcrumb, Spin, Card, Row, Col, Pagination, Button } from 'antd';
 import { ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import PublicLayout from '../components/PublicLayout';
 import { Link } from 'react-router-dom';
-import { useGetAllEventsQuery, GetAllEventsParams } from '../api/eventApi';
+import { useGetAllEventsQuery, GetAllEventsParams, EventDto } from '../api/eventApi';
 import moment from 'moment-timezone';
 
 const { Title, Text, Paragraph } = Typography;
@@ -12,7 +12,7 @@ const { TabPane } = Tabs;
 const EventsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'upcoming' | 'ongoing' | 'concluded'>('upcoming');
     const [page, setPage] = useState(1);
-    const pageSize = 10; // You can adjust this or make it dynamic if needed
+    const pageSize = 10;
 
     const queryParams: GetAllEventsParams = {
         page,
@@ -27,24 +27,35 @@ const EventsPage: React.FC = () => {
 
     const handleTabChange = (key: string) => {
         setActiveTab(key as 'upcoming' | 'ongoing' | 'concluded');
-        setPage(1); // Reset to first page when changing tabs
+        setPage(1);
     };
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
 
+    const isEventOngoing = (event: EventDto) => {
+        const now = moment();
+        const startTime = moment.tz(`${event.start_time_info.date} ${event.start_time_info.time}`, event.start_time_info.timezone);
+        const endTime = startTime.clone().add(event.duration, 'minutes');
+        return now.isBetween(startTime, endTime);
+    };
+
+    const handleJoinEvent = (zoomJoinUrl: string) => {
+        window.open(zoomJoinUrl, '_blank');
+    };
+
     return (
         <PublicLayout>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Breadcrumb className="mb-4">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <Breadcrumb className="mb-2">
                     <Breadcrumb.Item>
                         <Link to="/">Home</Link>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>Events</Breadcrumb.Item>
                 </Breadcrumb>
 
-                <Tabs activeKey={activeTab} centered className="mb-8" onChange={handleTabChange}>
+                <Tabs activeKey={activeTab} centered className="mb-4" onChange={handleTabChange}>
                     <TabPane tab="Upcoming" key="upcoming" />
                     <TabPane tab="Ongoing" key="ongoing" />
                     <TabPane tab="Concluded" key="concluded" />
@@ -56,25 +67,25 @@ const EventsPage: React.FC = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {events.map((event) => (
-                                <Card key={event.id} className="overflow-hidden">
+                                <Card key={event.id} className="overflow-hidden" bodyStyle={{ padding: '12px' }}>
                                     <Row gutter={16} align="middle">
                                         <Col xs={24} sm={4} className="text-center">
-                                            <Text className="text-5xl font-bold text-yellow-400">
+                                            <Text className="text-4xl font-bold text-yellow-400">
                                                 {moment(event.start_time_info.date).format('DD')}
                                             </Text>
                                             <Text className="block text-yellow-400">{moment(event.start_time_info.date).format('MMM')}</Text>
                                         </Col>
                                         <Col xs={24} sm={12}>
-                                            <Title level={4} className="mb-2">
+                                            <Title level={5} className="mb-1 leading-tight">
                                                 {event.topic}
                                             </Title>
-                                            <Paragraph className="text-gray-600 mb-4" ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}>
+                                            <Paragraph className="text-gray-600 mb-2 text-sm" ellipsis={{ rows: 2 }}>
                                                 {event.description}
                                             </Paragraph>
-                                            <div className="text-gray-500 mb-2">
-                                                <ClockCircleOutlined className="mr-2" />
+                                            <div className="text-gray-500 mb-1 text-xs">
+                                                <ClockCircleOutlined className="mr-1" />
                                                 <span>
                                                     {moment
                                                         .tz(
@@ -92,14 +103,24 @@ const EventsPage: React.FC = () => {
                                                         .format('h:mm A')}
                                                 </span>
                                             </div>
-                                            <div className="text-gray-500 mb-2">
-                                                <EnvironmentOutlined className="mr-2" />
+                                            <div className="text-gray-500 mb-1 text-xs">
+                                                <EnvironmentOutlined className="mr-1" />
                                                 <span>{event.start_time_info.timezone}</span>
                                             </div>
-                                            <Text className="text-gray-600">Duration: {event.duration} minutes</Text>
+                                            <Text className="text-gray-600 text-xs">Duration: {event.duration} minutes</Text>
+                                            {isEventOngoing(event) && (
+                                                <Button
+                                                    size="small"
+                                                    type="primary"
+                                                    className="mt-2"
+                                                    onClick={() => handleJoinEvent(event.zoom_join_url)}
+                                                >
+                                                    Join Event
+                                                </Button>
+                                            )}
                                         </Col>
                                         <Col xs={24} sm={8}>
-                                            <div style={{ height: '200px', overflow: 'hidden' }}>
+                                            <div style={{ height: '120px', overflow: 'hidden' }}>
                                                 <img
                                                     src={event.banner}
                                                     alt={event.topic}
@@ -111,7 +132,7 @@ const EventsPage: React.FC = () => {
                                 </Card>
                             ))}
                         </div>
-                        <div className="mt-8 flex justify-center">
+                        <div className="mt-4 flex justify-center">
                             <Pagination current={page} pageSize={pageSize} total={totalEvents} onChange={handlePageChange} showSizeChanger={false} />
                         </div>
                     </>

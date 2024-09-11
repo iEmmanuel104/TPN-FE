@@ -49,6 +49,8 @@ const EventManagement: React.FC = () => {
             const { year, month, day } = values.start_time_info.date;
             const formattedDate = `${year}-${month}-${day}`;
 
+            console.log({formattedDate, month});
+
             const eventDate = moment(formattedDate);
             const currentDate = moment().startOf('day');
 
@@ -85,9 +87,9 @@ const EventManagement: React.FC = () => {
     };
 
     const generateMonthOptions = () => {
-        return moment.months().map((index) => (
-            <Option key={index + 1} value={(index + 1).toString().padStart(2, '0')}>
-                {(index + 1).toString().padStart(2, '0')}
+        return Array.from({ length: 12 }, (_, index) => index + 1).map((month) => (
+            <Option key={month} value={month.toString().padStart(2, '0')}>
+                {month.toString().padStart(2, '0')}
             </Option>
         ));
     };
