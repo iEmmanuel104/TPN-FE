@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRightOutlined, BookOutlined, ReadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useGetAllSimilarOrPopularCoursesQuery } from '../api/courseApi';
 import { useGetAllBlogsQuery, BlogStatus, BlogDto } from '../api/blogApi';
+import { EventDto, useGetAllEventsQuery } from '../api/eventApi';
 import type { CarouselRef } from 'antd/lib/carousel';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -26,10 +27,7 @@ const Home: React.FC = () => {
         size: 3,
     });
 
-    const events = [
-        { date: { day: 15, month: 'Oct' }, title: 'Eduma Autumn 2022', time: '8:00 am - 5:00 pm', location: 'Venice, Italy' },
-        { date: { day: 20, month: 'Nov' }, title: 'Winter Workshop 2022', time: '9:00 am - 4:00 pm', location: 'Berlin, Germany' },
-    ];
+    const { data: eventsData } = useGetAllEventsQuery({ status: 'all', size: 2 });
 
     const items = [
         { icon: <BookOutlined />, text: '100,000 Online Courses' },
@@ -37,16 +35,16 @@ const Home: React.FC = () => {
         { icon: <SafetyCertificateOutlined />, text: 'Unlimited Lifetime Access' },
     ];
 
-        useEffect(() => {
-            if (location.hash) {
-                setTimeout(() => {
-                    const element = document.querySelector(location.hash);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }, 100);
-            }
-        }, [location]);
+    useEffect(() => {
+        if (location.hash) {
+            setTimeout(() => {
+                const element = document.querySelector(location.hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        }
+    }, [location]);
 
     return (
         <PublicLayout>
@@ -56,7 +54,7 @@ const Home: React.FC = () => {
                     <UnderHeroSection items={items} />
                 </div>
                 <div className="px-4 sm:px-6 lg:px-24 xl:px-32">
-                    <section id='about-us' className="py-8 sm:py-12 lg:py-24">
+                    <section id="about-us" className="py-8 sm:py-12 lg:py-24">
                         <NextStep />
                     </section>
                     <section className="py-8 sm:py-12">
@@ -81,9 +79,9 @@ const Home: React.FC = () => {
                         </Row>
                         {popularCoursesData?.data && <CourseFrame courses={popularCoursesData.data} />}
                     </section>
-                    <EventsAndTestimonialsSection events={events} />
+                    <EventsAndTestimonialsSection events={eventsData?.data?.events || []} />
                     <BlogSection blogs={blogsData?.data?.blogs || []} />
-                    <section id='faq' className="py-8 sm:py-12">
+                    <section id="faq" className="py-8 sm:py-12">
                         <Faq />
                     </section>
                 </div>
@@ -148,9 +146,7 @@ const UnderHeroSection: React.FC<{ items: { icon: React.ReactNode; text: string 
     </div>
 );
 
-const EventsAndTestimonialsSection: React.FC<{
-    events: { date: { day: number; month: string }; title: string; time: string; location: string }[];
-}> = ({ events }) => {
+const EventsAndTestimonialsSection: React.FC<{ events: EventDto[] }> = ({ events }) => {
     const testimonialCarouselRef = useRef<CarouselRef>(null);
 
     const testimonials = [
@@ -188,9 +184,17 @@ const EventsAndTestimonialsSection: React.FC<{
         <Row justify="center" gutter={[16, 16]} className="py-8 sm:py-12">
             <Col xs={24} lg={11}>
                 <Card className="bg-gray-100 w-full h-full" size="small">
-                    <Title level={4} className="font-bold">
-                        Events
-                    </Title>
+                    <div className="flex justify-between items-center">
+                        <Title level={4} className="font-bold m-0">
+                            Events
+                        </Title>
+                        <Link to="/events" className="text-primary hover:text-primary-dark flex items-center">
+                            <Text strong className="mr-1">
+                                View All
+                            </Text>
+                            <ArrowRightOutlined />
+                        </Link>
+                    </div>
                     <List
                         itemLayout="horizontal"
                         dataSource={events}
@@ -200,17 +204,21 @@ const EventsAndTestimonialsSection: React.FC<{
                                     avatar={
                                         <div className="text-center p-1 rounded bg-white">
                                             <Text strong className="text-base block">
-                                                {item.date.day}
+                                                {new Date(item.start_time_info.date).getDate()}
                                             </Text>
-                                            <Text className="text-sm block">{item.date.month}</Text>
+                                            <Text className="text-sm block">
+                                                {new Date(item.start_time_info.date).toLocaleString('default', { month: 'short' })}
+                                            </Text>
                                         </div>
                                     }
                                     title={
                                         <Text strong className="text-base">
-                                            {item.title}
+                                            {item.topic}
                                         </Text>
                                     }
-                                    description={<Text className="text-gray-500 text-sm">{`${item.time} ${item.location}`}</Text>}
+                                    description={
+                                        <Text className="text-gray-500 text-sm">{`${item.start_time_info.time} ${item.start_time_info.timezone}`}</Text>
+                                    }
                                 />
                             </List.Item>
                         )}
