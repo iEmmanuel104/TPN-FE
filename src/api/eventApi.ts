@@ -36,7 +36,6 @@ export const eventApiSlice = apiSlice.injectEndpoints({
         getAllEvents: builder.query<ApiResponse<{ events: EventDto[], count: number, totalPages: number }>, GetAllEventsParams>({
             query: (params) => {
                 const queryParams = new URLSearchParams();
-                if (params.page) queryParams.append('page', params.page.toString());
                 if (params.size) queryParams.append('size', params.size.toString());
                 if (params.status) queryParams.append('status', params.status);
 
