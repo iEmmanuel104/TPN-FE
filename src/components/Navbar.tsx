@@ -186,7 +186,6 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenAuthModal, isAuthModalOpen, authM
                         <a className="ant-dropdown-link flex items-center cursor-pointer">
                             <MenuOutlined className="mr-2" />
                             Categories
-                            <DownOutlined className="ml-2" />
                         </a>
                     </Dropdown>
 
