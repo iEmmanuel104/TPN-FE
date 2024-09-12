@@ -26,8 +26,10 @@ const CustomFooter: React.FC = () => {
                             Texas Prevention Network
                         </Title>
                         <Text className="block mt-3 text-sm sm:text-base" style={{ color: '#999999' }}>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-                            aliqua.
+                            Our platform offers a wide range of courses to help you build valuable skills and knowledge for a fulfilling life and
+                            career. From vocational training to personal development, our courses cover a wide range of topics And many more! Our
+                            comprehensive program is designed to support your personal growth, helping you acquire practical skills, explore new
+                            interests, and gain confidence for a successful future.
                         </Text>
                     </Col>
                     <Col xs={24} sm={12} md={8} className="mb-8 sm:mb-0">
