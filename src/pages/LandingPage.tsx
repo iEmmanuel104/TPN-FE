@@ -30,7 +30,7 @@ const Home: React.FC = () => {
     const { data: eventsData } = useGetAllEventsQuery({ status: 'all', size: 2 });
 
     const items = [
-        { icon: <BookOutlined />, text: '100,000 Online Courses' },
+        { icon: <BookOutlined />, text: '50+ Online Courses' },
         { icon: <ReadOutlined />, text: 'Expert Instruction' },
         { icon: <SafetyCertificateOutlined />, text: 'Unlimited Lifetime Access' },
     ];
@@ -67,13 +67,15 @@ const Home: React.FC = () => {
                             </Col>
                             <Col className="hidden sm:block">
                                 <Row gutter={[8, 8]}>
-                                    {['Parenting', 'Anger Management', 'Alcohol Addiction', 'Domestic Violence'].map((category) => (
-                                        <Col key={category}>
-                                            <Button className="font-semibold" type="link">
-                                                {category}
-                                            </Button>
-                                        </Col>
-                                    ))}
+                                    {['Parenting', 'Anger Management', 'Overcoming Substance Addiction', 'Domestic Violence', 'Life Skills'].map(
+                                        (category) => (
+                                            <Col key={category}>
+                                                <Button className="font-semibold" type="dashed">
+                                                    {category}
+                                                </Button>
+                                            </Col>
+                                        ),
+                                    )}
                                 </Row>
                             </Col>
                         </Row>
@@ -108,9 +110,9 @@ const HeroSection: React.FC = () => (
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="bg-white py-6 px-4 sm:px-6 max-w-sm sm:max-w-md"
             >
-                <Paragraph className="text-black text-lg sm:text-xl font-semibold">Course</Paragraph>
+                <Paragraph className="text-black text-lg sm:text-xl font-semibold">Here we are</Paragraph>
                 <Title level={2} className="text-gray-600 text-2xl sm:text-3xl lg:text-4xl">
-                    Get The Best Educational Courses
+                    Empowering Change, Shaping Better Lives.
                 </Title>
                 <Button type="primary" size="large" className="mt-4">
                     Get Started
@@ -151,21 +153,22 @@ const EventsAndTestimonialsSection: React.FC<{ events: EventDto[] }> = ({ events
 
     const testimonials = [
         {
-            name: 'Antonia Bells',
+            name: 'Michael T.',
             role: 'Director Biography',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            content:
+                'Before joining this platform, I had no formal training in any trade. The vocational training courses not only gave me the skills to become a certified electrician but also helped me regain confidence in myself. The instructors were incredibly supportive, and the materials were easy to understand. I now feel prepared for life after my release, with a skill that will help me build a better future.',
             avatar: 'https://www.shutterstock.com/shutterstock/photos/1865153395/display_1500/stock-photo-portrait-of-young-smiling-woman-looking-at-camera-with-crossed-arms-happy-girl-standing-in-1865153395.jpg',
         },
         {
             name: 'John Doe',
             role: 'Marketing Specialist',
-            content: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            content: 'Texas Preventive Network has been a game-changer for our facility. We’ve seen learners become more engaged, motivated, and focused on their personal development. It’s rewarding to see them take control of their education and make real progress.',
             avatar: 'https://example.com/john-doe-avatar.jpg',
         },
         {
             name: 'Jane Smith',
             role: 'Product Manager',
-            content: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+            content: 'Teaching on this platform has been a highly rewarding experience. The tools provided allow me to connect with the learners in a meaningful way. It’s TPN CONTENT 6 amazing to witness their personal transformation and to know that we are helping them prepare for a successful integration into society.',
             avatar: 'https://example.com/jane-smith-avatar.jpg',
         },
     ];
@@ -234,7 +237,7 @@ const EventsAndTestimonialsSection: React.FC<{ events: EventDto[] }> = ({ events
                         <Carousel autoplay ref={testimonialCarouselRef}>
                             {testimonials.map((testimonial, index) => (
                                 <div key={index}>
-                                    <Paragraph className="max-w-[300px] text-sm">{testimonial.content}</Paragraph>
+                                    <Paragraph className="max-w-full text-sm">{testimonial.content}</Paragraph>
                                     <div className="flex mt-2 items-center">
                                         <Avatar size={48} src={testimonial.avatar} className="mr-3" />
                                         <div>
