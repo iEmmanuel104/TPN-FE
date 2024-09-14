@@ -114,9 +114,11 @@ const HeroSection: React.FC = () => (
                 <Title level={2} className="text-gray-600 text-2xl sm:text-3xl lg:text-4xl">
                     Empowering Change, Shaping Better Lives.
                 </Title>
-                <Button type="primary" size="large" className="mt-4">
-                    Get Started
-                </Button>
+                <Link to="/courses">
+                    <Button type="primary" size="large" className="mt-4">
+                        Get Started
+                    </Button>
+                </Link>
             </motion.div>
         </div>
     </motion.div>
@@ -162,13 +164,15 @@ const EventsAndTestimonialsSection: React.FC<{ events: EventDto[] }> = ({ events
         {
             name: 'John Doe',
             role: 'Marketing Specialist',
-            content: 'Texas Preventive Network has been a game-changer for our facility. We’ve seen learners become more engaged, motivated, and focused on their personal development. It’s rewarding to see them take control of their education and make real progress.',
+            content:
+                'Texas Preventive Network has been a game-changer for our facility. We’ve seen learners become more engaged, motivated, and focused on their personal development. It’s rewarding to see them take control of their education and make real progress.',
             avatar: 'https://example.com/john-doe-avatar.jpg',
         },
         {
             name: 'Jane Smith',
             role: 'Product Manager',
-            content: 'Teaching on this platform has been a highly rewarding experience. The tools provided allow me to connect with the learners in a meaningful way. It’s TPN CONTENT 6 amazing to witness their personal transformation and to know that we are helping them prepare for a successful integration into society.',
+            content:
+                'Teaching on this platform has been a highly rewarding experience. The tools provided allow me to connect with the learners in a meaningful way. It’s TPN CONTENT 6 amazing to witness their personal transformation and to know that we are helping them prepare for a successful integration into society.',
             avatar: 'https://example.com/jane-smith-avatar.jpg',
         },
     ];

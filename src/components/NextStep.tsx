@@ -79,8 +79,10 @@ const NextStep: React.FC = () => {
                             </Title>
                             <Paragraph className="text-gray-600 mb-6">
                                 Imagine a chance at a brighter future, where education opens the doors to personal growth, skill development, and new
-                                opportunities. Our e-learning platform offers a secure and supportive environment to learn and thrive, tailored for
-                                those seeking positive change in their lives. By joining our platform, you're investing in yourself and your future.
+                                opportunities.
+                            </Paragraph>
+                            <Paragraph className="text-gray-600 mb-6">
+                                By joining our platform, you're investing in yourself and your future.
                                 Our mission is to equip you with the tools and knowledge needed for success, providing hope and empowerment for a
                                 better tomorrow.
                             </Paragraph>
