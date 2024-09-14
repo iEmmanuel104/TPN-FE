@@ -4,7 +4,7 @@ import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '.
 import QuillContent from './Admin/QuillContent';
 import confetti, { Options } from 'canvas-confetti';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUserCourses } from '../state/slices/courseSlice';
 
@@ -17,7 +17,7 @@ interface QuizModalProps {
 }
 
 const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseId }) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const dispatch = useDispatch();
     const [requestQuiz, { data: quizData, isLoading: isQuizLoading }] = useLazyRequestQuizQuery();
     const [gradeQuiz, { isLoading: isGrading }] = useGradeQuizMutation();
@@ -78,7 +78,11 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                 const { grade, passed, userCourse } = response.data;
                 setQuizCompleted(true);
                 setQuizResult({ grade, passed });
-
+                console.log({
+                    data: response.data,
+                    quizCompleted,
+                    quizResult,
+                });
                 // Update the Redux state with the new UserCourseDto
                 if (userCourse) {
                     dispatch(setUserCourses([userCourse]));
@@ -89,8 +93,8 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         particleCount: 100,
                         spread: 70,
                         origin: { y: 0.6 },
-                        duration: 5000, // Increased duration to 5 seconds
-                    } as Options); // Add 'as Options' to specify the type
+                        duration: 5000,
+                    } as Options);
                 }
             } else {
                 throw new Error('No data received from gradeQuiz');
@@ -101,6 +105,11 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
         }
     };
 
+    console.log("outside", {
+        quizCompleted,
+        quizResult,
+    });
+
     const handleClose = () => {
         setQuizStarted(false);
         setUserAnswers([]);
@@ -110,10 +119,10 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
         onClose();
     };
 
-    const handleBackToCourse = () => {
-        handleClose();
-        navigate(0);
-    };
+    // const handleBackToCourse = () => {
+    //     handleClose();
+    //     navigate(0);
+    // };
 
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -121,9 +130,9 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
         <Modal
             title="Course Quiz"
             open={isVisible}
-            onCancel={() => {}} // Prevent closing on cancel
-            closable={false} // Remove the close (X) button
-            maskClosable={false} // Prevent closing when clicking outside the modal
+            onCancel={handleClose}
+            closable={true}
+            maskClosable={false}
             footer={null}
             width={800}
             className="assessment-modal"
@@ -139,7 +148,31 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         Start Quiz
                     </Button>
                 </Card>
-            ) : !quizCompleted ? (
+            ) : quizCompleted ? (
+                <Card className="text-center">
+                    <Title level={2} className="mb-4">
+                        Quiz Results
+                    </Title>
+                    <div className="flex justify-center mb-4">
+                        {quizResult?.passed ? (
+                            <CheckCircleOutlined className="text-6xl text-green-500" />
+                        ) : (
+                            <CloseCircleOutlined className="text-6xl text-red-500" />
+                        )}
+                    </div>
+                    <Title level={3} className="mb-4">
+                        {quizResult?.passed ? 'Congratulations! You passed the quiz.' : 'You did not pass the quiz.'}
+                    </Title>
+                    <Paragraph className="text-xl mb-4">
+                        Your score: {quizResult?.grade !== undefined ? `${Math.round(quizResult.grade * 100)}%` : 'N/A'}
+                    </Paragraph>
+                    {!quizResult?.passed && <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>}
+                    <Button type="primary" onClick={handleClose}>
+                    {/* <Button type="primary" onClick={quizResult?.passed ? handleBackToCourse : handleClose}> */}
+                        {quizResult?.passed ? 'Back to Course' : 'Close'}
+                    </Button>
+                </Card>
+            ) : (
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     <Progress percent={((currentQuestionIndex + 1) / questions.length) * 100} showInfo={false} />
                     <Card title={`Question ${currentQuestionIndex + 1} of ${questions.length}`}>
@@ -166,29 +199,6 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         {currentQuestionIndex === questions.length - 1 ? 'Submit Quiz' : 'Next Question'}
                     </Button>
                 </Space>
-            ) : (
-                <Card className="text-center">
-                    <Title level={2} className="mb-4">
-                        Quiz Results
-                    </Title>
-                    <div className="flex justify-center mb-4">
-                        {quizResult?.passed ? (
-                            <CheckCircleOutlined className="text-6xl text-green-500" />
-                        ) : (
-                            <CloseCircleOutlined className="text-6xl text-red-500" />
-                        )}
-                    </div>
-                    <Title level={3} className="mb-4">
-                        {quizResult?.passed ? 'Congratulations! You passed the quiz.' : 'You did not pass the quiz.'}
-                    </Title>
-                    <Paragraph className="text-xl mb-4">
-                        Your score: {quizResult?.grade !== undefined ? `${Math.round(quizResult.grade * 100)}%` : 'N/A'}
-                    </Paragraph>
-                    {!quizResult?.passed && <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>}
-                    <Button type="primary" onClick={quizResult?.passed ? handleBackToCourse : handleClose}>
-                        {quizResult?.passed ? 'Back to Course' : 'Close'}
-                    </Button>
-                </Card>
             )}
         </Modal>
     );
