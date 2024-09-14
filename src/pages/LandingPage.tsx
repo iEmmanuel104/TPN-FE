@@ -15,6 +15,7 @@ import Faq from '../components/Faq';
 import backgroundImage from '../assets/schoolwork.jpg';
 import CourseFrame from '../components/CourseFrame';
 import QuillContent from '../components/Admin/QuillContent';
+import ProgressiveBackTop from '../components/ScrollToTopButton';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -88,6 +89,7 @@ const Home: React.FC = () => {
                     </section>
                 </div>
             </div>
+            <ProgressiveBackTop />
         </PublicLayout>
     );
 };
