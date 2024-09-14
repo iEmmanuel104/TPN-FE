@@ -41,20 +41,24 @@ export const courseSlice = createSlice({
         setUserCourses: (state, action: PayloadAction<UserCourseDto[]>) => {
             state.userCourses = action.payload;
         },
-        updateUserCourseProgress: (state, action: PayloadAction<{
-            courseId: string;
-            moduleId: string;
-            currentTime: number;
-            episodeNumber: number;
-        }>) => {
-            const { courseId, moduleId, currentTime, episodeNumber } = action.payload;
-            const userCourse = state.userCourses.find(uc => uc.courseId === courseId);
-            if (userCourse) {
-                userCourse.progress = {
-                    moduleId,
-                    currentTime,
-                    episodeNumber,
-                    watchedEps: userCourse.progress.watchedEps || [],
+        updateUserCourseProgress: (state, action: PayloadAction<UserCourseDto>) => {
+            const updatedUserCourse = action.payload;
+            const index = state.userCourses.findIndex(uc => uc.courseId === updatedUserCourse.courseId);
+            if (index !== -1) {
+                state.userCourses[index] = updatedUserCourse;
+            } else {
+                state.userCourses.push(updatedUserCourse);
+            }
+
+            // Update currentModuleId and currentEpisodeNumber
+            state.currentModuleId = updatedUserCourse.progress.moduleId;
+            state.currentEpisodeNumber = updatedUserCourse.progress.episodeNumber;
+
+            // Update selectedCourse if it matches the updated userCourse
+            if (state.selectedCourse && state.selectedCourse.id === updatedUserCourse.courseId) {
+                state.selectedCourse = {
+                    ...state.selectedCourse,
+                    userCourses: [updatedUserCourse],
                 };
             }
         },
