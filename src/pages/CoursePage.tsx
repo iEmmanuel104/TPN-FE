@@ -24,6 +24,7 @@ import { RootState } from '../state/store';
 import QuillContent from '../components/Admin/QuillContent';
 import { IReview, useGetReviewsByCourseQuery } from '../api/reviewApi';
 import { formatDate } from '../utils/formatDate';
+import AssessmentModal from '../components/AssessmentModal';
 
 const { Panel } = Collapse;
 
@@ -41,6 +42,7 @@ const CoursePage: React.FC = () => {
     const { selectedCourse, userCourses } = useSelector((state: RootState) => state.course); // Add this line
     const { data: reviewsData } = useGetReviewsByCourseQuery(id as string);
     const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+      const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
 
     const [activeSection, setActiveSection] = useState('overview');
     const [showBottomNav, setShowBottomNav] = useState(false);
@@ -138,6 +140,10 @@ const CoursePage: React.FC = () => {
         />
     );
 
+    const handleTakeQuiz = () => {
+        setIsQuizModalVisible(true);
+    };
+
     const CourseInfo = () => {
         if (!courseData) return null;
         const course = courseData?.data;
@@ -149,7 +155,7 @@ const CoursePage: React.FC = () => {
                 <div className="-mx-6 -mt-6 mb-6 border-0">
                     <img src={course?.media.videoThumbnail} alt={course?.title} className="w-full h-48 object-cover" />
                 </div>
-                {course && <CourseEnrollmentProgress course={course} />}
+                {course && <CourseEnrollmentProgress course={course} onTakeQuiz={handleTakeQuiz} />}
                 <Title level={4} className="mt-8 mb-4">
                     Course Features
                 </Title>
@@ -508,6 +514,8 @@ const CoursePage: React.FC = () => {
                     </Row>
                 </div>
             </div>
+
+            <AssessmentModal isVisible={isQuizModalVisible} onClose={() => setIsQuizModalVisible(false)} courseId={id as string} />
 
             {showBottomNav && (
                 <Affix offsetBottom={0}>
