@@ -151,7 +151,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                 return (
                     <>
                         <Text>
-                            In progress - Module {currentModuleInfo ? currentModuleInfo.index : 0}/{course.modules.length}
+                            In progress - Current Module {currentModuleInfo ? currentModuleInfo.index : 0}/{course.modules.length}
                         </Text>
                         <Progress percent={progressPercent} />
                     </>

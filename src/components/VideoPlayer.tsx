@@ -205,7 +205,7 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
         }, [isPlaying, updateProgress]);
 
         useEffect(() => {
-            const shouldMarkComplete = currentTime / duration >= 0.85 && !completionMarkedRef.current;
+            const shouldMarkComplete = currentTime / duration >= 0.95 && !completionMarkedRef.current;
             if (shouldMarkComplete && isModule && courseId && episodeNumberRef.current) {
                 if (!watchedEps || !watchedEps.includes(episodeNumberRef.current)) {
                     completionMarkedRef.current = true;
