@@ -14,9 +14,10 @@ const { Text, Paragraph, Title } = Typography;
 interface CourseEnrollmentProgressProps {
     course: CourseDto;
     userCourse?: UserCourseDto;
+    onTakeQuiz: () => void;
 }
 
-const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ course, userCourse: propUserCourse }) => {
+const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ course, userCourse: propUserCourse, onTakeQuiz }) => {
     const dispatch = useDispatch();
     const { userCourses } = useSelector((state: RootState) => state.course);
     const { user } = useSelector((state: RootState) => state.auth);
@@ -37,6 +38,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
     const [reviewComment, setReviewComment] = useState('');
 
     const hasUserReviewed = course.reviews.some((review) => review.reviewerId === user?.id);
+
     const handleEnroll = async () => {
         if (!termsAccepted) {
             message.error('Please accept the terms and conditions to enroll.');
@@ -76,10 +78,6 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         } finally {
             setIsGeneratingCertificate(false);
         }
-    };
-
-    const handleTakeQuiz = () => {
-        setIsQuizModalVisible(true);
     };
 
     const handleLeaveReview = () => {
@@ -160,7 +158,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                 return (
                     <>
                         <Text>Course completed - Quiz available</Text>
-                        <Button icon={<FileTextOutlined />} onClick={handleTakeQuiz}>
+                        <Button icon={<FileTextOutlined />} onClick={onTakeQuiz}>
                             Take Quiz
                         </Button>
                     </>
