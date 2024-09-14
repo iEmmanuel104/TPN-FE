@@ -114,7 +114,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         if (!userCourse || !userCourse.progress) return null;
 
         const currentModule = course.modules.find((m) => m.id === userCourse.progress.moduleId);
-        const moduleIndex = currentModule ? course.modules.indexOf(currentModule) : 0;
+        const moduleIndex = userCourse.progress.episodeNumber;
 
         return {
             module: currentModule,
@@ -151,7 +151,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
                 return (
                     <>
                         <Text>
-                            In progress - Module {currentModuleInfo ? currentModuleInfo.index + 1 : 0}/{course.modules.length}
+                            In progress - Module {currentModuleInfo ? currentModuleInfo.index : 0}/{course.modules.length}
                         </Text>
                         <Progress percent={progressPercent} />
                     </>
