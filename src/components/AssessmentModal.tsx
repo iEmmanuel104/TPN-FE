@@ -102,16 +102,16 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
     };
 
     const handleClose = () => {
-        if (!quizCompleted) {
-            setQuizStarted(false);
-            setUserAnswers([]);
-            setCurrentQuestionIndex(0);
-            setQuizResult(null);
-        }
+        setQuizStarted(false);
+        setUserAnswers([]);
+        setCurrentQuestionIndex(0);
+        setQuizResult(null);
+        setQuizCompleted(false);
         onClose();
     };
 
     const handleBackToCourse = () => {
+        handleClose();
         navigate(0);
     };
 
@@ -121,10 +121,11 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
         <Modal
             title="Course Quiz"
             open={isVisible}
-            onCancel={handleClose}
+            onCancel={() => {}} // Prevent closing on cancel
+            closable={false} // Remove the close (X) button
+            maskClosable={false} // Prevent closing when clicking outside the modal
             footer={null}
             width={800}
-            maskClosable={false}
             className="assessment-modal"
         >
             {isQuizLoading ? (
@@ -178,18 +179,12 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         )}
                     </div>
                     <Title level={3} className="mb-4">
-                        {quizResult?.passed
-                            ? 'Congratulations! You passed the quiz.'
-                            : 'You did not pass the quiz.'}
+                        {quizResult?.passed ? 'Congratulations! You passed the quiz.' : 'You did not pass the quiz.'}
                     </Title>
                     <Paragraph className="text-xl mb-4">
                         Your score: {quizResult?.grade !== undefined ? `${Math.round(quizResult.grade * 100)}%` : 'N/A'}
                     </Paragraph>
-                    {!quizResult?.passed && (
-                        <Paragraph className="mb-4">
-                            You may retake the quiz after reviewing the course material.
-                        </Paragraph>
-                    )}
+                    {!quizResult?.passed && <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>}
                     <Button type="primary" onClick={quizResult?.passed ? handleBackToCourse : handleClose}>
                         {quizResult?.passed ? 'Back to Course' : 'Close'}
                     </Button>
