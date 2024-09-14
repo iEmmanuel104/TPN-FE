@@ -149,7 +149,6 @@ const CoursePage: React.FC = () => {
                 <div className="-mx-6 -mt-6 mb-6 border-0">
                     <img src={course?.media.videoThumbnail} alt={course?.title} className="w-full h-48 object-cover" />
                 </div>
-                <Text className="block text-3xl font-bold mt-4">{`${course?.currency.symbol}${course?.price}`}</Text>
                 {course && <CourseEnrollmentProgress course={course} />}
                 <Title level={4} className="mt-8 mb-4">
                     Course Features

@@ -105,7 +105,7 @@ const CourseEnrollmentProgress: React.FC<CourseEnrollmentProgressProps> = ({ cou
         if (!userCourse || !userCourse.progress) return 0;
 
         const totalModules = course.modules.length;
-        const watchedEpisodes = userCourse.progress.watchedEps?.length || 0;
+        const watchedEpisodes = (userCourse.progress.episodeNumber) - 1;
 
         return Math.round((watchedEpisodes / totalModules) * 100);
     }, [course.modules.length, userCourse]);
