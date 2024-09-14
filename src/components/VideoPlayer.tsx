@@ -162,23 +162,23 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
             };
         }, [isFullscreen]);
 
-        const updateProgress = useCallback(() => {
+        const updateProgress = useCallback(async () => {
             const currentTimeInSeconds = Math.floor(currentTime);
             if (isModule && courseId && currentTime > 0 && episodeNumberRef.current) {
                 if (!watchedEps || !watchedEps.includes(episodeNumberRef.current)) {
-                    dispatch(
-                        updateUserCourseProgress({
-                            courseId,
-                            moduleId: videoId,
+                    try {
+                        const response = await updateModuleWatchProgress({
+                            id: videoId,
                             currentTime: currentTimeInSeconds,
                             episodeNumber: episodeNumberRef.current,
-                        }),
-                    );
-                    updateModuleWatchProgress({
-                        id: videoId,
-                        currentTime: currentTimeInSeconds,
-                        episodeNumber: episodeNumberRef.current,
-                    });
+                        }).unwrap();
+
+                        if (response.data) {
+                            dispatch(updateUserCourseProgress(response.data));
+                        }
+                    } catch (error) {
+                        console.error('Failed to update module watch progress:', error);
+                    }
                 }
             }
         }, [isModule, courseId, currentTime, videoId, dispatch, updateModuleWatchProgress, watchedEps]);
@@ -222,6 +222,10 @@ const VideoPlayer = forwardRef<HTMLDivElement, VideoPlayerProps>(
                         currentTime: Math.floor(currentTime),
                         episodeNumber: episodeNumberRef.current,
                         completed: true,
+                    }).then((response) => {
+                     if ('data' in response && response.data && response.data.data) {
+                         dispatch(updateUserCourseProgress(response.data.data));
+                     }
                     });
                 }
             }
