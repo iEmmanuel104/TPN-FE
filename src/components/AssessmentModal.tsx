@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Card, Radio, Space, message, Typography, Spin, Progress } from 'antd';
 import { useLazyRequestQuizQuery, useGradeQuizMutation, IQuiz, IAnswer } from '../api/quizApi';
 import QuillContent from './Admin/QuillContent';
-import confetti, { Options } from 'canvas-confetti'; // Import Options type from 'canvas-confetti'
+import confetti, { Options } from 'canvas-confetti';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -171,22 +171,24 @@ const AssessmentModal: React.FC<QuizModalProps> = ({ isVisible, onClose, courseI
                         Quiz Results
                     </Title>
                     <div className="flex justify-center mb-4">
-                        {quizResult?.passed || (quizResult?.grade !== undefined && quizResult.grade >= 1) ? (
+                        {quizResult?.passed ? (
                             <CheckCircleOutlined className="text-6xl text-green-500" />
                         ) : (
                             <CloseCircleOutlined className="text-6xl text-red-500" />
                         )}
                     </div>
                     <Title level={3} className="mb-4">
-                        {quizResult?.passed || (quizResult?.grade !== undefined && quizResult.grade >= 1)
+                        {quizResult?.passed
                             ? 'Congratulations! You passed the quiz.'
                             : 'You did not pass the quiz.'}
                     </Title>
                     <Paragraph className="text-xl mb-4">
                         Your score: {quizResult?.grade !== undefined ? `${Math.round(quizResult.grade * 100)}%` : 'N/A'}
                     </Paragraph>
-                    {!quizResult?.passed && quizResult?.grade !== undefined && quizResult.grade < 1 && (
-                        <Paragraph className="mb-4">You may retake the quiz after reviewing the course material.</Paragraph>
+                    {!quizResult?.passed && (
+                        <Paragraph className="mb-4">
+                            You may retake the quiz after reviewing the course material.
+                        </Paragraph>
                     )}
                     <Button type="primary" onClick={quizResult?.passed ? handleBackToCourse : handleClose}>
                         {quizResult?.passed ? 'Back to Course' : 'Close'}
